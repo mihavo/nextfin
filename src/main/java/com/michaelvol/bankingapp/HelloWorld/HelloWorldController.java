@@ -16,9 +16,16 @@ public class HelloWorldController {
     }
 
     @GetMapping("/hello-person")
-    public ResponseEntity<String> helloWorldCustom(@RequestParam(required = false) String name) {
+    public ResponseEntity<String> helloPerson(@RequestParam(required = false) String name) {
         if(name == null || name.isEmpty()) {
             return ResponseEntity.ok("Hello World!");
+        }
+        return ResponseEntity.ok("Hello " + name + "!");
+    }
+    @GetMapping("/hello-person-strict")
+    public ResponseEntity<String> helloPersonStrict(@RequestParam(required = false) String name) {
+        if(name == null || name.isEmpty()) {
+            return ResponseEntity.badRequest().body("You must provide a name!");
         }
         return ResponseEntity.ok("Hello " + name + "!");
     }
