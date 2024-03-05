@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.Currency;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.michaelvol.bankingapp.account.enums.AccountStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -29,9 +30,9 @@ import org.hibernate.annotations.UpdateTimestamp;
 @Table(name = "accounts")
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @Getter
 @Setter
-@Builder
 @ToString
 public class Account {
     @Id
@@ -53,7 +54,7 @@ public class Account {
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
 
-
+    @JsonIgnore
     @UpdateTimestamp
     @Column(nullable = false)
     private Instant updatedAt;
