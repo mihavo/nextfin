@@ -1,4 +1,4 @@
-package com.michaelvol.bankingapp.Transaction.Entity.enums;
+package com.michaelvol.bankingapp.transaction.enums;
 
 public enum TransactionStatus {
     PENDING,

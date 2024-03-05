@@ -1,16 +1,23 @@
-package com.michaelvol.bankingapp.Account.Entity;
+package com.michaelvol.bankingapp.account.entity;
 
-import com.michaelvol.bankingapp.Account.enums.AccountStatus;
-import jakarta.persistence.*;
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.util.Currency;
+
+import com.michaelvol.bankingapp.account.enums.AccountStatus;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-
-import java.math.BigDecimal;
-import java.time.Instant;
-import java.util.Currency;
 
 /**
  * Represents the Account entity that stores the user's bank accounts

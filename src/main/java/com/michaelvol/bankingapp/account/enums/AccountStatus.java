@@ -1,4 +1,4 @@
-package com.michaelvol.bankingapp.Account.enums;
+package com.michaelvol.bankingapp.account.enums;
 
 public enum AccountStatus {
     ACTIVE,

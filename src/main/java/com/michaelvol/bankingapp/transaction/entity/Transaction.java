@@ -1,11 +1,11 @@
-package com.michaelvol.bankingapp.Transaction.Entity;
+package com.michaelvol.bankingapp.transaction.entity;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.Currency;
 
-import com.michaelvol.bankingapp.Account.Entity.Account;
-import com.michaelvol.bankingapp.Transaction.Entity.enums.TransactionStatus;
+import com.michaelvol.bankingapp.account.entity.Account;
+import com.michaelvol.bankingapp.transaction.enums.TransactionStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Enumerated;
