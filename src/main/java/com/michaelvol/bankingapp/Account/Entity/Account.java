@@ -20,7 +20,7 @@ import java.util.Currency;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Account{
+public class Account {
     @Id
     @SequenceGenerator(name = "accounts_gen", sequenceName = "accounts_seq")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "accounts_gen")
