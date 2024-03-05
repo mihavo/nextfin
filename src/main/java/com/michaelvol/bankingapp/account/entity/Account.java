@@ -15,7 +15,10 @@ import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -26,7 +29,10 @@ import org.hibernate.annotations.UpdateTimestamp;
 @Table(name = "accounts")
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
+@Setter
 @Builder
+@ToString
 public class Account {
     @Id
     @SequenceGenerator(name = "accounts_gen", sequenceName = "accounts_seq")
