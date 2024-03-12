@@ -8,13 +8,6 @@ This project implements a simple RESTful API using Spring Boot (Java) for handli
 - [Endpoints](#endpoints)
 - [Data Models](#data-models)
 - [General Notes](#general-notes)
-- [Getting Started](#getting-started)
-- [Dependencies](#dependencies)
-- [Build](#build)
-- [Usage](#usage)
-- [Mocking](#mocking)
-- [Contributing](#contributing)
-- [License](#license)
 
 ## Features
 
@@ -42,13 +35,13 @@ This project implements a simple RESTful API using Spring Boot (Java) for handli
     - Success:
       ```json
       {
-        "message": "Transaction successful"
+        "feelFree": "to decide the response type"
       }
       ```
     - Failure:
       ```json
       {
-        "error": "Error message"
+        "feelFree": "to decide the response type"
       }
       ```
 
@@ -61,7 +54,8 @@ This project implements a simple RESTful API using Spring Boot (Java) for handli
   "id": "string",
   "balance": 100.0,
   "currency": "GBP",
-  "createdAt": "2024-01-15T12:00:00Z"
+  "createdAt": "2024-01-15T12:00:00Z",
+  "addOther": "optionalFieldsIfNecessary"
 }
 ```
 
@@ -73,14 +67,13 @@ This project implements a simple RESTful API using Spring Boot (Java) for handli
   "sourceAccountId": "string",
   "targetAccountId": "string",
   "amount": 10.5,
-  "currency": "GBP"
+  "currency": "GBP",
+  "addOther": "optionalFieldsIfNecessary"
 }
 ```
 
 ## General Notes
 
-- Use [https://start.spring.io](https://start.spring.io) to generate your project.
-- Mock external services and databases as needed.
-- Use any libraries suitable for your implementation.
+- Mock external services and databases if needed.
 - Choose between Maven or Gradle for dependency management.
 - The API is assumed to be public; no security measures are required for this assignment.
