@@ -1,17 +1,16 @@
 package com.michaelvol.bankingapp.account.entity;
 
-import java.math.BigDecimal;
-import java.time.Instant;
-import java.util.Currency;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.michaelvol.bankingapp.account.enums.AccountStatus;
+import com.michaelvol.bankingapp.holder.entity.Holder;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -22,6 +21,10 @@ import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.util.Currency;
 
 /**
  * Represents the Account entity that stores the user's bank accounts
@@ -49,6 +52,10 @@ public class Account {
 
     @Enumerated
     private AccountStatus status;
+
+    @ManyToOne
+    @JoinColumn(name = "holder_id")
+    private Holder holder;
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
