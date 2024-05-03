@@ -5,9 +5,13 @@ import com.michaelvol.bankingapp.holder.dto.HolderMapper;
 import com.michaelvol.bankingapp.holder.entity.Holder;
 import com.michaelvol.bankingapp.holder.repository.HolderRepository;
 import com.michaelvol.bankingapp.holder.service.HolderService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.util.NoSuchElementException;
 
+@Service
+@RequiredArgsConstructor
 public class HolderServiceImpl implements HolderService {
 
     HolderRepository holderRepository;
@@ -21,9 +25,8 @@ public class HolderServiceImpl implements HolderService {
     }
 
     @Override
-    public Holder getHolderById(Long holderId) {
+    public Holder getHolderById(Long holderId) throws NoSuchElementException {
         return holderRepository.findById(holderId)
                                .orElseThrow(() -> new NoSuchElementException("Holder with id " + holderId + " not found"));
-
     }
 }

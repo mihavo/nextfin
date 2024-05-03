@@ -2,6 +2,8 @@ package com.michaelvol.bankingapp.account.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.michaelvol.bankingapp.account.enums.AccountStatus;
+import com.michaelvol.bankingapp.account.enums.AccountType;
+import com.michaelvol.bankingapp.employee.entity.Employee;
 import com.michaelvol.bankingapp.holder.entity.Holder;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -53,16 +55,24 @@ public class Account {
     @Enumerated
     private AccountStatus status;
 
+    @Enumerated
+    @Builder.Default
+    private AccountType accountType = AccountType.SAVINGS;
+
     @ManyToOne
     @JoinColumn(name = "holder_id")
     private Holder holder;
 
+    @ManyToOne
+    @JoinColumn(name = "manager_id")
+    private Employee manager;
+
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
-    private Instant createdAt;
+    private Instant dateOpened;
 
     @JsonIgnore
     @UpdateTimestamp
     @Column(nullable = false)
-    private Instant updatedAt;
+    private Instant lastUpdated;
 }

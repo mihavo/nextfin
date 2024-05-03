@@ -3,6 +3,8 @@ package com.michaelvol.bankingapp.holder.service;
 import com.michaelvol.bankingapp.holder.dto.CreateHolderRequestDto;
 import com.michaelvol.bankingapp.holder.entity.Holder;
 
+import java.util.NoSuchElementException;
+
 public interface HolderService {
 
     /**
@@ -19,5 +21,5 @@ public interface HolderService {
      * @param holderId the holder's id
      * @return the holder
      */
-    Holder getHolderById(Long holderId);
+    Holder getHolderById(Long holderId) throws NoSuchElementException;
 }
