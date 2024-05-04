@@ -46,7 +46,6 @@ public class Holder {
     @Column(name = "date-of-birth", nullable = false)
     private LocalDate dateOfBirth;
 
-
     @Column(name = "phone-number", nullable = false)
     @Size(min = 10, max = 15, message = "Phone number should have at least 10 or less than 15 digits")
     private String phoneNumber;

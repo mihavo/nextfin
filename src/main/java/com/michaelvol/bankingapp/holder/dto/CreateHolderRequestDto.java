@@ -1,13 +1,14 @@
 package com.michaelvol.bankingapp.holder.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Size;
-import lombok.Builder;
 import lombok.Data;
 
-@Builder
+import java.time.LocalDate;
+
 @Data
 public class CreateHolderRequestDto {
     @NotEmpty(message = "First name cannot be empty")
@@ -16,8 +17,9 @@ public class CreateHolderRequestDto {
     @NotEmpty(message = "Last Name cannot be empty")
     public String lastName;
 
-    @Past(message = "date of birth must be in the past")
-    public String dateOfBirth;
+    @Past(message = "Date of birth must be in the past")
+    @JsonFormat(pattern = "dd/MM/yyyy:HH:mm:ss")
+    public LocalDate dateOfBirth;
 
     @Size(min = 10, max = 15, message = "Phone number should be between 10 and 15 digits")
     public String phoneNumber;

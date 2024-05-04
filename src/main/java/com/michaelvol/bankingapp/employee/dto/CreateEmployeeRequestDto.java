@@ -16,7 +16,7 @@ public class CreateEmployeeRequestDto {
     @NotEmpty(message = "Last Name cannot be empty")
     public String lastName;
 
-    @Past(message = "date of birth must be in the past")
+    @Past(message = "Date of birth must be in the past")
     @JsonFormat(pattern = "dd/MM/yyyy:HH:mm:ss")
     public LocalDate dateOfBirth;
 

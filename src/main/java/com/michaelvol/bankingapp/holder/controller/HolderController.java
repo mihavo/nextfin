@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(AppConstants.API_BASE_URL + "/holders")
+@RequestMapping(AppConstants.API_BASE_URL + "/holders/")
 public class HolderController {
 
     private final HolderService holderService;
