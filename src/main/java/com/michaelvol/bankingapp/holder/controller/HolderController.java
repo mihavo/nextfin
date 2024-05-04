@@ -27,7 +27,7 @@ public class HolderController {
 
     private final HolderService holderService;
 
-    private MessageSource messageSource;
+    private final MessageSource messageSource;
 
     /**
      * Creates a holder and persists it given a {@link CreateHolderRequestDto}

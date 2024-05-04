@@ -22,9 +22,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class EmployeeController {
 
-    private EmployeeService employeeService;
+    private final EmployeeService employeeService;
 
-    private MessageSource messageSource;
+    private final MessageSource messageSource;
 
     /**
      * Creates and stores an employee given a {@link CreateEmployeeResponseDto}

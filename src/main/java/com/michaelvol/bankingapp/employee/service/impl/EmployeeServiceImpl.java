@@ -14,8 +14,8 @@ import java.util.NoSuchElementException;
 @RequiredArgsConstructor
 public class EmployeeServiceImpl implements EmployeeService {
 
-    EmployeeRepository employeeRepository;
-    EmployeeMapper employeeMapper;
+    private final EmployeeRepository employeeRepository;
+    private final EmployeeMapper employeeMapper;
 
     @Override
     public Employee createEmployee(CreateEmployeeRequestDto dto) {

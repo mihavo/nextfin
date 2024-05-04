@@ -14,9 +14,9 @@ import java.util.NoSuchElementException;
 @RequiredArgsConstructor
 public class HolderServiceImpl implements HolderService {
 
-    HolderRepository holderRepository;
+    private final HolderRepository holderRepository;
 
-    HolderMapper mapper;
+    private final HolderMapper mapper;
 
     @Override
     public Holder createHolder(CreateHolderRequestDto dto) {
