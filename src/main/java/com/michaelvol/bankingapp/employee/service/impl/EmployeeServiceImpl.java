@@ -1,10 +1,10 @@
 package com.michaelvol.bankingapp.employee.service.impl;
 
 import com.michaelvol.bankingapp.employee.dto.CreateEmployeeRequestDto;
+import com.michaelvol.bankingapp.employee.dto.EmployeeMapper;
 import com.michaelvol.bankingapp.employee.entity.Employee;
 import com.michaelvol.bankingapp.employee.repository.EmployeeRepository;
 import com.michaelvol.bankingapp.employee.service.EmployeeService;
-import com.michaelvol.bankingapp.holder.entity.Holder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -13,11 +13,14 @@ import java.util.NoSuchElementException;
 @Service
 @RequiredArgsConstructor
 public class EmployeeServiceImpl implements EmployeeService {
+
     EmployeeRepository employeeRepository;
+    EmployeeMapper employeeMapper;
 
     @Override
-    public Holder createEmployee(CreateEmployeeRequestDto dto) {
-        return null;
+    public Employee createEmployee(CreateEmployeeRequestDto dto) {
+        Employee employee = employeeMapper.toEmployee(dto);
+        return employeeRepository.save(employee);
     }
 
     @Override

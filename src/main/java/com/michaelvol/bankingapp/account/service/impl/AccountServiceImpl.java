@@ -28,7 +28,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public Account createAccount(CreateAccountRequestDto dto) {
         Holder holder = holderService.getHolderById(dto.holderId);
-        Employee manager = employeeService.getEmployeeById(dto.manager);
+        Employee manager = employeeService.getEmployeeById(dto.managerId);
 
         Account account = Account.builder()
                                  .balance(BigDecimal.ZERO)

@@ -7,9 +7,11 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
@@ -18,6 +20,7 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "employees")
 @AllArgsConstructor
+@NoArgsConstructor
 @ToString
 @Builder
 @Getter
@@ -29,12 +32,16 @@ public class Employee {
     private Long id;
 
 
-    @Column(name = "first_name")
+    @Column(name = "first_name", nullable = false)
     private String firstName;
 
-    @Column(name = "last_name")
+    @Column(name = "last_name", nullable = false)
     private String lastName;
 
     @Column(name = "date-of-birth", nullable = false)
     private LocalDate dateOfBirth;
+
+    @Column(name = "phone-number", nullable = false)
+    @Size(min = 10, max = 15, message = "Phone number should have at least 10 or less than 15 digits")
+    private String phoneNumber;
 }

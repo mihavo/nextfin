@@ -26,7 +26,7 @@ public class CreateAccountRequestDto {
      */
     @NotNull
     @Positive(message = "{manager.id.positive}")
-    public Long manager;
+    public Long managerId;
 
     @Builder.Default
     @Size(min = 3, max = 3, message = "{account.currency.length")
