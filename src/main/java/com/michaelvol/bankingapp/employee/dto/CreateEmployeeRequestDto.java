@@ -1,9 +1,12 @@
 package com.michaelvol.bankingapp.employee.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+
+import java.time.LocalDate;
 
 @Data
 public class CreateEmployeeRequestDto {
@@ -14,7 +17,8 @@ public class CreateEmployeeRequestDto {
     public String lastName;
 
     @Past(message = "date of birth must be in the past")
-    public String dateOfBirth;
+    @JsonFormat(pattern = "dd/MM/yyyy:HH:mm:ss")
+    public LocalDate dateOfBirth;
 
     @Size(min = 10, max = 15, message = "Phone number should be between 10 and 15 digits")
     public String phoneNumber;

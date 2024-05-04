@@ -1,4 +1,4 @@
-package com.michaelvol.bankingapp.employee;
+package com.michaelvol.bankingapp.config;
 
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
@@ -13,13 +13,12 @@ public class AppConfig {
 
     /**
      * Sets up a message source loader for loading messages used in controllers
-     *
      * @return the MessageSource
      */
     @Bean
     public MessageSource messageSource() {
         ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
-        messageSource.setBasenames("messages");
+        messageSource.setBasenames("messages/controller-messages");
         messageSource.setDefaultEncoding("UTF-8");
         return messageSource;
     }

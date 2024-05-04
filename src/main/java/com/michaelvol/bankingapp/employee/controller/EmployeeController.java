@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(AppConstants.API_BASE_URL + "/employees")
+@RequestMapping(AppConstants.API_BASE_URL + "/employees/")
 @RequiredArgsConstructor
 public class EmployeeController {
 
