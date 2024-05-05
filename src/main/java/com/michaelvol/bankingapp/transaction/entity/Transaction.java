@@ -10,7 +10,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
-import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,10 +18,12 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.Currency;
+import java.util.UUID;
 
 @Entity
 @Table(name = "transactions")
@@ -34,9 +35,9 @@ import java.util.Currency;
 @ToString
 public class Transaction {
     @Id
-    @SequenceGenerator(name = "transactions_gen", sequenceName = "transactions_seq")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "transactions_gen")
-    private Long id;
+    @UuidGenerator(style = UuidGenerator.Style.TIME)
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @Column(name = "amount", nullable = false)
     private BigDecimal amount;
