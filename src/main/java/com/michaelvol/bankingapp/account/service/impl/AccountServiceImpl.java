@@ -2,6 +2,7 @@ package com.michaelvol.bankingapp.account.service.impl;
 
 import com.michaelvol.bankingapp.account.dto.CreateAccountRequestDto;
 import com.michaelvol.bankingapp.account.dto.DepositAmountRequestDto;
+import com.michaelvol.bankingapp.account.dto.GetAccountBalanceDto;
 import com.michaelvol.bankingapp.account.dto.WithdrawAmountRequestDto;
 import com.michaelvol.bankingapp.account.entity.Account;
 import com.michaelvol.bankingapp.account.enums.AccountStatus;
@@ -76,5 +77,11 @@ public class AccountServiceImpl implements AccountService {
         account.setBalance(balance.subtract(withdrawAmount));
         accountRepository.save(account);
         return account.getBalance();
+    }
+
+    @Override
+    public GetAccountBalanceDto checkBalance(Long accountId) {
+        Account account = getAccount(accountId);
+        return new GetAccountBalanceDto(account.getBalance(), account.getCurrency());
     }
 }

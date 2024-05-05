@@ -5,6 +5,7 @@ import com.michaelvol.bankingapp.account.dto.CreateAccountRequestDto;
 import com.michaelvol.bankingapp.account.dto.CreateAccountResponseDto;
 import com.michaelvol.bankingapp.account.dto.DepositAmountRequestDto;
 import com.michaelvol.bankingapp.account.dto.DepositAmountResponseDto;
+import com.michaelvol.bankingapp.account.dto.GetAccountBalanceDto;
 import com.michaelvol.bankingapp.account.dto.GetAccountResponseDto;
 import com.michaelvol.bankingapp.account.dto.WithdrawAmountRequestDto;
 import com.michaelvol.bankingapp.account.dto.WithdrawAmountResponseDto;
@@ -68,5 +69,13 @@ public class AccountController {
                                                                           null,
                                                                           LocaleContextHolder.getLocale())),
                                     HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}/balance")
+    public ResponseEntity<String> checkBalance(@PathVariable @NotNull Long id) {
+        GetAccountBalanceDto dto = accountService.checkBalance(id);
+        return new ResponseEntity<>(messageSource.getMessage("account.balance.check",
+                                                             new String[]{dto.balance().toString(), dto.currency().getSymbol()},
+                                                             LocaleContextHolder.getLocale()), HttpStatus.OK);
     }
 }

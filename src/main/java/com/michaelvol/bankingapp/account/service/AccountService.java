@@ -2,6 +2,7 @@ package com.michaelvol.bankingapp.account.service;
 
 import com.michaelvol.bankingapp.account.dto.CreateAccountRequestDto;
 import com.michaelvol.bankingapp.account.dto.DepositAmountRequestDto;
+import com.michaelvol.bankingapp.account.dto.GetAccountBalanceDto;
 import com.michaelvol.bankingapp.account.dto.WithdrawAmountRequestDto;
 import com.michaelvol.bankingapp.account.entity.Account;
 import jakarta.persistence.EntityNotFoundException;
@@ -38,4 +39,11 @@ public interface AccountService {
      * @return the updated balance
      */
     BigDecimal withdrawAmount(Long accountId, WithdrawAmountRequestDto dto);
+
+    /**
+     * Gets the current balance of the account
+     * @param accountId the account id
+     * @return a dto containing the current balance and currency
+     */
+    GetAccountBalanceDto checkBalance(Long accountId);
 }
