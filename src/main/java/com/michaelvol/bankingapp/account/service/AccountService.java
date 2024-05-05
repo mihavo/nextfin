@@ -8,8 +8,17 @@ import com.michaelvol.bankingapp.account.entity.Account;
 import jakarta.persistence.EntityNotFoundException;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public interface AccountService {
+    /**
+     * Checks that all the provided account ids correspond to existing accounts. If any accountId
+     * is not matched an {@link EntityNotFoundException} is thrown
+     * @param accountIds a series of account ids
+     * @return a set of the accounts found
+     */
+    List<Account> checkExistence(Long... accountIds);
+
     /**
      * Creates a new account given the info from {@link CreateAccountRequestDto}
      * @param createAccountRequestDto the dto
