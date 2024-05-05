@@ -1,6 +1,5 @@
 package com.michaelvol.bankingapp.account.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.michaelvol.bankingapp.account.enums.AccountStatus;
 import com.michaelvol.bankingapp.account.enums.AccountType;
 import com.michaelvol.bankingapp.employee.entity.Employee;
@@ -71,7 +70,6 @@ public class Account {
     @Column(nullable = false, updatable = false)
     private Instant dateOpened;
 
-    @JsonIgnore
     @UpdateTimestamp
     @Column(nullable = false)
     private Instant lastUpdated;

@@ -1,6 +1,8 @@
 package com.michaelvol.bankingapp.account.dto;
 
 
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import com.michaelvol.bankingapp.AppConstants;
 import com.michaelvol.bankingapp.account.enums.AccountType;
 import com.michaelvol.bankingapp.holder.entity.Holder;
@@ -9,9 +11,11 @@ import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Data;
+import lombok.extern.jackson.Jacksonized;
 
-@Builder
 @Data
+@Builder
+@Jacksonized
 public class CreateAccountRequestDto {
 
     /**
@@ -30,8 +34,10 @@ public class CreateAccountRequestDto {
 
     @Builder.Default
     @Size(min = 3, max = 3, message = "{account.currency.length")
+    @JsonSetter(nulls = Nulls.SKIP)
     public String currencyCode = AppConstants.DEFAULT_CURRENCY_CODE;
 
     @Builder.Default
+    @JsonSetter(nulls = Nulls.SKIP)
     public AccountType accountType = AccountType.SAVINGS;
 }
