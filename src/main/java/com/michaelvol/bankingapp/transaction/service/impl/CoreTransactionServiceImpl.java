@@ -10,6 +10,7 @@ import com.michaelvol.bankingapp.transaction.entity.Transaction;
 import com.michaelvol.bankingapp.transaction.enums.TransactionStatus;
 import com.michaelvol.bankingapp.transaction.repository.TransactionRepository;
 import com.michaelvol.bankingapp.transaction.service.TransactionService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.javamoney.moneta.Money;
 import org.springframework.context.MessageSource;
@@ -41,6 +42,7 @@ public class CoreTransactionServiceImpl implements TransactionService {
         BigDecimal amount = dto.getAmount();
         Long sourceAccountId = dto.getSourceAccountId();
         Long targetAccountId = dto.getTargetAccountId();
+        Currency currency = dto.getCurrency();
 
         List<Account> accounts = accountService.checkExistence(sourceAccountId, targetAccountId);
         Account sourceAccount = accounts.get(0);
@@ -51,18 +53,31 @@ public class CoreTransactionServiceImpl implements TransactionService {
                                               messageSource.getMessage("transaction.transfer.account.same", null,
                                                                        LocaleContextHolder.getLocale()));
         }
-
-        doTransaction(sourceAccount, targetAccount, amount, dto.getCurrency());
-        return null;
+        Transaction transaction = Transaction.builder()
+                                             .amount(amount)
+                                             .currency(currency)
+                                             .sourceAccount(sourceAccount)
+                                             .targetAccount(targetAccount)
+                                             .build();
+        transactionRepository.save(transaction);
+        processTransaction(transaction);
+        return TransferResultDto.builder().transaction(transaction).message(
+                messageSource.getMessage("transaction.transfer.processed",
+                                         new UUID[]{transaction.getId()},
+                                         LocaleContextHolder.getLocale())).build();
     }
 
-    private void doTransaction(Account sourceAccount, Account targetAccount, BigDecimal amount, Currency requestedCurrency) {
-        //Convert amount to target account's default currency
+    private void doTransaction(Transaction transaction) {
+        Account sourceAccount = transaction.getSourceAccount();
+        Account targetAccount = transaction.getTargetAccount();
+        Currency currency = transaction.getCurrency();
+        BigDecimal amount = transaction.getAmount();
+        //Convert amount to target & source account's default currency
         CurrencyConversion requestToTargetConversion = MonetaryConversions.getConversion(targetAccount.getCurrency()
                                                                                                       .getCurrencyCode());
         CurrencyConversion requestToSourceConversion = MonetaryConversions.getConversion(sourceAccount.getCurrency()
                                                                                                       .getCurrencyCode());
-        Money requestedCurrencyAmount = Money.of(amount, requestedCurrency.getCurrencyCode());
+        Money requestedCurrencyAmount = Money.of(amount, currency.getCurrencyCode());
         Money targetCurrencyAmount = requestedCurrencyAmount.with(requestToTargetConversion); //amount in source account's currency
         Money sourceCurrencyAmount = requestedCurrencyAmount.with(requestToSourceConversion); //amount in target account's currency
 
@@ -87,6 +102,16 @@ public class CoreTransactionServiceImpl implements TransactionService {
 
     @Override
     public Transaction processTransaction(UUID transactionId) {
-        return null;
+        Transaction transaction = transactionRepository.findById(transactionId)
+                                                       .orElseThrow(EntityNotFoundException::new);
+        return processTransaction(transaction);
+    }
+
+    private Transaction processTransaction(Transaction transaction) {
+        transaction.setTransactionStatus(TransactionStatus.PROCESSING);
+        transactionRepository.save(transaction);
+        doTransaction(transaction);
+        transaction.setTransactionStatus(TransactionStatus.COMPLETED);
+        return transactionRepository.save(transaction);
     }
 }
