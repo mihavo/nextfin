@@ -3,12 +3,18 @@ package com.michaelvol.bankingapp.account.controller;
 import com.michaelvol.bankingapp.AppConstants;
 import com.michaelvol.bankingapp.account.dto.CreateAccountRequestDto;
 import com.michaelvol.bankingapp.account.dto.CreateAccountResponseDto;
+import com.michaelvol.bankingapp.account.dto.DepositAmountRequestDto;
+import com.michaelvol.bankingapp.account.dto.DepositAmountResponseDto;
 import com.michaelvol.bankingapp.account.dto.GetAccountResponseDto;
+import com.michaelvol.bankingapp.account.dto.WithdrawAmountRequestDto;
+import com.michaelvol.bankingapp.account.dto.WithdrawAmountResponseDto;
 import com.michaelvol.bankingapp.account.entity.Account;
 import com.michaelvol.bankingapp.account.service.AccountService;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,12 +24,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigDecimal;
+
 @RestController
 @RequestMapping(AppConstants.API_BASE_URL + "/accounts")
 @AllArgsConstructor
 public class AccountController {
 
     private final AccountService accountService;
+    private final MessageSource messageSource;
 
     @PostMapping("")
     public ResponseEntity<CreateAccountResponseDto> createAccount(@RequestBody CreateAccountRequestDto dto) {
@@ -38,5 +47,26 @@ public class AccountController {
         Account account = accountService.getAccount(accountId);
         GetAccountResponseDto responseDto = new GetAccountResponseDto(account, "Fetched account successfully");
         return new ResponseEntity<>(responseDto, HttpStatus.OK);
+    }
+
+    @PostMapping("/{id}/deposit")
+    public ResponseEntity<DepositAmountResponseDto> depositAmount(@PathVariable @NotNull Long id, @RequestBody DepositAmountRequestDto dto) {
+        BigDecimal updatedBalance = accountService.depositAmount(id, dto);
+        return new ResponseEntity<>(new DepositAmountResponseDto(updatedBalance,
+                                                                 messageSource.getMessage("account.deposit.success",
+                                                                                          null,
+                                                                                          LocaleContextHolder.getLocale())),
+                                    HttpStatus.OK);
+    }
+
+    @PostMapping("/{id}/withdraw")
+    public ResponseEntity<WithdrawAmountResponseDto> withdrawAmount(@PathVariable @NotNull Long id, @RequestBody WithdrawAmountRequestDto dto) {
+        BigDecimal updatedBalance = accountService.withdrawAmount(id, dto);
+        return new ResponseEntity<>(new WithdrawAmountResponseDto(updatedBalance,
+                                                                  messageSource.getMessage(
+                                                                          "account.withdraw.success",
+                                                                          null,
+                                                                          LocaleContextHolder.getLocale())),
+                                    HttpStatus.OK);
     }
 }

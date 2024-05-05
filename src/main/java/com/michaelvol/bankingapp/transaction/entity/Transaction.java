@@ -1,9 +1,5 @@
 package com.michaelvol.bankingapp.transaction.entity;
 
-import java.math.BigDecimal;
-import java.time.Instant;
-import java.util.Currency;
-
 import com.michaelvol.bankingapp.account.entity.Account;
 import com.michaelvol.bankingapp.transaction.enums.TransactionStatus;
 import jakarta.persistence.Column;
@@ -23,6 +19,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
+
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.util.Currency;
 
 @Entity
 @Table(name = "transactions")
