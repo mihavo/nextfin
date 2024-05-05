@@ -22,6 +22,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.math.BigDecimal;
 import java.util.Currency;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 import javax.money.convert.CurrencyConversion;
@@ -92,12 +93,12 @@ public class CoreTransactionServiceImpl implements TransactionService {
 
     @Override
     public Transaction getTransaction(UUID transactionId) {
-        return null;
+        return transactionRepository.findById(transactionId).orElseThrow(NoSuchElementException::new);
     }
 
     @Override
-    public TransactionStatus checkTransactionStatus(UUID transactionId) {
-        return null;
+    public TransactionStatus checkStatus(UUID transactionId) {
+        return getTransaction(transactionId).getTransactionStatus();
     }
 
     @Override
@@ -106,6 +107,7 @@ public class CoreTransactionServiceImpl implements TransactionService {
                                                        .orElseThrow(EntityNotFoundException::new);
         return processTransaction(transaction);
     }
+
 
     private Transaction processTransaction(Transaction transaction) {
         transaction.setTransactionStatus(TransactionStatus.PROCESSING);

@@ -25,11 +25,11 @@ public interface TransactionService {
     Transaction getTransaction(UUID transactionId);
 
     /**
-     * Checks the transaction status from a given transactionId
+     * Gets the {@link TransactionStatus} of a transaction by its id
      * @param transactionId the transactionID
-     * @return the {@link TransactionStatus}
+     * @return the status
      */
-    TransactionStatus checkTransactionStatus(UUID transactionId);
+    TransactionStatus checkStatus(UUID transactionId);
 
     /**
      * Processes a transaction and updates its status
