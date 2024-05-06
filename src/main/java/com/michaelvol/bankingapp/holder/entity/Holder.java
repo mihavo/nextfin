@@ -68,5 +68,6 @@ public class Holder {
 
     @ToString.Exclude
     @OneToMany(mappedBy = "holder")
+    @JsonIgnore
     private List<Account> accounts;
 }

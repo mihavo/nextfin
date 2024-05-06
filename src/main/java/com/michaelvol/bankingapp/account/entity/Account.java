@@ -1,5 +1,6 @@
 package com.michaelvol.bankingapp.account.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.michaelvol.bankingapp.account.enums.AccountStatus;
 import com.michaelvol.bankingapp.account.enums.AccountType;
 import com.michaelvol.bankingapp.employee.entity.Employee;
@@ -60,6 +61,7 @@ public class Account {
 
     @ManyToOne
     @JoinColumn(name = "holder_id")
+    @JsonIgnore
     private Holder holder;
 
     @ManyToOne

@@ -54,6 +54,8 @@ public class CoreTransactionServiceImpl implements TransactionService {
                                               messageSource.getMessage("transaction.transfer.account.same", null,
                                                                        LocaleContextHolder.getLocale()));
         }
+        accountService.validateWithdrawal(sourceAccount, amount, currency);
+
         Transaction transaction = Transaction.builder()
                                              .amount(amount)
                                              .currency(currency)

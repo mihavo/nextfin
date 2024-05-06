@@ -14,6 +14,7 @@ import com.michaelvol.bankingapp.holder.entity.Holder;
 import com.michaelvol.bankingapp.holder.service.HolderService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.javamoney.moneta.Money;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
@@ -25,6 +26,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Currency;
 import java.util.List;
+
+import javax.money.convert.MonetaryConversions;
 
 @Service
 @RequiredArgsConstructor
@@ -102,4 +105,18 @@ public class AccountServiceImpl implements AccountService {
         return new GetAccountBalanceDto(account.getBalance(), account.getCurrency());
     }
 
+    @Override
+    public void validateWithdrawal(Account account, BigDecimal amount, Currency currency) {
+        //Convert amount to account's selected currency
+        Currency targetCurrency = account.getCurrency();
+        MonetaryConversions.getConversion(targetCurrency.getCurrencyCode());
+        BigDecimal convertedAmount = Money.of(amount, currency.getCurrencyCode())
+                                          .getNumber()
+                                          .numberValue(BigDecimal.class);
+        if (account.getBalance().compareTo(convertedAmount) < 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                                              messageSource.getMessage("account.withdraw.insufficient", null,
+                                                                       LocaleContextHolder.getLocale()));
+        }
+    }
 }

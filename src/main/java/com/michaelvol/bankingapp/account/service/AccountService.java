@@ -8,6 +8,7 @@ import com.michaelvol.bankingapp.account.entity.Account;
 import jakarta.persistence.EntityNotFoundException;
 
 import java.math.BigDecimal;
+import java.util.Currency;
 import java.util.List;
 
 public interface AccountService {
@@ -15,7 +16,7 @@ public interface AccountService {
      * Checks that all the provided account ids correspond to existing accounts. If any accountId
      * is not matched an {@link EntityNotFoundException} is thrown
      * @param accountIds a series of account ids
-     * @return a set of the accounts found
+     * @return a list of the accounts found
      */
     List<Account> checkExistence(Long... accountIds);
 
@@ -55,4 +56,12 @@ public interface AccountService {
      * @return a dto containing the current balance and currency
      */
     GetAccountBalanceDto checkBalance(Long accountId);
+
+    /**
+     * Validates an amount in the given currency for being able to be withdrawn i.e. funds suffice
+     * @param account  the account to perform the validation
+     * @param amount   the amount to be withdrawn
+     * @param currency the currency of the given amount
+     */
+    void validateWithdrawal(Account account, BigDecimal amount, Currency currency);
 }
