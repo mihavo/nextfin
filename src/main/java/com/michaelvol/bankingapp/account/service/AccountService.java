@@ -23,7 +23,7 @@ public interface AccountService {
     /**
      * Creates a new account given the info from {@link CreateAccountRequestDto}
      * @param createAccountRequestDto the dto
-     * @return the new account creaeted
+     * @return the new account created
      */
     Account createAccount(CreateAccountRequestDto createAccountRequestDto);
 
