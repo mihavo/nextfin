@@ -11,6 +11,8 @@ import com.michaelvol.bankingapp.account.dto.WithdrawAmountRequestDto;
 import com.michaelvol.bankingapp.account.dto.WithdrawAmountResponseDto;
 import com.michaelvol.bankingapp.account.entity.Account;
 import com.michaelvol.bankingapp.account.service.AccountService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
@@ -29,6 +31,7 @@ import java.math.BigDecimal;
 
 @RestController
 @RequestMapping(AppConstants.API_BASE_URL + "/accounts")
+@Tag(name = "Accounts API", description = "Methods for account operations")
 @AllArgsConstructor
 public class AccountController {
 
@@ -36,6 +39,7 @@ public class AccountController {
     private final MessageSource messageSource;
 
     @PostMapping("")
+    @Operation(summary = "Account initialization", description = "Method for creating accounts for non-employees i.e. holders")
     public ResponseEntity<CreateAccountResponseDto> createAccount(@RequestBody CreateAccountRequestDto dto) {
         Account account = accountService.createAccount(dto);
         CreateAccountResponseDto responseDto = new CreateAccountResponseDto(account.getId(),
@@ -44,6 +48,7 @@ public class AccountController {
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Gets account data", description = "Method for fetching account information")
     public ResponseEntity<GetAccountResponseDto> getAccountData(@PathVariable(name = "id") @NotNull @Positive Long accountId) {
         Account account = accountService.getAccount(accountId);
         GetAccountResponseDto responseDto = new GetAccountResponseDto(account, "Fetched account successfully");
@@ -51,6 +56,7 @@ public class AccountController {
     }
 
     @PostMapping("/{id}/deposit")
+    @Operation(summary = "Deposit to account", description = "Method for depositing a specified amount to an account")
     public ResponseEntity<DepositAmountResponseDto> depositAmount(@PathVariable @NotNull Long id, @RequestBody DepositAmountRequestDto dto) {
         BigDecimal updatedBalance = accountService.depositAmount(id, dto);
         return new ResponseEntity<>(new DepositAmountResponseDto(updatedBalance,
@@ -61,6 +67,7 @@ public class AccountController {
     }
 
     @PostMapping("/{id}/withdraw")
+    @Operation(summary = "Withdraw from account", description = "Method for withdrawing a specified amount from an account")
     public ResponseEntity<WithdrawAmountResponseDto> withdrawAmount(@PathVariable @NotNull Long id, @RequestBody WithdrawAmountRequestDto dto) {
         BigDecimal updatedBalance = accountService.withdrawAmount(id, dto);
         return new ResponseEntity<>(new WithdrawAmountResponseDto(updatedBalance,
@@ -72,6 +79,7 @@ public class AccountController {
     }
 
     @GetMapping("/{id}/balance")
+    @Operation(summary = "Gets account balance", description = "Method for fetching current account balance")
     public ResponseEntity<String> checkBalance(@PathVariable @NotNull Long id) {
         GetAccountBalanceDto dto = accountService.checkBalance(id);
         return new ResponseEntity<>(messageSource.getMessage("account.balance.check",
