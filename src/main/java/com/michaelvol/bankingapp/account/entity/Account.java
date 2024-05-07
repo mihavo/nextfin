@@ -47,7 +47,8 @@ public class Account {
     private Long id;
 
     @Column(name = "balance", nullable = false)
-    private BigDecimal balance;
+    @Builder.Default
+    private BigDecimal balance = BigDecimal.ZERO;
 
     @Column(name = "currency", nullable = false)
     private Currency currency;

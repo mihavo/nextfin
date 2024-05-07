@@ -21,7 +21,7 @@ public class AccountSamples {
                       .manager(manager)
                       .accountType(AccountType.SAVINGS)
                       .status(AccountStatus.ACTIVE)
-                      .balance(new BigDecimal("100.00"))
+                      .balance(BigDecimal.ZERO)
                       .currency(Currency.getInstance("EUR"))
                       .build();
     }

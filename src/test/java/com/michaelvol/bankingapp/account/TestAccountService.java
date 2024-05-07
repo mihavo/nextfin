@@ -1,6 +1,9 @@
 package com.michaelvol.bankingapp.account;
 
 import com.michaelvol.bankingapp.account.dto.CreateAccountRequestDto;
+import com.michaelvol.bankingapp.account.dto.DepositAmountRequestDto;
+import com.michaelvol.bankingapp.account.dto.GetAccountBalanceDto;
+import com.michaelvol.bankingapp.account.dto.WithdrawAmountRequestDto;
 import com.michaelvol.bankingapp.account.entity.Account;
 import com.michaelvol.bankingapp.account.repository.AccountRepository;
 import com.michaelvol.bankingapp.account.samples.AccountSamples;
@@ -9,22 +12,25 @@ import com.michaelvol.bankingapp.employee.entity.Employee;
 import com.michaelvol.bankingapp.employee.service.EmployeeService;
 import com.michaelvol.bankingapp.holder.entity.Holder;
 import com.michaelvol.bankingapp.holder.service.HolderService;
+import jakarta.persistence.EntityNotFoundException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.MessageSource;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest
 @ExtendWith(MockitoExtension.class)
 public class TestAccountService {
 
@@ -43,8 +49,15 @@ public class TestAccountService {
     @Mock
     private MessageSource messageSource;
 
+    Account sampleAccount;
+
+    @BeforeEach
+    public void init() {
+        sampleAccount = AccountSamples.sampleAccount(1L, new Holder(), new Employee());
+    }
+
     @Test
-    public void createAccount_success() {
+    public void createAccount() {
         Holder sampleHolder = Holder.builder().id(1L).build();
         Employee sampleEmployee = Employee.builder().id(1L).build();
         Account sampleAccount = AccountSamples.sampleAccount(1L, sampleHolder,
@@ -69,5 +82,57 @@ public class TestAccountService {
         assertEquals(sampleAccount.getCurrency(), returnedAccount.getCurrency());
         assertEquals(returnedAccount.getBalance(), BigDecimal.ZERO);
         assertEquals(returnedAccount.getAccountType(), sampleAccount.getAccountType());
+    }
+
+    @Test
+    public void getAccount_success() {
+        when(accountRepository.findById(1L)).thenReturn(Optional.of(sampleAccount));
+        Account account = accountService.getAccount(1L);
+        verify(accountRepository).findById(1L);
+        assertEquals(sampleAccount, account);
+    }
+
+    @Test
+    public void getAccount_notFound() {
+        assertThrows(EntityNotFoundException.class, () -> accountService.getAccount(1L));
+    }
+
+    @Test
+    public void checkBalance() {
+        sampleAccount.setBalance(new BigDecimal("50.00"));
+        when(accountRepository.findById(1L)).thenReturn(Optional.of(sampleAccount));
+        GetAccountBalanceDto result = accountService.checkBalance(1L);
+        assertEquals(sampleAccount.getCurrency(), result.currency());
+        assertEquals(new BigDecimal("50.00"), result.balance());
+    }
+
+    @Test
+    public void depositAmount() {
+        when(accountRepository.findById(1L)).thenReturn(Optional.of(sampleAccount));
+        BigDecimal amount = new BigDecimal("50.00");
+        DepositAmountRequestDto dto = new DepositAmountRequestDto(amount);
+        accountService.depositAmount(1L, dto);
+        accountService.depositAmount(1L, dto);
+        BigDecimal result = accountService.depositAmount(1L, dto);
+        assertEquals(new BigDecimal("150.00"), result);
+    }
+
+    @Test
+    public void withdrawAmount_success() {
+        when(accountRepository.findById(1L)).thenReturn(Optional.of(sampleAccount));
+        sampleAccount.setBalance(new BigDecimal("75.00"));
+        BigDecimal amount = new BigDecimal("50.00");
+        WithdrawAmountRequestDto dto = new WithdrawAmountRequestDto(amount);
+        BigDecimal balance = accountService.withdrawAmount(1L, dto);
+        assertEquals(new BigDecimal("25.00"), balance);
+    }
+
+    @Test
+    public void withdrawAmount_insufficientFunds() {
+        when(accountRepository.findById(1L)).thenReturn(Optional.of(sampleAccount));
+        BigDecimal amount = new BigDecimal("50.00");
+        WithdrawAmountRequestDto dto = new WithdrawAmountRequestDto(amount);
+        assertThrows(ResponseStatusException.class,
+                     () -> accountService.withdrawAmount(1L, dto)).getMessage();
     }
 }
