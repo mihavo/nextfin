@@ -1,0 +1,31 @@
+version: '3'
+
+services:
+  app:
+    container_name: aa-banking-app
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    image:
+      aa-banking-app:1.0
+    ports:
+      - '8080:8080'
+    environment:
+      - DB_URL=aa-banking-db
+      - DB_DATABASE=bankdb
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_PREFS=sslmode=require
+    depends_on:
+      - psql-db
+  psql-db:
+    image: postgres
+    container_name: aa-banking-db
+    restart: always
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=bankdb
+    ports:
+      - '5432:5432'
+
