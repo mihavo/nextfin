@@ -91,6 +91,15 @@
                 </configuration>
             </plugin>
             <plugin>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-maven-plugin</artifactId>
+                <version>10.7.1</version>
+                <configuration>
+                    <user>${env.DB_USER}</user>
+                    <password>${env.DB_PASSWORD}</password>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.11.0</version>
