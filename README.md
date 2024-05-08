@@ -14,7 +14,7 @@ This project implements a simple RESTful API using Spring Boot (Java) for handli
 - Happy path for money transfer between two accounts.
 - Handling insufficient balance to process money transfer.
 - Preventing transfer between the same account.
-- Validating the existence of accounts during the account.
+- Validating the existence of accounts during the transaction.
 - Simple and extensible data models for accounts and transactions.
 
 ## Endpoints
