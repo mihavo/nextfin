@@ -5,6 +5,7 @@ import com.michaelvol.bankingapp.account.dto.WithdrawAmountRequestDto;
 import com.michaelvol.bankingapp.account.entity.Account;
 import com.michaelvol.bankingapp.account.service.AccountService;
 import com.michaelvol.bankingapp.transaction.dto.GetTransactionOptions;
+import com.michaelvol.bankingapp.transaction.dto.TransactionDirection;
 import com.michaelvol.bankingapp.transaction.dto.TransferRequestDto;
 import com.michaelvol.bankingapp.transaction.dto.TransferResultDto;
 import com.michaelvol.bankingapp.transaction.entity.Transaction;
@@ -116,12 +117,22 @@ public class CoreTransactionServiceImpl implements TransactionService {
 
     @Override
     public Page<Transaction> getAccountTransactions(Account account, GetTransactionOptions options) {
+        TransactionDirection direction = options.getDirection();
         PageRequest pageRequest = PageRequest.of(options.getSkip(),
                                                  options.getPageSize(),
                                                  Sort.by(options.getSortDirection(),
                                                          options.getSortBy().getValue()));
-
-        return transactionRepository.findBySourceAccountOrTargetAccount(account, account, pageRequest);
+        switch (direction) {
+            case INCOMING -> {
+                return transactionRepository.findByTargetAccount(account, pageRequest);
+            }
+            case OUTGOING -> {
+                return transactionRepository.findBySourceAccount(account, pageRequest);
+            }
+            default -> {
+                return transactionRepository.findBySourceAccountOrTargetAccount(account, account, pageRequest);
+            }
+        }
     }
 
 

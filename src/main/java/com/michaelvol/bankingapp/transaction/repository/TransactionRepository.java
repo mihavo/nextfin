@@ -12,4 +12,8 @@ import java.util.UUID;
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, UUID> {
     Page<Transaction> findBySourceAccountOrTargetAccount(Account sourceAccount, Account targetAccount, Pageable pageable);
+
+    Page<Transaction> findBySourceAccount(Account sourceAccount, Pageable pageable);
+
+    Page<Transaction> findByTargetAccount(Account targetAccount, Pageable pageable);
 }

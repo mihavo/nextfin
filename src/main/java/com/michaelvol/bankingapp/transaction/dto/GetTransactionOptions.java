@@ -20,6 +20,9 @@ import org.springframework.data.domain.Sort;
 @Jacksonized
 public class GetTransactionOptions {
 
+    @Builder.Default
+    TransactionDirection direction = TransactionDirection.ALL;
+
     @Positive
     @Max(100)
     @Builder.Default
@@ -34,4 +37,5 @@ public class GetTransactionOptions {
 
     @Builder.Default
     Sort.Direction sortDirection = Sort.Direction.DESC;
+
 }
