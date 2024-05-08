@@ -8,6 +8,7 @@ import com.michaelvol.bankingapp.holder.entity.Holder;
 import com.michaelvol.bankingapp.holder.service.HolderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -37,7 +38,7 @@ public class HolderController {
      */
     @PostMapping
     @Operation(summary = "Creates an app user/holder")
-    public ResponseEntity<CreateHolderResponseDto> createHolder(@RequestBody CreateHolderRequestDto requestDto) {
+    public ResponseEntity<CreateHolderResponseDto> createHolder(@Valid @RequestBody CreateHolderRequestDto requestDto) {
         Holder holder = holderService.createHolder(requestDto);
         String successMessage = messageSource.getMessage("holder.create.success",
                                                          null,

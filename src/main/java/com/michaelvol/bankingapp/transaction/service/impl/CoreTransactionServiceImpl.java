@@ -4,6 +4,7 @@ import com.michaelvol.bankingapp.account.dto.DepositAmountRequestDto;
 import com.michaelvol.bankingapp.account.dto.WithdrawAmountRequestDto;
 import com.michaelvol.bankingapp.account.entity.Account;
 import com.michaelvol.bankingapp.account.service.AccountService;
+import com.michaelvol.bankingapp.transaction.dto.GetTransactionOptions;
 import com.michaelvol.bankingapp.transaction.dto.TransferRequestDto;
 import com.michaelvol.bankingapp.transaction.dto.TransferResultDto;
 import com.michaelvol.bankingapp.transaction.entity.Transaction;
@@ -15,6 +16,9 @@ import lombok.RequiredArgsConstructor;
 import org.javamoney.moneta.Money;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -108,6 +112,16 @@ public class CoreTransactionServiceImpl implements TransactionService {
         Transaction transaction = transactionRepository.findById(transactionId)
                                                        .orElseThrow(EntityNotFoundException::new);
         return processTransaction(transaction);
+    }
+
+    @Override
+    public Page<Transaction> getAccountTransactions(Account account, GetTransactionOptions options) {
+        PageRequest pageRequest = PageRequest.of(options.getSkip(),
+                                                 options.getPageSize(),
+                                                 Sort.by(options.getSortDirection(),
+                                                         options.getSortBy().getValue()));
+
+        return transactionRepository.findBySourceAccountOrTargetAccount(account, account, pageRequest);
     }
 
 

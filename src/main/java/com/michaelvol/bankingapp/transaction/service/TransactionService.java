@@ -1,9 +1,13 @@
 package com.michaelvol.bankingapp.transaction.service;
 
+import com.michaelvol.bankingapp.account.entity.Account;
+import com.michaelvol.bankingapp.transaction.dto.GetTransactionOptions;
 import com.michaelvol.bankingapp.transaction.dto.TransferRequestDto;
 import com.michaelvol.bankingapp.transaction.dto.TransferResultDto;
 import com.michaelvol.bankingapp.transaction.entity.Transaction;
 import com.michaelvol.bankingapp.transaction.enums.TransactionStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.UUID;
 
@@ -37,4 +41,12 @@ public interface TransactionService {
      * @return the updated (processed) transaction
      */
     Transaction processTransaction(UUID transactionId);
+
+    /**
+     * Gets a subset of transactions of a specified account based on a {@link PageRequest}
+     * @param account the account that contains the transactions
+     * @param options the {@link GetTransactionOptions}
+     * @return a page containing transactions
+     */
+    Page<Transaction> getAccountTransactions(Account account, GetTransactionOptions options);
 }

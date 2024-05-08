@@ -8,7 +8,7 @@ import com.michaelvol.bankingapp.transaction.enums.TransactionStatus;
 import com.michaelvol.bankingapp.transaction.service.TransactionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +33,7 @@ public class TransactionController {
     @Operation(summary = "Transfers amount from one account to another",
             description = "Transfers a specified amount provided that the source account has" +
                     " the required funds and the source and target accounts differ.")
-    public ResponseEntity<TransferResultDto> transferAmount(@NotNull @RequestBody TransferRequestDto dto) {
+    public ResponseEntity<TransferResultDto> transferAmount(@Valid @RequestBody TransferRequestDto dto) {
         TransferResultDto result = transactionService.transferAmount(dto);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }

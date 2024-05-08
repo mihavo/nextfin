@@ -7,6 +7,7 @@ import com.michaelvol.bankingapp.employee.entity.Employee;
 import com.michaelvol.bankingapp.employee.service.EmployeeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -36,7 +37,7 @@ public class EmployeeController {
      */
     @PostMapping
     @Operation(summary = "Creates a bank employee")
-    public ResponseEntity<CreateEmployeeResponseDto> createEmployee(@RequestBody CreateEmployeeRequestDto requestDto) {
+    public ResponseEntity<CreateEmployeeResponseDto> createEmployee(@Valid @RequestBody CreateEmployeeRequestDto requestDto) {
         Employee employee = employeeService.createEmployee(requestDto);
         String successMessage = messageSource.getMessage("employee.create.success",
                                                          null,
