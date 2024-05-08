@@ -4,8 +4,8 @@ services:
   app:
     container_name: aa-banking-app
     build:
-      context: ./
-      dockerfile: Dockerfile
+      context: ../../../
+      dockerfile: src/main/docker/Dockerfile
     image:
       aa-banking-app:1.0
     ports:
@@ -23,7 +23,7 @@ services:
     container_name: aa-banking-db
     restart: always
     environment:
-      - POSTGRES_USER=admin
+      - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=bankdb
     ports:
