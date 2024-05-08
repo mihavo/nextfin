@@ -12,10 +12,10 @@ services:
       - '8080:8080'
     environment:
       - DB_URL=aa-banking-db
-      - DB_DATABASE=bankdb
       - DB_USER=postgres
       - DB_PASSWORD=postgres
-      - DB_PREFS=sslmode=require
+      - DB_DATABASE=bankdb
+      - DB_PREFS=sslmodde=require
     depends_on:
       - psql-db
   psql-db:
