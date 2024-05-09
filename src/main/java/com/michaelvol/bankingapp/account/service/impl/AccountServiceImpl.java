@@ -10,6 +10,7 @@ import com.michaelvol.bankingapp.account.repository.AccountRepository;
 import com.michaelvol.bankingapp.account.service.AccountService;
 import com.michaelvol.bankingapp.employee.entity.Employee;
 import com.michaelvol.bankingapp.employee.service.EmployeeService;
+import com.michaelvol.bankingapp.exceptions.exception.NotFoundException;
 import com.michaelvol.bankingapp.holder.entity.Holder;
 import com.michaelvol.bankingapp.holder.service.HolderService;
 import jakarta.persistence.EntityNotFoundException;
@@ -73,7 +74,10 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Account getAccount(Long accountId) {
-        return accountRepository.findById(accountId).orElseThrow(EntityNotFoundException::new);
+        return accountRepository.findById(accountId)
+                                .orElseThrow(() -> new NotFoundException(messageSource.getMessage("account.notfound",
+                                                                                                  new Long[]{accountId},
+                                                                                                  LocaleContextHolder.getLocale())));
     }
 
     @Override

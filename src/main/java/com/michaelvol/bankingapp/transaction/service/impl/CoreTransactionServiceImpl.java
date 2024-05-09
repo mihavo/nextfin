@@ -4,6 +4,7 @@ import com.michaelvol.bankingapp.account.dto.DepositAmountRequestDto;
 import com.michaelvol.bankingapp.account.dto.WithdrawAmountRequestDto;
 import com.michaelvol.bankingapp.account.entity.Account;
 import com.michaelvol.bankingapp.account.service.AccountService;
+import com.michaelvol.bankingapp.exceptions.exception.NotFoundException;
 import com.michaelvol.bankingapp.transaction.dto.GetTransactionOptions;
 import com.michaelvol.bankingapp.transaction.dto.TransactionDirection;
 import com.michaelvol.bankingapp.transaction.dto.TransferRequestDto;
@@ -12,9 +13,9 @@ import com.michaelvol.bankingapp.transaction.entity.Transaction;
 import com.michaelvol.bankingapp.transaction.enums.TransactionStatus;
 import com.michaelvol.bankingapp.transaction.repository.TransactionRepository;
 import com.michaelvol.bankingapp.transaction.service.TransactionService;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.javamoney.moneta.Money;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
@@ -27,8 +28,8 @@ import org.springframework.web.server.ResponseStatusException;
 import java.math.BigDecimal;
 import java.util.Currency;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 import javax.money.convert.CurrencyConversion;
 import javax.money.convert.MonetaryConversions;
@@ -100,7 +101,8 @@ public class CoreTransactionServiceImpl implements TransactionService {
 
     @Override
     public Transaction getTransaction(UUID transactionId) {
-        return transactionRepository.findById(transactionId).orElseThrow(NoSuchElementException::new);
+        return transactionRepository.findById(transactionId)
+                                    .orElseThrow(getNotFoundExceptionSupplier(transactionId));
     }
 
     @Override
@@ -111,7 +113,7 @@ public class CoreTransactionServiceImpl implements TransactionService {
     @Override
     public Transaction processTransaction(UUID transactionId) {
         Transaction transaction = transactionRepository.findById(transactionId)
-                                                       .orElseThrow(EntityNotFoundException::new);
+                                                       .orElseThrow(getNotFoundExceptionSupplier(transactionId));
         return processTransaction(transaction);
     }
 
@@ -142,5 +144,12 @@ public class CoreTransactionServiceImpl implements TransactionService {
         doTransaction(transaction);
         transaction.setTransactionStatus(TransactionStatus.COMPLETED);
         return transactionRepository.save(transaction);
+    }
+
+    private @NotNull Supplier<NotFoundException> getNotFoundExceptionSupplier(UUID transactionId) {
+        return () -> new NotFoundException(messageSource.getMessage(
+                "transaction.notfound",
+                new UUID[]{transactionId},
+                LocaleContextHolder.getLocale()));
     }
 }

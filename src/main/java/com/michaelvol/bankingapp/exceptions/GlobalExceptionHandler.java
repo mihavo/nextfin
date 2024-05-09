@@ -35,7 +35,6 @@ public class GlobalExceptionHandler {
                                                     .trace(printStackTrace(e))
                                                     .build(),
                                     HttpStatus.NOT_FOUND);
-
     }
 
     protected String printStackTrace(Throwable exception) {
