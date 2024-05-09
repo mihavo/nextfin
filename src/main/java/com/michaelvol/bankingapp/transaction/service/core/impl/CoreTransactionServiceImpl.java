@@ -26,7 +26,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Currency;
+import java.util.List;
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -115,6 +117,10 @@ public class CoreTransactionServiceImpl implements TransactionService {
                 return transactionRepository.findBySourceAccountOrTargetAccount(account, account, pageRequest);
             }
         }
+    }
+
+    public List<Transaction> getLatestSourceAccountTransactionsByDate(Account sourceAccount, LocalDateTime date) {
+        return transactionRepository.getTransactionsByAccountAndDate(sourceAccount, date);
     }
 
     private Transaction processTransaction(Transaction transaction) {

@@ -9,6 +9,8 @@ import com.michaelvol.bankingapp.transaction.enums.TransactionStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 public interface TransactionService {
@@ -49,4 +51,12 @@ public interface TransactionService {
      * @return a page containing transactions
      */
     Page<Transaction> getAccountTransactions(Account account, GetTransactionOptions options);
+
+    /**
+     * Gets the latest transactions that have been initiated (source transactions) from a specified account beginning from a given datetime
+     * @param sourceAccount the source account
+     * @param date          the earliest timestamp of the transactions
+     * @return the list of found transactions
+     */
+    List<Transaction> getLatestSourceAccountTransactionsByDate(Account sourceAccount, LocalDateTime date);
 }

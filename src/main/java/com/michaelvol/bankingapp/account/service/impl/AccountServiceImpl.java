@@ -10,19 +10,24 @@ import com.michaelvol.bankingapp.account.repository.AccountRepository;
 import com.michaelvol.bankingapp.account.service.AccountService;
 import com.michaelvol.bankingapp.employee.entity.Employee;
 import com.michaelvol.bankingapp.employee.service.EmployeeService;
+import com.michaelvol.bankingapp.exceptions.exception.BadRequestException;
 import com.michaelvol.bankingapp.exceptions.exception.NotFoundException;
 import com.michaelvol.bankingapp.holder.entity.Holder;
 import com.michaelvol.bankingapp.holder.service.HolderService;
+import com.michaelvol.bankingapp.transaction.entity.Transaction;
+import com.michaelvol.bankingapp.transaction.service.core.TransactionService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.javamoney.moneta.Money;
 import org.springframework.context.MessageSource;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Currency;
@@ -38,7 +43,7 @@ public class AccountServiceImpl implements AccountService {
 
     private final HolderService holderService;
     private final EmployeeService employeeService;
-
+    @Lazy private final TransactionService transactionService;
     private final MessageSource messageSource;
 
     @Override
@@ -113,7 +118,17 @@ public class AccountServiceImpl implements AccountService {
     public void validateWithdrawal(Account account, BigDecimal amount, Currency currency) {
         //Check if current account has not exceeded daily transaction limit
         Long transactionLimit = account.getTransactionLimit();
-
+        List<Transaction> latestTransactions = transactionService.getLatestSourceAccountTransactionsByDate(
+                account,
+                LocalDateTime.now().minusHours(24));
+        BigDecimal totalAmount = latestTransactions.stream()
+                                                   .map(Transaction::getAmount)
+                                                   .reduce(BigDecimal.ZERO, BigDecimal::add).add(amount);
+        if (totalAmount.compareTo(BigDecimal.valueOf(transactionLimit)) > 0) {
+            throw new BadRequestException(messageSource.getMessage("account.transactionLimit.surpassed",
+                                                                   new String[]{transactionLimit.toString(), account.getCurrency().getSymbol()},
+                                                                   LocaleContextHolder.getLocale()));
+        }
 
         //Convert amount to account's selected currency
         Currency targetCurrency = account.getCurrency();

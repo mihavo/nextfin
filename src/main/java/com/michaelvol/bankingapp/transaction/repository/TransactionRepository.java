@@ -5,8 +5,11 @@ import com.michaelvol.bankingapp.transaction.entity.Transaction;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -18,6 +21,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
 
     Page<Transaction> findByTargetAccount(Account targetAccount, Pageable pageable);
 
-    //    @Query(value = "SELECT sourceAccount FROM transactions where created_at > ")
-    List<Transaction> getLast24HoursTransactions(Account account);
+    @Query(value = "SELECT t FROM Transaction t WHERE t.sourceAccount = :account AND t.createdAt >= :startDate")
+    List<Transaction> getTransactionsByAccountAndDate(@Param("account") Account account, @Param("startDate") LocalDateTime startDate);
 }
