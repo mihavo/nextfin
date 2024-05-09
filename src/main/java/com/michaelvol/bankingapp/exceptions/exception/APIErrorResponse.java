@@ -11,11 +11,11 @@ import java.time.ZonedDateTime;
 @Setter
 @Builder
 public class APIErrorResponse {
-    private String trace;
-
     private HttpStatus status;
 
     private String message;
 
     private ZonedDateTime timestamp;
+
+    private String trace;
 }
