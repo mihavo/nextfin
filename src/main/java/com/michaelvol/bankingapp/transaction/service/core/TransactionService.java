@@ -1,4 +1,4 @@
-package com.michaelvol.bankingapp.transaction.service;
+package com.michaelvol.bankingapp.transaction.service.core;
 
 import com.michaelvol.bankingapp.account.entity.Account;
 import com.michaelvol.bankingapp.transaction.dto.GetTransactionOptions;

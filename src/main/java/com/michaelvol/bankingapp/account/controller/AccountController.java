@@ -13,7 +13,7 @@ import com.michaelvol.bankingapp.account.entity.Account;
 import com.michaelvol.bankingapp.account.service.AccountService;
 import com.michaelvol.bankingapp.transaction.dto.GetTransactionOptions;
 import com.michaelvol.bankingapp.transaction.entity.Transaction;
-import com.michaelvol.bankingapp.transaction.service.TransactionService;
+import com.michaelvol.bankingapp.transaction.service.core.TransactionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;

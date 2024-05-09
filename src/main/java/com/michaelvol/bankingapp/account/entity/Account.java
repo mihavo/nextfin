@@ -69,6 +69,10 @@ public class Account {
     @JoinColumn(name = "manager_id")
     private Employee manager;
 
+    @Column(name = "transaction_limit")
+    @Builder.Default
+    Long transactionLimit = 1000L;
+
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private Instant dateOpened;

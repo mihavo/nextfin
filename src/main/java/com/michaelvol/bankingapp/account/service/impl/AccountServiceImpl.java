@@ -111,6 +111,10 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public void validateWithdrawal(Account account, BigDecimal amount, Currency currency) {
+        //Check if current account has not exceeded daily transaction limit
+        Long transactionLimit = account.getTransactionLimit();
+
+
         //Convert amount to account's selected currency
         Currency targetCurrency = account.getCurrency();
         MonetaryConversions.getConversion(targetCurrency.getCurrencyCode());
