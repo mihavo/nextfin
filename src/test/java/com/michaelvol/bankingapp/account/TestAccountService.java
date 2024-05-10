@@ -10,15 +10,16 @@ import com.michaelvol.bankingapp.account.samples.AccountSamples;
 import com.michaelvol.bankingapp.account.service.core.impl.AccountServiceImpl;
 import com.michaelvol.bankingapp.employee.entity.Employee;
 import com.michaelvol.bankingapp.employee.service.EmployeeService;
+import com.michaelvol.bankingapp.exceptions.exception.NotFoundException;
 import com.michaelvol.bankingapp.holder.entity.Holder;
 import com.michaelvol.bankingapp.holder.service.HolderService;
-import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.MessageSource;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
@@ -44,6 +45,9 @@ public class TestAccountService {
 
     @Mock
     private EmployeeService employeeService;
+
+    @Mock
+    private MessageSource messageSource;
 
     Account sampleAccount;
 
@@ -90,7 +94,7 @@ public class TestAccountService {
 
     @Test
     public void getAccount_notFound() {
-        assertThrows(EntityNotFoundException.class, () -> accountService.getAccount(1L));
+        assertThrows(NotFoundException.class, () -> accountService.getAccount(1L));
     }
 
     @Test
