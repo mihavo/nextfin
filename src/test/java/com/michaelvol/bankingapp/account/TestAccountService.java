@@ -7,7 +7,7 @@ import com.michaelvol.bankingapp.account.dto.WithdrawAmountRequestDto;
 import com.michaelvol.bankingapp.account.entity.Account;
 import com.michaelvol.bankingapp.account.repository.AccountRepository;
 import com.michaelvol.bankingapp.account.samples.AccountSamples;
-import com.michaelvol.bankingapp.account.service.impl.AccountServiceImpl;
+import com.michaelvol.bankingapp.account.service.core.impl.AccountServiceImpl;
 import com.michaelvol.bankingapp.employee.entity.Employee;
 import com.michaelvol.bankingapp.employee.service.EmployeeService;
 import com.michaelvol.bankingapp.holder.entity.Holder;
@@ -19,7 +19,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.MessageSource;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
@@ -45,9 +44,6 @@ public class TestAccountService {
 
     @Mock
     private EmployeeService employeeService;
-
-    @Mock
-    private MessageSource messageSource;
 
     Account sampleAccount;
 

@@ -3,7 +3,7 @@ package com.michaelvol.bankingapp.transaction.service.core.impl;
 import com.michaelvol.bankingapp.account.dto.DepositAmountRequestDto;
 import com.michaelvol.bankingapp.account.dto.WithdrawAmountRequestDto;
 import com.michaelvol.bankingapp.account.entity.Account;
-import com.michaelvol.bankingapp.account.service.AccountService;
+import com.michaelvol.bankingapp.account.service.core.AccountService;
 import com.michaelvol.bankingapp.exceptions.exception.NotFoundException;
 import com.michaelvol.bankingapp.transaction.dto.GetTransactionOptions;
 import com.michaelvol.bankingapp.transaction.dto.TransactionDirection;
@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.javamoney.moneta.Money;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.context.MessageSource;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -36,12 +37,12 @@ import javax.money.convert.CurrencyConversion;
 import javax.money.convert.MonetaryConversions;
 
 @Service
-@RequiredArgsConstructor
+@RequiredArgsConstructor(onConstructor_ = {@Lazy})
 public class CoreTransactionServiceImpl implements TransactionService {
 
     private final TransactionRepository transactionRepository;
     private final TransactionProcessor transactionProcessor;
-    private final TransactionValidator transactionValidator;
+    @Lazy private final TransactionValidator transactionValidator;
 
     private final AccountService accountService;
 

@@ -1,14 +1,15 @@
-package com.michaelvol.bankingapp.account.service;
+package com.michaelvol.bankingapp.account.service.core;
 
 import com.michaelvol.bankingapp.account.dto.CreateAccountRequestDto;
 import com.michaelvol.bankingapp.account.dto.DepositAmountRequestDto;
 import com.michaelvol.bankingapp.account.dto.GetAccountBalanceDto;
+import com.michaelvol.bankingapp.account.dto.ValidateWithdrawalDto;
 import com.michaelvol.bankingapp.account.dto.WithdrawAmountRequestDto;
 import com.michaelvol.bankingapp.account.entity.Account;
+import com.michaelvol.bankingapp.account.service.validator.AccountValidator;
 import jakarta.persistence.EntityNotFoundException;
 
 import java.math.BigDecimal;
-import java.util.Currency;
 import java.util.List;
 
 public interface AccountService {
@@ -58,10 +59,9 @@ public interface AccountService {
     GetAccountBalanceDto checkBalance(Long accountId);
 
     /**
-     * Validates an amount in the given currency for being able to be withdrawn i.e. funds suffice
-     * @param account  the account to perform the validation
-     * @param amount   the amount to be withdrawn
-     * @param currency the currency of the given amount
+     * Uses an {@link AccountValidator} to validate a withdrawal
+     * @param dto the dto containing the withdrawal info
      */
-    void validateWithdrawal(Account account, BigDecimal amount, Currency currency);
+    void validateWithdrawal(ValidateWithdrawalDto dto);
+
 }

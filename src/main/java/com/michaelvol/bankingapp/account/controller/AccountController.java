@@ -10,7 +10,7 @@ import com.michaelvol.bankingapp.account.dto.GetAccountResponseDto;
 import com.michaelvol.bankingapp.account.dto.WithdrawAmountRequestDto;
 import com.michaelvol.bankingapp.account.dto.WithdrawAmountResponseDto;
 import com.michaelvol.bankingapp.account.entity.Account;
-import com.michaelvol.bankingapp.account.service.AccountService;
+import com.michaelvol.bankingapp.account.service.core.AccountService;
 import com.michaelvol.bankingapp.transaction.dto.GetTransactionOptions;
 import com.michaelvol.bankingapp.transaction.entity.Transaction;
 import com.michaelvol.bankingapp.transaction.service.core.TransactionService;

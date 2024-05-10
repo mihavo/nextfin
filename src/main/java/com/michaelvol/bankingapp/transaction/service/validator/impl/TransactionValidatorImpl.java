@@ -1,7 +1,8 @@
 package com.michaelvol.bankingapp.transaction.service.validator.impl;
 
+import com.michaelvol.bankingapp.account.dto.ValidateWithdrawalDto;
 import com.michaelvol.bankingapp.account.entity.Account;
-import com.michaelvol.bankingapp.account.service.AccountService;
+import com.michaelvol.bankingapp.account.service.core.AccountService;
 import com.michaelvol.bankingapp.transaction.dto.TransferRequestDto;
 import com.michaelvol.bankingapp.transaction.service.validator.TransactionValidator;
 import lombok.RequiredArgsConstructor;
@@ -40,6 +41,10 @@ public class TransactionValidatorImpl implements TransactionValidator {
                                                                        LocaleContextHolder.getLocale()));
         }
 
-        accountService.validateWithdrawal(sourceAccount, amount, currency);
+        accountService.validateWithdrawal(ValidateWithdrawalDto.builder()
+                                                               .account(sourceAccount)
+                                                               .amount(amount)
+                                                               .currency(currency)
+                                                               .build());
     }
 }

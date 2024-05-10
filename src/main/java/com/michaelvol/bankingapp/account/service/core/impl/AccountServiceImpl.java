@@ -1,24 +1,23 @@
-package com.michaelvol.bankingapp.account.service.impl;
+package com.michaelvol.bankingapp.account.service.core.impl;
 
 import com.michaelvol.bankingapp.account.dto.CreateAccountRequestDto;
 import com.michaelvol.bankingapp.account.dto.DepositAmountRequestDto;
 import com.michaelvol.bankingapp.account.dto.GetAccountBalanceDto;
+import com.michaelvol.bankingapp.account.dto.ValidateWithdrawalDto;
 import com.michaelvol.bankingapp.account.dto.WithdrawAmountRequestDto;
 import com.michaelvol.bankingapp.account.entity.Account;
 import com.michaelvol.bankingapp.account.enums.AccountStatus;
 import com.michaelvol.bankingapp.account.repository.AccountRepository;
-import com.michaelvol.bankingapp.account.service.AccountService;
+import com.michaelvol.bankingapp.account.service.core.AccountService;
+import com.michaelvol.bankingapp.account.service.validator.AccountValidator;
 import com.michaelvol.bankingapp.employee.entity.Employee;
 import com.michaelvol.bankingapp.employee.service.EmployeeService;
-import com.michaelvol.bankingapp.exceptions.exception.BadRequestException;
 import com.michaelvol.bankingapp.exceptions.exception.NotFoundException;
 import com.michaelvol.bankingapp.holder.entity.Holder;
 import com.michaelvol.bankingapp.holder.service.HolderService;
-import com.michaelvol.bankingapp.transaction.entity.Transaction;
 import com.michaelvol.bankingapp.transaction.service.core.TransactionService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.javamoney.moneta.Money;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -27,23 +26,22 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Currency;
 import java.util.List;
 
-import javax.money.convert.MonetaryConversions;
-
 @Service
-@RequiredArgsConstructor
+@RequiredArgsConstructor(onConstructor_ = {@Lazy})
 public class AccountServiceImpl implements AccountService {
 
     private final AccountRepository accountRepository;
+    @Lazy private final AccountValidator accountValidator;
 
     private final HolderService holderService;
     private final EmployeeService employeeService;
     @Lazy private final TransactionService transactionService;
+
     private final MessageSource messageSource;
 
     @Override
@@ -115,31 +113,8 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public void validateWithdrawal(Account account, BigDecimal amount, Currency currency) {
-        //Check if current account has not exceeded daily transaction limit
-        Long transactionLimit = account.getTransactionLimit();
-        List<Transaction> latestTransactions = transactionService.getLatestSourceAccountTransactionsByDate(
-                account,
-                LocalDateTime.now().minusHours(24));
-        BigDecimal totalAmount = latestTransactions.stream()
-                                                   .map(Transaction::getAmount)
-                                                   .reduce(BigDecimal.ZERO, BigDecimal::add).add(amount);
-        if (totalAmount.compareTo(BigDecimal.valueOf(transactionLimit)) > 0) {
-            throw new BadRequestException(messageSource.getMessage("account.transactionLimit.surpassed",
-                                                                   new String[]{transactionLimit.toString(), account.getCurrency().getSymbol()},
-                                                                   LocaleContextHolder.getLocale()));
-        }
-
-        //Convert amount to account's selected currency
-        Currency targetCurrency = account.getCurrency();
-        MonetaryConversions.getConversion(targetCurrency.getCurrencyCode());
-        BigDecimal convertedAmount = Money.of(amount, currency.getCurrencyCode())
-                                          .getNumber()
-                                          .numberValue(BigDecimal.class);
-        if (account.getBalance().compareTo(convertedAmount) < 0) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                                              messageSource.getMessage("account.withdraw.insufficient", null,
-                                                                       LocaleContextHolder.getLocale()));
-        }
+    public void validateWithdrawal(ValidateWithdrawalDto dto) {
+        accountValidator.validateWithdrawal(dto);
     }
+
 }
