@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,5 +22,5 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
     Page<Transaction> findByTargetAccount(Account targetAccount, Pageable pageable);
 
     @Query(value = "SELECT t FROM Transaction t WHERE t.sourceAccount = :account AND t.createdAt >= :startDate")
-    List<Transaction> getTransactionsByAccountAndDate(@Param("account") Account account, @Param("startDate") LocalDateTime startDate);
+    List<Transaction> getTransactionsByAccountAndDate(@Param("account") Account account, @Param("startDate") Instant instant);
 }

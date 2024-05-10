@@ -23,7 +23,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Supplier;
@@ -89,8 +89,8 @@ public class CoreTransactionServiceImpl implements TransactionService {
         }
     }
 
-    public List<Transaction> getLatestSourceAccountTransactionsByDate(Account sourceAccount, LocalDateTime date) {
-        return transactionRepository.getTransactionsByAccountAndDate(sourceAccount, date);
+    public List<Transaction> getLatestSourceAccountTransactionsByDate(Account sourceAccount, Instant instant) {
+        return transactionRepository.getTransactionsByAccountAndDate(sourceAccount, instant);
     }
 
     private @NotNull Transaction processTransaction(Transaction transaction) {

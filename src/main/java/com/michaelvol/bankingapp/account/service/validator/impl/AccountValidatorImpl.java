@@ -16,6 +16,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Currency;
 import java.util.List;
 
@@ -36,7 +37,7 @@ public class AccountValidatorImpl implements AccountValidator {
         Long transactionLimit = account.getTransactionLimit();
         List<Transaction> latestTransactions = transactionService.getLatestSourceAccountTransactionsByDate(
                 account,
-                LocalDateTime.now().minusHours(24));
+                LocalDateTime.now().minusHours(24).atZone(ZoneId.systemDefault()).toInstant());
         BigDecimal totalAmount = latestTransactions.stream()
                                                    .map(Transaction::getAmount)
                                                    .reduce(BigDecimal.ZERO, BigDecimal::add).add(amount);
