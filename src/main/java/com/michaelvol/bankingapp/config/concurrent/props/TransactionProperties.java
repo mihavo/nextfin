@@ -14,9 +14,12 @@ public class TransactionProperties {
 
     private final int queueCapacity;
 
-    public TransactionProperties(int corePoolSize, int maxPoolSize, int queueCapacity) {
+    private final int keepAliveSeconds;
+
+    public TransactionProperties(int corePoolSize, int maxPoolSize, int queueCapacity, int keepAliveSeconds) {
         this.corePoolSize = corePoolSize;
         this.maxPoolSize = maxPoolSize;
         this.queueCapacity = queueCapacity;
+        this.keepAliveSeconds = keepAliveSeconds;
     }
 }

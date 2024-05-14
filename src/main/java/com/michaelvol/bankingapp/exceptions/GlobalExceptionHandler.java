@@ -3,6 +3,7 @@ package com.michaelvol.bankingapp.exceptions;
 import com.michaelvol.bankingapp.exceptions.exception.APIErrorResponse;
 import com.michaelvol.bankingapp.exceptions.exception.BadRequestException;
 import com.michaelvol.bankingapp.exceptions.exception.NotFoundException;
+import com.michaelvol.bankingapp.exceptions.exception.TransactionTimeoutException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -35,6 +36,16 @@ public class GlobalExceptionHandler {
                                                     .trace(printStackTrace(e))
                                                     .build(),
                                     HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(TransactionTimeoutException.class)
+    public ResponseEntity<APIErrorResponse> handleTransactionTimeoutException(TransactionTimeoutException e) {
+        return new ResponseEntity<>(APIErrorResponse.builder()
+                                                    .status(HttpStatus.SERVICE_UNAVAILABLE)
+                                                    .message(e.getMessage())
+                                                    .timestamp(ZonedDateTime.now())
+                                                    .trace(printStackTrace(e))
+                                                    .build(), HttpStatus.SERVICE_UNAVAILABLE);
     }
 
     protected String printStackTrace(Throwable exception) {
