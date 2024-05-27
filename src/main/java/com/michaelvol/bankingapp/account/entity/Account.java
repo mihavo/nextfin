@@ -73,6 +73,10 @@ public class Account {
     @Builder.Default
     Long transactionLimit = 1000L;
 
+    @Column(name = "transaction_limit_enabled")
+    @Builder.Default
+    Boolean transactionLimitEnabled = true;
+
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private Instant dateOpened;

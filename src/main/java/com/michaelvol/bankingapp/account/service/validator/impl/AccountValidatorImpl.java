@@ -34,17 +34,20 @@ public class AccountValidatorImpl implements AccountValidator {
         BigDecimal amount = dto.getAmount();
         Currency currency = dto.getCurrency();
         //Check if current account has not exceeded daily transaction limit
-        Long transactionLimit = account.getTransactionLimit();
-        List<Transaction> latestTransactions = transactionService.getLatestSourceAccountTransactionsByDate(
-                account,
-                LocalDateTime.now().minusHours(24).atZone(ZoneId.systemDefault()).toInstant());
-        BigDecimal totalAmount = latestTransactions.stream()
-                                                   .map(Transaction::getAmount)
-                                                   .reduce(BigDecimal.ZERO, BigDecimal::add).add(amount);
-        if (totalAmount.compareTo(BigDecimal.valueOf(transactionLimit)) > 0) {
-            throw new BadRequestException(messageSource.getMessage("account.transactionLimit.surpassed",
-                                                                   new String[]{transactionLimit.toString(), account.getCurrency().getSymbol()},
-                                                                   LocaleContextHolder.getLocale()));
+        if (account.getTransactionLimitEnabled()) {
+            Long transactionLimit = account.getTransactionLimit();
+            List<Transaction> latestTransactions = transactionService.getLatestSourceAccountTransactionsByDate(
+                    account,
+                    LocalDateTime.now().minusHours(24).atZone(ZoneId.systemDefault()).toInstant());
+
+            BigDecimal totalAmount = latestTransactions.stream()
+                                                       .map(Transaction::getAmount)
+                                                       .reduce(BigDecimal.ZERO, BigDecimal::add).add(amount);
+            if (totalAmount.compareTo(BigDecimal.valueOf(transactionLimit)) > 0) {
+                throw new BadRequestException(messageSource.getMessage("account.transaction-limit.surpassed",
+                                                                       new String[]{transactionLimit.toString(), account.getCurrency().getSymbol()},
+                                                                       LocaleContextHolder.getLocale()));
+            }
         }
 
         //Convert amount to account's selected currency

@@ -5,7 +5,6 @@ import com.michaelvol.bankingapp.account.dto.WithdrawAmountRequestDto;
 import com.michaelvol.bankingapp.account.entity.Account;
 import com.michaelvol.bankingapp.account.service.core.AccountService;
 import com.michaelvol.bankingapp.config.concurrent.props.TransactionProperties;
-import com.michaelvol.bankingapp.exceptions.exception.TransactionTimeoutException;
 import com.michaelvol.bankingapp.transaction.entity.Transaction;
 import com.michaelvol.bankingapp.transaction.enums.TransactionStatus;
 import com.michaelvol.bankingapp.transaction.repository.TransactionRepository;
@@ -13,10 +12,7 @@ import com.michaelvol.bankingapp.transaction.service.processor.TransactionProces
 import lombok.RequiredArgsConstructor;
 import org.javamoney.moneta.Money;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -24,29 +20,19 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.Currency;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import javax.money.convert.CurrencyConversion;
 import javax.money.convert.MonetaryConversions;
 
 @Service
-@Transactional(isolation = Isolation.REPEATABLE_READ, propagation = Propagation.REQUIRED, timeout = 30)
+@Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED, timeout = 30)
 @RequiredArgsConstructor(onConstructor_ = {@Lazy})
 @EnableConfigurationProperties(TransactionProperties.class)
 public class TransactionProcessorImpl implements TransactionProcessor {
 
     private final TransactionRepository transactionRepository;
 
-    private final ThreadPoolTaskExecutor transactionTaskExecutor;
-
-    private final TransactionProperties transactionProperties;
-
     @Lazy private final AccountService accountService;
-
-    private final MessageSource messageSource;
 
     @Override
     public void doTransaction(Transaction transaction) {
@@ -82,15 +68,6 @@ public class TransactionProcessorImpl implements TransactionProcessor {
     }
 
     private void submitTransactionTask(Transaction transaction) {
-        Future<?> transactionResult = transactionTaskExecutor.submit(() -> doTransaction(transaction));
-        try {
-            transactionResult.get(transactionProperties.getKeepAliveSeconds(), TimeUnit.SECONDS);
-        } catch (InterruptedException | ExecutionException e) {
-            throw new RuntimeException(e);
-        } catch (TimeoutException e) {
-            throw new TransactionTimeoutException(messageSource.getMessage("transaction.executor.timeout",
-                                                                           null,
-                                                                           LocaleContextHolder.getLocale()));
-        }
+        doTransaction(transaction);
     }
 }
