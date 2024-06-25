@@ -16,6 +16,4 @@ public class APIErrorResponse {
     private String message;
 
     private ZonedDateTime timestamp;
-
-    private String trace;
 }

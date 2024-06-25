@@ -1,5 +1,6 @@
 package com.michaelvol.bankingapp.holder.service.impl;
 
+import com.michaelvol.bankingapp.exceptions.exception.NotFoundException;
 import com.michaelvol.bankingapp.holder.dto.CreateHolderRequestDto;
 import com.michaelvol.bankingapp.holder.dto.HolderMapper;
 import com.michaelvol.bankingapp.holder.entity.Holder;
@@ -27,6 +28,6 @@ public class HolderServiceImpl implements HolderService {
     @Override
     public Holder getHolderById(Long holderId) throws NoSuchElementException {
         return holderRepository.findById(holderId)
-                               .orElseThrow(() -> new NoSuchElementException("Holder with id " + holderId + " not found"));
+                               .orElseThrow(() -> new NotFoundException("Holder with id " + holderId + " not found"));
     }
 }

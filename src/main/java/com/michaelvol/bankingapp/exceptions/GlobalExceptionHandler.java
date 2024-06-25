@@ -22,7 +22,6 @@ public class GlobalExceptionHandler {
                                                     .status(HttpStatus.BAD_REQUEST)
                                                     .message(e.getMessage())
                                                     .timestamp(ZonedDateTime.now())
-                                                    .trace(printStackTrace(e))
                                                     .build(),
                                     HttpStatus.BAD_REQUEST);
     }
@@ -33,7 +32,6 @@ public class GlobalExceptionHandler {
                                                     .status(HttpStatus.NOT_FOUND)
                                                     .message(e.getMessage())
                                                     .timestamp(ZonedDateTime.now())
-                                                    .trace(printStackTrace(e))
                                                     .build(),
                                     HttpStatus.NOT_FOUND);
     }
@@ -44,7 +42,6 @@ public class GlobalExceptionHandler {
                                                     .status(HttpStatus.SERVICE_UNAVAILABLE)
                                                     .message(e.getMessage())
                                                     .timestamp(ZonedDateTime.now())
-                                                    .trace(printStackTrace(e))
                                                     .build(), HttpStatus.SERVICE_UNAVAILABLE);
     }
 

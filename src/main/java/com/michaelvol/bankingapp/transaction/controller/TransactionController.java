@@ -51,5 +51,4 @@ public class TransactionController {
         TransactionStatus transactionStatus = transactionService.checkStatus(id);
         return new ResponseEntity<>(transactionStatus, HttpStatus.OK);
     }
-
 }
