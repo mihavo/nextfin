@@ -105,6 +105,7 @@ public class CoreTransactionServiceImpl implements TransactionService {
                                              .targetAccount(accountService.getAccount(dto.getTargetAccountId()))
                                              .build();
         transactionRepository.save(transaction);
+        
         return transaction;
     }
 
