@@ -22,6 +22,13 @@ public interface AccountService {
     List<Account> checkExistence(Long... accountIds);
 
     /**
+     * Checks for the existence of a single account based on its id.
+     * @param accountId the account id
+     * @return true/false depending on the existence of the account
+     */
+    Boolean checkExistence(Long accountId);
+
+    /**
      * Creates a new account given the info from {@link CreateAccountRequestDto}
      * @param createAccountRequestDto the dto
      * @return the new account created

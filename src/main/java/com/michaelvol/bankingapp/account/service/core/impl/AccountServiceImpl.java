@@ -58,6 +58,10 @@ public class AccountServiceImpl implements AccountService {
         return accounts;
     }
 
+    public Boolean checkExistence(Long accountId) {
+        return accountRepository.existsById(accountId);
+    }
+
     @Override
     public Account createAccount(CreateAccountRequestDto dto) {
         Holder holder = holderService.getHolderById(dto.holderId);
