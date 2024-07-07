@@ -2,11 +2,14 @@ package com.michaelvol.bankingapp.holder.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.michaelvol.bankingapp.account.entity.Account;
+import com.michaelvol.bankingapp.common.address.entity.Address;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
@@ -65,6 +68,11 @@ public class Holder {
     @Size(min = 7, max = 20, message = "Password must be between 7 and 20 characters")
     @JsonIgnore
     private String password;
+
+    @ManyToOne
+    @JoinColumn(name = "address_id")
+    @JsonIgnore
+    private Address address;
 
     @ToString.Exclude
     @OneToMany(mappedBy = "holder")

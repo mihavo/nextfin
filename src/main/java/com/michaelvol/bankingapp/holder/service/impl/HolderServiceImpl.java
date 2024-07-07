@@ -1,5 +1,7 @@
 package com.michaelvol.bankingapp.holder.service.impl;
 
+import com.michaelvol.bankingapp.common.address.service.def.AddressService;
+import com.michaelvol.bankingapp.exceptions.exception.BadRequestException;
 import com.michaelvol.bankingapp.exceptions.exception.NotFoundException;
 import com.michaelvol.bankingapp.holder.dto.CreateHolderRequestDto;
 import com.michaelvol.bankingapp.holder.dto.HolderMapper;
@@ -7,6 +9,8 @@ import com.michaelvol.bankingapp.holder.entity.Holder;
 import com.michaelvol.bankingapp.holder.repository.HolderRepository;
 import com.michaelvol.bankingapp.holder.service.HolderService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.NoSuchElementException;
@@ -17,10 +21,20 @@ public class HolderServiceImpl implements HolderService {
 
     private final HolderRepository holderRepository;
 
+    private final AddressService addressService;
+
     private final HolderMapper mapper;
+
+    private final MessageSource messageSource;
 
     @Override
     public Holder createHolder(CreateHolderRequestDto dto) {
+        boolean holderMatch = holderRepository.existsHolderBySocialSecurityNumber(dto.getSocialSecurityNumber());
+        if (holderMatch) {
+            throw new BadRequestException(messageSource.getMessage("holder.exists",
+                                                                   null,
+                                                                   LocaleContextHolder.getLocale()));
+        }
         Holder holder = mapper.createHolderRequestDtoToHolder(dto);
         return holderRepository.save(holder);
     }

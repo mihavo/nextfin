@@ -1,6 +1,7 @@
 package com.michaelvol.bankingapp.holder.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.michaelvol.bankingapp.common.address.dto.AddressDataDto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Past;
@@ -35,4 +36,6 @@ public class CreateHolderRequestDto {
 
     @Size(min = 7, max = 20, message = "Password must be between 7 and 20 characters")
     public String password;
+
+    AddressDataDto addressData;
 }
