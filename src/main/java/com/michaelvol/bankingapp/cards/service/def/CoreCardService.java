@@ -4,7 +4,7 @@ import com.michaelvol.bankingapp.account.entity.Account;
 import com.michaelvol.bankingapp.cards.dto.IssueCardRequestDto;
 import com.michaelvol.bankingapp.cards.dto.details.CardDetails;
 
-public interface CardService {
+public interface CoreCardService {
 
     /**
      * Business logic for issuing a card to an account

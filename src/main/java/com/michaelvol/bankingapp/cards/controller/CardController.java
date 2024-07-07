@@ -3,7 +3,7 @@ package com.michaelvol.bankingapp.cards.controller;
 import com.michaelvol.bankingapp.AppConstants;
 import com.michaelvol.bankingapp.cards.dto.IssueCardRequestDto;
 import com.michaelvol.bankingapp.cards.dto.IssueCardResponseDto;
-import com.michaelvol.bankingapp.cards.service.def.CardService;
+import com.michaelvol.bankingapp.cards.service.def.CoreCardService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Payment Cards API", description = "Methods for HTTP card requests")
 public class CardController {
 
-    private final CardService cardService;
+    private final CoreCardService cardService;
     private final MessageSource messageSource;
 
     @PostMapping("/issue")
