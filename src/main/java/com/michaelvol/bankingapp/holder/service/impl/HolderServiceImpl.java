@@ -1,5 +1,7 @@
 package com.michaelvol.bankingapp.holder.service.impl;
 
+import com.michaelvol.bankingapp.common.address.dto.AddressDataDto;
+import com.michaelvol.bankingapp.common.address.entity.Address;
 import com.michaelvol.bankingapp.common.address.service.def.AddressService;
 import com.michaelvol.bankingapp.exceptions.exception.BadRequestException;
 import com.michaelvol.bankingapp.exceptions.exception.NotFoundException;
@@ -35,7 +37,14 @@ public class HolderServiceImpl implements HolderService {
                                                                    null,
                                                                    LocaleContextHolder.getLocale()));
         }
+        AddressDataDto addressData = dto.getAddressData();
+
+        //The address service will check if an address with the same address
+        //data already exists, returning the existing one in that case
+        Address address = addressService.create(addressData);
+
         Holder holder = mapper.createHolderRequestDtoToHolder(dto);
+        holder.setAddress(address);
         return holderRepository.save(holder);
     }
 
