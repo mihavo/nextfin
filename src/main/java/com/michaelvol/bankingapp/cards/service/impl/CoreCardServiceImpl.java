@@ -1,6 +1,7 @@
 package com.michaelvol.bankingapp.cards.service.impl;
 
 import com.michaelvol.bankingapp.account.entity.Account;
+import com.michaelvol.bankingapp.account.enums.AccountStatus;
 import com.michaelvol.bankingapp.account.service.core.AccountService;
 import com.michaelvol.bankingapp.cards.dto.IssueCardRequestDto;
 import com.michaelvol.bankingapp.cards.dto.details.CardDetails;
@@ -37,6 +38,11 @@ public class CoreCardServiceImpl implements CoreCardService {
 
     @Override
     public void issue(IssueCardRequestDto request) {
-
+        Account account = accountService.getAccount(request.accountId());
+        if (!account.getStatus().equals(AccountStatus.ACTIVE)) {
+            throw new BadRequestException(messageSource.getMessage("account.notactive", new Long[]{account.getId()},
+                                                                   LocaleContextHolder.getLocale()));
+        }
+        
     }
 }
