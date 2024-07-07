@@ -2,6 +2,7 @@ package com.michaelvol.bankingapp.cards.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.michaelvol.bankingapp.account.entity.Account;
+import com.michaelvol.bankingapp.cards.enums.CardStatus;
 import com.michaelvol.bankingapp.cards.enums.CardType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -16,6 +17,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.validator.constraints.CreditCardNumber;
 import org.hibernate.validator.constraints.Length;
 
 import java.time.LocalDate;
@@ -33,6 +36,7 @@ public class Card {
     private UUID id;
 
     @Column(name = "card_number", nullable = false, unique = true)
+    @CreditCardNumber
     @Length(min = 16, max = 16)
     private String cardNumber;
 
@@ -57,4 +61,13 @@ public class Card {
     @Column(name = "type", nullable = false)
     @Enumerated
     private CardType type;
+
+    @Column(name = "status", nullable = false)
+    @Enumerated
+    private CardStatus status;
+
+    @CreationTimestamp
+    @Column(name = "issue_date", nullable = false)
+    private LocalDate issueDate;
+
 }
