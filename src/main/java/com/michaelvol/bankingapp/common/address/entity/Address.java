@@ -1,7 +1,9 @@
 package com.michaelvol.bankingapp.common.address.entity;
 
+import com.michaelvol.bankingapp.common.address.enums.AddressType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -46,9 +48,14 @@ public class Address {
     @Column(name = "state", nullable = false)
     public String state;
 
-    @Column(name = "zip", nullable = false)
+    @Column(name = "zip_code", nullable = false)
     @Range(min = 5, max = 5)
-    public String zip;
+    public String zipCode;
+
+    @Column(name = "type", nullable = false)
+    @Builder.Default
+    @Enumerated
+    public AddressType type = AddressType.BILLING;
 
     @CreationTimestamp
     @Column(name = "creation_date", nullable = false)
