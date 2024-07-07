@@ -1,0 +1,58 @@
+package com.michaelvol.bankingapp.common.address.service.impl;
+
+import com.michaelvol.bankingapp.common.address.dto.AddressDataDto;
+import com.michaelvol.bankingapp.common.address.entity.Address;
+import com.michaelvol.bankingapp.common.address.enums.AddressType;
+import com.michaelvol.bankingapp.common.address.repository.AddressRepository;
+import com.michaelvol.bankingapp.common.address.service.def.AddressService;
+import com.michaelvol.bankingapp.exceptions.exception.BadRequestException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.stereotype.Service;
+
+/**
+ * Main implementation of {@link AddressService}
+ */
+@Service
+@RequiredArgsConstructor
+public class AddressServiceImpl implements AddressService {
+    private final AddressRepository addressRepository;
+    private final MessageSource messageSource;
+
+    @Override
+    public Address create(AddressDataDto dto) {
+        String street = dto.street();
+        Integer number = dto.number();
+        Integer floor = dto.floor();
+        String city = dto.city();
+        String zipCode = dto.zipCode();
+
+        Address address = addressRepository.findAddress(street, number, floor, city, zipCode);
+        if (address != null)
+            return address;
+        return addressRepository.save(Address.builder()
+                                             .street(street)
+                                             .number(number)
+                                             .floor(floor)
+                                             .city(city)
+                                             .zipCode(zipCode)
+                                             .state(dto.state())
+                                             .type(dto.addressType() != null ? dto.addressType() : AddressType.BILLING)
+                                             .build());
+    }
+
+    @Override
+    public Address update(AddressDataDto dto) {
+        //TODO: Implement
+        return null;
+    }
+
+    @Override
+    public void delete(Long addressId) {
+        addressRepository.findById(addressId)
+                         .orElseThrow(() -> new BadRequestException(messageSource.getMessage("address.notfound",
+                                                                                             new Long[]{addressId},
+                                                                                             LocaleContextHolder.getLocale())));
+    }
+}
