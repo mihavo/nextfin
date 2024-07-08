@@ -1,5 +1,6 @@
 package com.michaelvol.bankingapp.cards.service.impl;
 
+import com.michaelvol.bankingapp.cards.repository.CardRepository;
 import com.michaelvol.bankingapp.cards.service.def.CardDataService;
 import lombok.RequiredArgsConstructor;
 import net.datafaker.Faker;
@@ -22,9 +23,12 @@ public class CardDataServiceImpl implements CardDataService {
     @Value("${finance.card.expiration-date-interval}")
     private Short expirationDateInterval;
 
+    private final CardRepository cardRepository;
+
     @Override
     public String generateNumber() {
-        return faker.finance().creditCard(Finance.CreditCardType.valueOf(creditCardIssuer));
+        String cardNumber = faker.finance().creditCard(Finance.CreditCardType.valueOf(creditCardIssuer));
+        return cardRepository.existsCardByCardNumber(cardNumber) ? generateNumber() : cardNumber;
     }
 
     @Override
