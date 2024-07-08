@@ -1,5 +1,6 @@
 package com.michaelvol.bankingapp.cards.service.impl;
 
+import com.michaelvol.bankingapp.AppConstants;
 import com.michaelvol.bankingapp.cards.repository.CardRepository;
 import com.michaelvol.bankingapp.cards.service.def.CardDataService;
 import lombok.RequiredArgsConstructor;
@@ -27,13 +28,13 @@ public class CardDataServiceImpl implements CardDataService {
 
     @Override
     public String generateNumber() {
-        String cardNumber = faker.finance().creditCard(Finance.CreditCardType.valueOf(creditCardIssuer));
+        String cardNumber = faker.finance().creditCard(Finance.CreditCardType.valueOf(creditCardIssuer.toUpperCase()));
         return cardRepository.existsCardByCardNumber(cardNumber) ? generateNumber() : cardNumber;
     }
 
     @Override
     public boolean validate(String cardNumber) {
-        return cardNumber.matches(" ^(5[1-5]|222[1-9]|22[3-9]|2[3-6]|27[01]|2720)[0-9]*$.");
+        return cardNumber.matches(AppConstants.VISA_REGEX);
     }
 
     @Override

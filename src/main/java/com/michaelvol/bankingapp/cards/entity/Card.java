@@ -1,6 +1,7 @@
 package com.michaelvol.bankingapp.cards.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.michaelvol.bankingapp.AppConstants;
 import com.michaelvol.bankingapp.account.entity.Account;
 import com.michaelvol.bankingapp.cards.enums.CardStatus;
 import com.michaelvol.bankingapp.cards.enums.CardType;
@@ -14,6 +15,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -39,8 +41,8 @@ public class Card {
     private UUID id;
 
     @Column(name = "card_number", nullable = false, unique = true)
-    @CreditCardNumber
-    @Length(min = 16, max = 16)
+    @CreditCardNumber(ignoreNonDigitCharacters = true)
+    @Pattern(regexp = AppConstants.VISA_REGEX)
     private String cardNumber;
 
     @Column(name = "expiration_date", nullable = false)
