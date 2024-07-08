@@ -64,4 +64,24 @@ public class Address {
     @UpdateTimestamp
     @Column(name = "updated_date", nullable = false)
     public LocalDate updatedDate;
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(street);
+        sb.append(" ");
+        sb.append(number);
+        if (floor != 0) {
+            sb.append(" ");
+            sb.append(floor);
+            sb.append(" floor");
+        }
+        sb.append(", ");
+        sb.append(city);
+        sb.append(" ");
+        sb.append(state);
+        sb.append(" ");
+        sb.append(zipCode);
+        return sb.toString();
+    }
 }

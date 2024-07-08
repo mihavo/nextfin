@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.michaelvol.bankingapp.account.entity.Account;
 import com.michaelvol.bankingapp.cards.enums.CardStatus;
 import com.michaelvol.bankingapp.cards.enums.CardType;
+import com.michaelvol.bankingapp.common.address.entity.Address;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Enumerated;
@@ -14,6 +15,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -30,6 +32,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Getter
 @Setter
+@Builder
 public class Card {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -45,13 +48,15 @@ public class Card {
 
     @Column(name = "cvv", nullable = false)
     @JsonIgnore
-    private String cvv;
+    private Long cvv;
 
     @Column(name = "cardholder_name", nullable = false)
+    @Length(min = 2, max = 26)
     private String cardholderName;
 
-    @Column(name = "billing_address", nullable = false)
-    private String billingAddress;
+    @ManyToOne
+    @JoinColumn(name = "billing_address_id")
+    private Address billingAddress;
 
     @ManyToOne
     @JoinColumn(name = "account_id")

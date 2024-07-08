@@ -78,4 +78,9 @@ public class Holder {
     @OneToMany(mappedBy = "holder")
     @JsonIgnore
     private List<Account> accounts;
+
+
+    public String getFullName() {
+        return firstName + " " + lastName;
+    }
 }
