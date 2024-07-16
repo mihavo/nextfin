@@ -1,10 +1,13 @@
 package com.michaelvol.bankingapp.transaction.controller;
 
 import com.michaelvol.bankingapp.AppConstants;
+import com.michaelvol.bankingapp.transaction.dto.TransactionScheduleRequestDto;
+import com.michaelvol.bankingapp.transaction.dto.TransactionScheduleResponseDto;
 import com.michaelvol.bankingapp.transaction.dto.TransferRequestDto;
 import com.michaelvol.bankingapp.transaction.dto.TransferResultDto;
 import com.michaelvol.bankingapp.transaction.entity.Transaction;
 import com.michaelvol.bankingapp.transaction.enums.TransactionStatus;
+import com.michaelvol.bankingapp.transaction.scheduler.TransactionScheduler;
 import com.michaelvol.bankingapp.transaction.service.core.TransactionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -29,6 +32,8 @@ public class TransactionController {
 
     private final TransactionService transactionService;
 
+    private final TransactionScheduler transactionScheduler;
+
     @PostMapping("/transfer")
     @Operation(summary = "Transfers amount from one account to another",
             description = "Transfers a specified amount provided that the source account has" +
@@ -51,4 +56,11 @@ public class TransactionController {
         TransactionStatus transactionStatus = transactionService.checkStatus(id);
         return new ResponseEntity<>(transactionStatus, HttpStatus.OK);
     }
+
+    @PostMapping("/schedule")
+    @Operation(summary = "Schedule a transaction to be processed at a later time")
+    public ResponseEntity<TransactionScheduleResponseDto> scheduleTransaction(@RequestBody TransactionScheduleRequestDto dto) {
+
+    }
+
 }

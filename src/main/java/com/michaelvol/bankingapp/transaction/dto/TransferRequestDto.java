@@ -1,5 +1,6 @@
 package com.michaelvol.bankingapp.transaction.dto;
 
+import com.michaelvol.bankingapp.transaction.enums.TransferType;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.Builder;
@@ -23,4 +24,7 @@ public class TransferRequestDto {
 
     @NotNull(message = "{transaction.transfer.account.currency")
     Currency currency;
+
+    @NotNull(message = "{transaction.transfer.type.notnull")
+    TransferType transactionType;
 }
