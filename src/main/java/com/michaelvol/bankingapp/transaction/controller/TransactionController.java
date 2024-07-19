@@ -60,7 +60,7 @@ public class TransactionController {
     @PostMapping("/schedule")
     @Operation(summary = "Schedule a transaction to be processed at a later time")
     public ResponseEntity<TransactionScheduleResponseDto> scheduleTransaction(@RequestBody TransactionScheduleRequestDto dto) {
-
+        return null;
     }
 
 }

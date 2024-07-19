@@ -35,7 +35,7 @@ import java.util.List;
 @ToString
 public class Holder {
     @Id
-    @SequenceGenerator(name = "sequence_gen", sequenceName = "holders_seq")
+    @SequenceGenerator(name = "sequence_gen", sequenceName = "holders_seq", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequence_gen")
     @Column(name = "id", nullable = false)
     private Long id;

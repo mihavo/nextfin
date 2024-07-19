@@ -40,6 +40,6 @@ public class CreateHolderRequestDto {
     public String password;
 
     @Valid
-    @NotNull
-    AddressDataDto addressData;
+    @NotNull(message = "The holder must provide a valid address")
+    AddressDataDto address;
 }

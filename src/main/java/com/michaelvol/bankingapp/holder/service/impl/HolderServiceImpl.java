@@ -37,7 +37,7 @@ public class HolderServiceImpl implements HolderService {
                                                                    null,
                                                                    LocaleContextHolder.getLocale()));
         }
-        AddressDataDto addressData = dto.getAddressData();
+        AddressDataDto addressData = dto.getAddress();
 
         //The address service will check if an address with the same address
         //data already exists, returning the existing one in that case

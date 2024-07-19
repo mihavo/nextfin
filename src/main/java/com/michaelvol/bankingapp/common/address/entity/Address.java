@@ -16,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.hibernate.validator.constraints.Range;
+import org.hibernate.validator.constraints.Length;
 
 import java.time.LocalDate;
 
@@ -51,7 +51,7 @@ public class Address {
     public String state;
 
     @Column(name = "zip_code", nullable = false)
-    @Range(min = 5, max = 5)
+    @Length(min = 5, max = 5)
     public String zipCode;
 
     @Column(name = "type", nullable = false)
