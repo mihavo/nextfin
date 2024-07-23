@@ -1,5 +1,7 @@
 package com.michaelvol.bankingapp.employee.service.impl;
 
+import com.michaelvol.bankingapp.common.address.entity.Address;
+import com.michaelvol.bankingapp.common.address.service.def.AddressService;
 import com.michaelvol.bankingapp.employee.dto.CreateEmployeeRequestDto;
 import com.michaelvol.bankingapp.employee.dto.EmployeeMapper;
 import com.michaelvol.bankingapp.employee.entity.Employee;
@@ -17,14 +19,19 @@ import java.util.NoSuchElementException;
 @RequiredArgsConstructor
 public class EmployeeServiceImpl implements EmployeeService {
 
+    private final AddressService addressService;
+
     private final EmployeeRepository employeeRepository;
     private final EmployeeMapper employeeMapper;
 
     private final MessageSource messageSource;
 
+
     @Override
     public Employee createEmployee(CreateEmployeeRequestDto dto) {
+        Address address = addressService.create(dto.getAddress());
         Employee employee = employeeMapper.toEmployee(dto);
+        employee.setAddress(address);
         return employeeRepository.save(employee);
     }
 

@@ -1,10 +1,13 @@
 package com.michaelvol.bankingapp.employee.entity;
 
+import com.michaelvol.bankingapp.common.address.entity.Address;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Size;
@@ -44,4 +47,8 @@ public class Employee {
     @Column(name = "phone-number", nullable = false)
     @Size(min = 10, max = 15, message = "Phone number should have at least 10 or less than 15 digits")
     private String phoneNumber;
+
+    @ManyToOne
+    @JoinColumn(name = "address_id")
+    private Address address;
 }
