@@ -30,10 +30,9 @@ import java.time.LocalDate;
 @Setter
 public class Employee {
     @Id
-    @SequenceGenerator(name = "employee_gen", sequenceName = "employee_seq")
+    @SequenceGenerator(name = "employee_gen", sequenceName = "employee_seq", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "employee_gen")
     private Long id;
-
 
     @Column(name = "first_name", nullable = false)
     private String firstName;

@@ -3,6 +3,7 @@ package com.michaelvol.bankingapp.employee.controller;
 import com.michaelvol.bankingapp.AppConstants;
 import com.michaelvol.bankingapp.employee.dto.CreateEmployeeRequestDto;
 import com.michaelvol.bankingapp.employee.dto.CreateEmployeeResponseDto;
+import com.michaelvol.bankingapp.employee.dto.GetEmployeeDto;
 import com.michaelvol.bankingapp.employee.entity.Employee;
 import com.michaelvol.bankingapp.employee.service.EmployeeService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -53,8 +54,8 @@ public class EmployeeController {
      */
     @GetMapping("/{id}")
     @Operation(summary = "Fetches a bank employee by its ID")
-    public ResponseEntity<Employee> getHolderById(@PathVariable Long id) {
+    public ResponseEntity<GetEmployeeDto> getEmployeeById(@PathVariable Long id) {
         Employee employee = employeeService.getEmployeeById(id);
-        return new ResponseEntity<>(employee, HttpStatus.OK);
+        return new ResponseEntity<>(new GetEmployeeDto(employee), HttpStatus.OK);
     }
 }
