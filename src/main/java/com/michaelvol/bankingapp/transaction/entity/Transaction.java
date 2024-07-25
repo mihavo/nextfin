@@ -9,7 +9,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -46,11 +46,11 @@ public class Transaction {
     @Column(name = "currency", nullable = false)
     private Currency currency;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "source_account_id", nullable = false)
     private Account sourceAccount;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "target_account_id", nullable = false)
     private Account targetAccount;
 
