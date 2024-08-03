@@ -1,0 +1,26 @@
+Configuration:
+  name: Default
+
+  properties:
+    property:
+      - name: CLR
+        value: "{FATAL=red blink, ERROR=red, WARN=yellow bold, INFO=\u001B[92m, DEBUG=green, TRACE=blue}"
+      - name: LOG_PATTERN
+        value: "%highlight{%5p- %d{yy-MM-dd HH:mm:ss.SSS}}${CLR} %clr{${sys:PID}}{magenta}%clr{-}{faint}%clr{[%15.15t]}{faint} %clr{%-40.40c{1.}}{cyan}  %highlight{: %m%n%xwEx}${CLR}"
+  appenders:
+    Console:
+      name: LogToConsole
+      target: SYSTEM_OUT
+      PatternLayout:
+        pattern: "${LOG_PATTERN}"
+  loggers:
+    logger:
+      additivity: false
+      appender-ref:
+        ref: LogToConsole
+      level: debug
+      name: com.michaelvol.bankingapp
+    root:
+      appender-ref:
+        ref: LogToConsole
+      level: info

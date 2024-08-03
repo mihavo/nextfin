@@ -10,6 +10,7 @@ import com.michaelvol.bankingapp.transaction.enums.TransactionStatus;
 import com.michaelvol.bankingapp.transaction.repository.TransactionRepository;
 import com.michaelvol.bankingapp.transaction.service.processor.TransactionProcessor;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.javamoney.moneta.Money;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Lazy;
@@ -28,6 +29,7 @@ import javax.money.convert.MonetaryConversions;
 @Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED, timeout = 30)
 @RequiredArgsConstructor(onConstructor_ = {@Lazy})
 @EnableConfigurationProperties(TransactionProperties.class)
+@Slf4j
 public class TransactionProcessorImpl implements TransactionProcessor {
 
     private final TransactionRepository transactionRepository;
@@ -62,7 +64,9 @@ public class TransactionProcessorImpl implements TransactionProcessor {
     public Transaction process(Transaction transaction) {
         transaction.setTransactionStatus(TransactionStatus.PROCESSING);
         transactionRepository.save(transaction);
+        log.debug("Transaction with id {} submitted for processing", transaction.getId());
         submitTransactionTask(transaction);
+        log.debug("Transaction with id {} completed", transaction.getId());
         transaction.setTransactionStatus(TransactionStatus.COMPLETED);
         return transactionRepository.save(transaction);
     }
