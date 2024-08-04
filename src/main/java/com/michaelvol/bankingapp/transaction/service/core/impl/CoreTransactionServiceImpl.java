@@ -90,7 +90,7 @@ public class CoreTransactionServiceImpl implements TransactionService {
     }
 
     public List<Transaction> getLatestSourceAccountTransactionsByDate(Account sourceAccount, Instant instant) {
-        return transactionRepository.getTransactionsByAccountAndDate(sourceAccount, instant);
+        return transactionRepository.getTransactionsByAccountAndDate(sourceAccount.getId(), instant);
     }
 
     private @NotNull Transaction processTransaction(Transaction transaction) {
@@ -105,7 +105,6 @@ public class CoreTransactionServiceImpl implements TransactionService {
                                              .targetAccount(accountService.getAccount(dto.getTargetAccountId()))
                                              .build();
         transactionRepository.save(transaction);
-        
         return transaction;
     }
 

@@ -36,7 +36,7 @@ import java.util.UUID;
 @ToString
 public class Transaction {
     @Id
-    @UuidGenerator(style = UuidGenerator.Style.TIME)
+    @UuidGenerator(style = UuidGenerator.Style.AUTO)
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 

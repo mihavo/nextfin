@@ -19,7 +19,7 @@ public interface AccountService {
      * @param accountIds a series of account ids
      * @return a list of the accounts found
      */
-    List<Account> checkExistence(Long... accountIds);
+    List<Account> checkExistence(Long... accountIds) throws EntityNotFoundException;
 
     /**
      * Checks for the existence of a single account based on its id.
