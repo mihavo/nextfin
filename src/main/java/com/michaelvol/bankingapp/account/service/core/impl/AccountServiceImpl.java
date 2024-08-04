@@ -120,4 +120,27 @@ public class AccountServiceImpl implements AccountService {
         accountValidator.validateWithdrawal(dto);
     }
 
+    @Override
+    public void updateTransactionLimit(Account account, Long transactionLimit) {
+        if (transactionLimit <= 0L) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                                              messageSource.getMessage("account.transaction.limit.invalid", null,
+                                                                       LocaleContextHolder.getLocale()));
+        }
+        if (!account.getTransactionLimitEnabled()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                                              messageSource.getMessage("account.transaction.limit.disabled", null,
+                                                                       LocaleContextHolder.getLocale()));
+        }
+        account.setTransactionLimit(transactionLimit);
+        accountRepository.save(account);
+    }
+
+    @Override
+    public Boolean toggleTransactionLimit(Account account) {
+        account.setTransactionLimitEnabled(!account.getTransactionLimitEnabled());
+        accountRepository.save(account);
+        return account.getTransactionLimitEnabled();
+    }
+
 }

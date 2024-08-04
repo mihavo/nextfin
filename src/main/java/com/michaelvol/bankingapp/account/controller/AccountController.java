@@ -7,6 +7,9 @@ import com.michaelvol.bankingapp.account.dto.DepositAmountRequestDto;
 import com.michaelvol.bankingapp.account.dto.DepositAmountResponseDto;
 import com.michaelvol.bankingapp.account.dto.GetAccountBalanceDto;
 import com.michaelvol.bankingapp.account.dto.GetAccountResponseDto;
+import com.michaelvol.bankingapp.account.dto.ToggleTransactionLimitResponseDto;
+import com.michaelvol.bankingapp.account.dto.UpdateTransactionLimitRequestDto;
+import com.michaelvol.bankingapp.account.dto.UpdateTransactionLimitResponseDto;
 import com.michaelvol.bankingapp.account.dto.WithdrawAmountRequestDto;
 import com.michaelvol.bankingapp.account.dto.WithdrawAmountResponseDto;
 import com.michaelvol.bankingapp.account.entity.Account;
@@ -26,6 +29,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -99,5 +103,24 @@ public class AccountController {
         Account account = accountService.getAccount(id);
         Page<Transaction> filteredTransactions = transactionService.getAccountTransactions(account, options);
         return new ResponseEntity<>(filteredTransactions, HttpStatus.OK);
+    }
+
+    @PatchMapping("/{id}/transactions/update-limit")
+    @Operation(summary = "Updates transaction limit", description = "Method for updating transaction limit of an account")
+    public ResponseEntity<UpdateTransactionLimitResponseDto> updateTransactionLimit(@PathVariable @NotNull Long id, @Valid @RequestBody UpdateTransactionLimitRequestDto dto) {
+        Account account = accountService.getAccount(id);
+        accountService.updateTransactionLimit(account, dto.transactionLimit());
+        return new ResponseEntity<>(new UpdateTransactionLimitResponseDto(dto.transactionLimit()), HttpStatus.OK);
+    }
+
+    @PatchMapping("/{id}/transactions/toggle-limit")
+    @Operation(summary = "Toggles transaction limit", description = "Method for toggling transaction limit of an account")
+    public ResponseEntity<ToggleTransactionLimitResponseDto> toggleTransactionLimit(@PathVariable @NotNull Long id) {
+        Account account = accountService.getAccount(id);
+        Boolean enabled = accountService.toggleTransactionLimit(account);
+        String message = messageSource.getMessage("account.transaction.limit.toggle",
+                                                  new String[]{enabled.toString()},
+                                                  LocaleContextHolder.getLocale());
+        return new ResponseEntity<>(new ToggleTransactionLimitResponseDto(enabled, message), HttpStatus.OK);
     }
 }

@@ -70,4 +70,18 @@ public interface AccountService {
      */
     void validateWithdrawal(ValidateWithdrawalDto dto);
 
+    /**
+     * Updates the transaction limit of the account.
+     * @param account          the account to update
+     * @param transactionLimit the new transaction limit
+     */
+    void updateTransactionLimit(Account account, Long transactionLimit);
+
+    /**
+     * Toggles the transaction limit of the account
+     * @param account the account to toggle
+     * @return the new state of the transaction limit
+     */
+    Boolean toggleTransactionLimit(Account account);
+
 }
