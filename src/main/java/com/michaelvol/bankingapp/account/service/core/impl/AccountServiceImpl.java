@@ -15,9 +15,9 @@ import com.michaelvol.bankingapp.employee.service.EmployeeService;
 import com.michaelvol.bankingapp.exceptions.exception.NotFoundException;
 import com.michaelvol.bankingapp.holder.entity.Holder;
 import com.michaelvol.bankingapp.holder.service.HolderService;
-import com.michaelvol.bankingapp.transaction.service.core.TransactionService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -31,6 +31,7 @@ import java.util.Currency;
 import java.util.List;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor(onConstructor_ = {@Lazy})
 public class AccountServiceImpl implements AccountService {
 
@@ -39,7 +40,6 @@ public class AccountServiceImpl implements AccountService {
 
     private final HolderService holderService;
     private final EmployeeService employeeService;
-    @Lazy private final TransactionService transactionService;
 
     private final MessageSource messageSource;
 
@@ -58,7 +58,6 @@ public class AccountServiceImpl implements AccountService {
     public Account createAccount(CreateAccountRequestDto dto) {
         Holder holder = holderService.getHolderById(dto.holderId);
         Employee manager = employeeService.getEmployeeById(dto.managerId);
-
         Account account = Account.builder()
                                  .balance(BigDecimal.ZERO)
                                  .status(AccountStatus.ACTIVE)
@@ -67,8 +66,9 @@ public class AccountServiceImpl implements AccountService {
                                  .accountType(dto.accountType)
                                  .currency(Currency.getInstance(dto.currencyCode))
                                  .build();
-
-        return accountRepository.save(account);
+        Account savedAccount = accountRepository.save(account);
+        log.debug("Account created: {}", savedAccount);
+        return savedAccount;
     }
 
     @Override
@@ -89,6 +89,7 @@ public class AccountServiceImpl implements AccountService {
         Account account = getAccount(accountId);
         account.setBalance(account.getBalance().add(dto.amount()));
         accountRepository.save(account);
+        log.debug("Account {} deposited with amount {}", account, dto.amount());
         return account.getBalance();
     }
 
@@ -104,6 +105,7 @@ public class AccountServiceImpl implements AccountService {
         }
         account.setBalance(balance.subtract(withdrawAmount));
         accountRepository.save(account);
+        log.debug("Account {} withdrawn with amount {}", account, withdrawAmount);
         return account.getBalance();
     }
 

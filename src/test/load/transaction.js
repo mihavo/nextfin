@@ -32,7 +32,8 @@ export default function () {
         "sourceAccountId": 2,
         "targetAccountId": 1,
         "amount": 1,
-        "currency": "EUR"
+        "currency": "EUR",
+        "transactionType": "CARD"
     })
 
     http.post(url, payload, params);
