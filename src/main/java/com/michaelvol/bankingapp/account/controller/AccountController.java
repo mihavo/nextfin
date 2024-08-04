@@ -1,6 +1,7 @@
 package com.michaelvol.bankingapp.account.controller;
 
 import com.michaelvol.bankingapp.AppConstants;
+import com.michaelvol.bankingapp.account.dto.AccountBalanceResponseDto;
 import com.michaelvol.bankingapp.account.dto.CreateAccountRequestDto;
 import com.michaelvol.bankingapp.account.dto.CreateAccountResponseDto;
 import com.michaelvol.bankingapp.account.dto.DepositAmountRequestDto;
@@ -90,11 +91,13 @@ public class AccountController {
 
     @GetMapping("/{id}/balance")
     @Operation(summary = "Gets account balance", description = "Method for fetching current account balance")
-    public ResponseEntity<String> checkBalance(@PathVariable @NotNull Long id) {
+    public ResponseEntity<AccountBalanceResponseDto> checkBalance(@PathVariable @NotNull Long id) {
         GetAccountBalanceDto dto = accountService.checkBalance(id);
-        return new ResponseEntity<>(messageSource.getMessage("account.balance.check",
-                                                             new String[]{dto.balance().toString(), dto.currency().getSymbol()},
-                                                             LocaleContextHolder.getLocale()), HttpStatus.OK);
+        String message = messageSource.getMessage("account.balance.check",
+                                                  new String[]{dto.balance().toString(), dto.currency().getSymbol()},
+                                                  LocaleContextHolder.getLocale());
+        return new ResponseEntity<>(new AccountBalanceResponseDto(dto.balance(), dto.currency(), message),
+                                    HttpStatus.OK);
     }
 
     @GetMapping("/{id}/transactions")
