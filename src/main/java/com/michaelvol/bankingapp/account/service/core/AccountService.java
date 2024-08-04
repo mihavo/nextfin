@@ -17,16 +17,8 @@ public interface AccountService {
      * Checks that all the provided account ids correspond to existing accounts. If any accountId
      * is not matched an {@link EntityNotFoundException} is thrown
      * @param accountIds a series of account ids
-     * @return a list of the accounts found
      */
-    List<Account> checkExistence(Long... accountIds) throws EntityNotFoundException;
-
-    /**
-     * Checks for the existence of a single account based on its id.
-     * @param accountId the account id
-     * @return true/false depending on the existence of the account
-     */
-    Boolean checkExistence(Long accountId);
+    void checkExistence(Long... accountIds) throws EntityNotFoundException;
 
     /**
      * Creates a new account given the info from {@link CreateAccountRequestDto}
@@ -40,7 +32,14 @@ public interface AccountService {
      * @param accountId the accountId
      * @return the fetched account
      */
-    Account getAccount(Long accountId);
+    Account getAccount(Long accountId) throws EntityNotFoundException;
+
+    /**
+     * Gets a set of accounts based on the provided accountIds. If an account is not found / doesn't exist a {@link EntityNotFoundException} is thrown
+     * @param accountIds the accountIds
+     * @return a list of accounts
+     */
+    List<Account> getAccounts(Long... accountIds) throws EntityNotFoundException;
 
     /**
      * Deposits an amount in the provided account based on accountId

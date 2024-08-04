@@ -26,7 +26,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Currency;
 import java.util.List;
@@ -45,21 +44,14 @@ public class AccountServiceImpl implements AccountService {
     private final MessageSource messageSource;
 
     @Override
-    public List<Account> checkExistence(Long... accountIds) {
-        List<Account> accounts = new ArrayList<>();
+    public void checkExistence(Long... accountIds) {
         Arrays.stream(accountIds).forEach(id -> {
             if (!accountRepository.existsById(id)) {
                 throw new EntityNotFoundException(messageSource.getMessage("account.notfound",
                                                                            new Long[]{id},
                                                                            LocaleContextHolder.getLocale()));
             }
-            accounts.add(getAccount(id));
         });
-        return accounts;
-    }
-
-    public Boolean checkExistence(Long accountId) {
-        return accountRepository.existsById(accountId);
     }
 
     @Override
@@ -85,6 +77,11 @@ public class AccountServiceImpl implements AccountService {
                                 .orElseThrow(() -> new NotFoundException(messageSource.getMessage("account.notfound",
                                                                                                   new Long[]{accountId},
                                                                                                   LocaleContextHolder.getLocale())));
+    }
+
+    @Override
+    public List<Account> getAccounts(Long... accountIds) throws EntityNotFoundException {
+        return accountRepository.findAllById(Arrays.asList(accountIds));
     }
 
     @Override

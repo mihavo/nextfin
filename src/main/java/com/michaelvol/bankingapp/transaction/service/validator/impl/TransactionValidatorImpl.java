@@ -31,7 +31,7 @@ public class TransactionValidatorImpl implements TransactionValidator {
         Long targetAccountId = dto.getTargetAccountId();
         Currency currency = dto.getCurrency();
 
-        List<Account> accounts = accountService.checkExistence(sourceAccountId, targetAccountId);
+        List<Account> accounts = accountService.getAccounts(sourceAccountId, targetAccountId);
         Account sourceAccount = accounts.get(0);
 
         if (sourceAccountId.equals(targetAccountId)) {
