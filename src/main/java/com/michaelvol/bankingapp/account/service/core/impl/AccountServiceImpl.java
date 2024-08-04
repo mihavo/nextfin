@@ -89,7 +89,7 @@ public class AccountServiceImpl implements AccountService {
         Account account = getAccount(accountId);
         account.setBalance(account.getBalance().add(dto.amount()));
         accountRepository.save(account);
-        log.debug("Account {} deposited with amount {}", account, dto.amount());
+        log.trace("Account {} deposited with amount {}", account, dto.amount());
         return account.getBalance();
     }
 
@@ -105,7 +105,7 @@ public class AccountServiceImpl implements AccountService {
         }
         account.setBalance(balance.subtract(withdrawAmount));
         accountRepository.save(account);
-        log.debug("Account {} withdrawn with amount {}", account, withdrawAmount);
+        log.trace("Account {} withdrawn with amount {}", account, withdrawAmount);
         return account.getBalance();
     }
 
