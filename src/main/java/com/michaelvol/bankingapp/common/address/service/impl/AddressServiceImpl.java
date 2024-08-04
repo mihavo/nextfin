@@ -3,6 +3,7 @@ package com.michaelvol.bankingapp.common.address.service.impl;
 import com.michaelvol.bankingapp.common.address.dto.AddressDataDto;
 import com.michaelvol.bankingapp.common.address.entity.Address;
 import com.michaelvol.bankingapp.common.address.enums.AddressType;
+import com.michaelvol.bankingapp.common.address.enums.Floor;
 import com.michaelvol.bankingapp.common.address.repository.AddressRepository;
 import com.michaelvol.bankingapp.common.address.service.def.AddressService;
 import com.michaelvol.bankingapp.exceptions.exception.BadRequestException;
@@ -24,7 +25,7 @@ public class AddressServiceImpl implements AddressService {
     public Address create(AddressDataDto dto) {
         String street = dto.street();
         Integer number = dto.number();
-        Integer floor = dto.floor();
+        Floor floor = dto.floor();
         String city = dto.city();
         String zipCode = dto.zipCode();
 
@@ -34,7 +35,7 @@ public class AddressServiceImpl implements AddressService {
         return addressRepository.save(Address.builder()
                                              .street(street)
                                              .number(number)
-                                             .floor(floor)
+                                             .floor(floor != null ? floor : Floor.GROUND)
                                              .city(city)
                                              .zipCode(zipCode)
                                              .state(dto.state())

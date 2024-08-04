@@ -1,6 +1,7 @@
 package com.michaelvol.bankingapp.common.address.entity;
 
 import com.michaelvol.bankingapp.common.address.enums.AddressType;
+import com.michaelvol.bankingapp.common.address.enums.Floor;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Enumerated;
@@ -42,7 +43,8 @@ public class Address {
     public Integer number;
 
     @Builder.Default
-    public Integer floor = 0;
+    @Enumerated
+    public Floor floor = Floor.GROUND;
 
     @Column(name = "city", nullable = false)
     public String city;
@@ -73,11 +75,8 @@ public class Address {
         sb.append(street);
         sb.append(" ");
         sb.append(number);
-        if (floor != 0) {
-            sb.append(" ");
-            sb.append(floor);
-            sb.append(" floor");
-        }
+        sb.append(" ");
+        sb.append(floor);
         sb.append(", ");
         sb.append(city);
         sb.append(" ");
