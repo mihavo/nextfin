@@ -16,7 +16,6 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -26,7 +25,7 @@ import javax.money.convert.CurrencyConversion;
 import javax.money.convert.MonetaryConversions;
 
 @Service
-@Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED, timeout = 30)
+@Transactional(isolation = Isolation.READ_COMMITTED)
 @RequiredArgsConstructor(onConstructor_ = {@Lazy})
 @EnableConfigurationProperties(TransactionProperties.class)
 @Slf4j

@@ -22,6 +22,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
@@ -32,6 +33,7 @@ import java.util.Currency;
  * Represents the Account entity that stores the user's bank accounts
  */
 @Entity
+@DynamicUpdate
 @Table(name = "accounts")
 @AllArgsConstructor
 @NoArgsConstructor

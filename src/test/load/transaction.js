@@ -4,9 +4,9 @@ export const options = {
 
     vus: 10, //virtual users to use at start
     stages: [
-        {duration: '10s', target: 10},
-        {duration: '15s', target: 50},
-        {duration: '20s', target: 1000},
+        {duration: '5s', target: 10},
+        {duration: '5s', target: 50},
+        {duration: '5s', target: 1000},
     ],
     cloud: {
         projectID: "3698047",

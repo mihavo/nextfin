@@ -23,6 +23,8 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
@@ -33,6 +35,7 @@ import java.util.List;
 @Service
 @Slf4j
 @RequiredArgsConstructor(onConstructor_ = {@Lazy})
+@Transactional(isolation = Isolation.READ_COMMITTED)
 public class AccountServiceImpl implements AccountService {
 
     private final AccountRepository accountRepository;
