@@ -6,5 +6,5 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface HolderMapper {
 
-    Holder createHolderRequestDtoToHolder(CreateHolderRequestDto dto);
+    Holder createHolderDtoToHolder(CreateHolderDto dto);
 }

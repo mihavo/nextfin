@@ -1,27 +1,31 @@
 package com.michaelvol.bankingapp.holder.service.impl;
 
+import java.util.NoSuchElementException;
+
 import com.michaelvol.bankingapp.common.address.dto.AddressDataDto;
 import com.michaelvol.bankingapp.common.address.entity.Address;
 import com.michaelvol.bankingapp.common.address.service.def.AddressService;
 import com.michaelvol.bankingapp.exceptions.exception.BadRequestException;
 import com.michaelvol.bankingapp.exceptions.exception.NotFoundException;
-import com.michaelvol.bankingapp.holder.dto.CreateHolderRequestDto;
+import com.michaelvol.bankingapp.holder.dto.CreateHolderDto;
 import com.michaelvol.bankingapp.holder.dto.HolderMapper;
 import com.michaelvol.bankingapp.holder.entity.Holder;
 import com.michaelvol.bankingapp.holder.repository.HolderRepository;
 import com.michaelvol.bankingapp.holder.service.HolderService;
+import com.michaelvol.bankingapp.users.entity.User;
+import com.michaelvol.bankingapp.users.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
-
-import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
 public class HolderServiceImpl implements HolderService {
 
     private final HolderRepository holderRepository;
+
+    private final UserRepository userRepository;
 
     private final AddressService addressService;
 
@@ -30,8 +34,8 @@ public class HolderServiceImpl implements HolderService {
     private final MessageSource messageSource;
 
     @Override
-    public Holder createHolder(CreateHolderRequestDto dto) {
-        boolean holderMatch = holderRepository.existsHolderBySocialSecurityNumber(dto.getSocialSecurityNumber());
+    public Holder createHolder(CreateHolderDto dto, User user) {
+        boolean holderMatch = userRepository.existsByHolder(user.getHolder());
         if (holderMatch) {
             throw new BadRequestException(messageSource.getMessage("holder.exists",
                                                                    null,
@@ -43,8 +47,9 @@ public class HolderServiceImpl implements HolderService {
         //data already exists, returning the existing one in that case
         Address address = addressService.create(addressData);
 
-        Holder holder = mapper.createHolderRequestDtoToHolder(dto);
+        Holder holder = mapper.createHolderDtoToHolder(dto);
         holder.setAddress(address);
+        holder.setUser(user);
         return holderRepository.save(holder);
     }
 

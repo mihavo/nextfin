@@ -2,10 +2,12 @@ package com.michaelvol.bankingapp.holder.controller;
 
 
 import com.michaelvol.bankingapp.AppConstants;
-import com.michaelvol.bankingapp.holder.dto.CreateHolderRequestDto;
+import com.michaelvol.bankingapp.holder.dto.CreateCustomerDto;
 import com.michaelvol.bankingapp.holder.dto.CreateHolderResponseDto;
 import com.michaelvol.bankingapp.holder.entity.Holder;
 import com.michaelvol.bankingapp.holder.service.HolderService;
+import com.michaelvol.bankingapp.users.entity.User;
+import com.michaelvol.bankingapp.users.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -29,24 +31,29 @@ public class HolderController {
 
     private final HolderService holderService;
 
+    private final UserService userService;
+
     private final MessageSource messageSource;
 
     /**
-     * Creates a holder and persists it given a {@link CreateHolderRequestDto}
-     * @param requestDto the request dto
+     * Creates a customer (holder + user) and persists it given a {@link CreateCustomerDto}
+     * @param dto the request dto
      * @return a {@link ResponseEntity} containing {@link CreateHolderResponseDto}
      */
     @PostMapping
-    @Operation(summary = "Creates an app user/holder")
-    public ResponseEntity<CreateHolderResponseDto> createHolder(@Valid @RequestBody CreateHolderRequestDto requestDto) {
-        Holder holder = holderService.createHolder(requestDto);
+    @Operation(summary = "Creates an app user & holder")
+    public ResponseEntity<CreateHolderResponseDto> createCustomer(@Valid @RequestBody CreateCustomerDto dto) {
+        User user = userService.createUser(dto.getUser());
+        Holder holder = holderService.createHolder(dto.getHolder(), user);
         String successMessage = messageSource.getMessage("holder.create.success",
                                                          null,
                                                          LocaleContextHolder.getLocale());
-        return new ResponseEntity<>(CreateHolderResponseDto.builder()
-                                                           .holder(holder)
-                                                           .message(successMessage)
-                                                           .build(),
+        return new ResponseEntity<>(CreateHolderResponseDto
+                                    .builder()
+                                    .user(user)
+                                    .holder(holder)
+                                    .message(successMessage)
+                                    .build(),
                                     HttpStatus.CREATED);
     }
 

@@ -1,19 +1,21 @@
 package com.michaelvol.bankingapp.holder.service;
 
-import com.michaelvol.bankingapp.holder.dto.CreateHolderRequestDto;
-import com.michaelvol.bankingapp.holder.entity.Holder;
-
 import java.util.NoSuchElementException;
+
+import com.michaelvol.bankingapp.holder.dto.CreateHolderDto;
+import com.michaelvol.bankingapp.holder.entity.Holder;
+import com.michaelvol.bankingapp.users.entity.User;
 
 public interface HolderService {
 
     /**
-     * Creates a new Holder entity and persists it to DB
-     *
-     * @param dto the {@link CreateHolderRequestDto}
+     * Creates a new Holder entity and persists it to DB. Requires a User entity to be passed in order to associate the
+     * holder with the user.
+     * @param dto the {@link CreateHolderDto}
+     * @param user the {@link User} entity
      * @return the created holder
      */
-    Holder createHolder(CreateHolderRequestDto dto);
+    Holder createHolder(CreateHolderDto dto, User user);
 
     /**
      * Fetches a holder from persistence from its id
