@@ -33,5 +33,5 @@ build/
 .vscode/
 
 ### Custom ###
-env.properties
+env*.properties
 .resourceCache/
