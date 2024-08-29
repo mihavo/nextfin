@@ -9,6 +9,8 @@ import com.michaelvol.bankingapp.users.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -30,5 +32,13 @@ public class UserServiceImpl implements UserService {
 		User user = userMapper.toUser(dto);
 		//TODO: hash password
 		return userRepository.save(user);
+	}
+
+	@Override
+	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+		return userRepository.findByUsername(username)
+							 .orElseThrow(() -> new UsernameNotFoundException(messageSource.getMessage("user.not-found",
+																									   null,
+																									   LocaleContextHolder.getLocale())));
 	}
 }
