@@ -11,6 +11,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -18,8 +19,8 @@ import org.springframework.stereotype.Service;
 public class UserServiceImpl implements UserService {
 
 	private final UserMapper userMapper;
-
 	private final UserRepository userRepository;
+	private final PasswordEncoder passwordEncoder;
 
 	private final MessageSource messageSource;
 
@@ -30,7 +31,8 @@ public class UserServiceImpl implements UserService {
 			throw new BadRequestException(messageSource.getMessage("user.exists", null, LocaleContextHolder.getLocale()));
 		}
 		User user = userMapper.toUser(dto);
-		//TODO: hash password
+		String encodedPassword = passwordEncoder.encode(user.getPassword());
+		user.setHashedPassword(encodedPassword);
 		return userRepository.save(user);
 	}
 
