@@ -26,7 +26,6 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        SecurityContextRepository securityContextRepository = new HttpSessionSecurityContextRepository();
         http
                 .csrf(AbstractHttpConfigurer::disable).cors(Customizer.withDefaults())
                 .authorizeHttpRequests(request -> {
@@ -35,7 +34,7 @@ public class SecurityConfig {
                     request.requestMatchers("/api/public/**").permitAll();
                 });
 
-        http.securityContext(context -> context.securityContextRepository(securityContextRepository));
+        http.securityContext(context -> context.securityContextRepository(securityContextRepository()));
 
         http.sessionManagement(session -> {
             session.sessionFixation(SessionManagementConfigurer.SessionFixationConfigurer::newSession);
@@ -56,4 +55,8 @@ public class SecurityConfig {
         return new HttpSessionEventPublisher();
     }
 
+    @Bean
+    public SecurityContextRepository securityContextRepository() {
+        return new HttpSessionSecurityContextRepository();
+    }
 }
