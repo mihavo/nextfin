@@ -16,6 +16,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -42,6 +43,7 @@ public class HolderController {
      */
     @PostMapping
     @Operation(summary = "Creates an app user & holder")
+    @PreAuthorize("hasAnyRole('MANAGER', 'EMPLOYEE', 'ADMIN')")
     public ResponseEntity<CreateHolderResponseDto> createCustomer(@Valid @RequestBody CreateCustomerDto dto) {
         User user = userService.createUser(dto.getUser());
         Holder holder = holderService.createHolder(dto.getHolder(), user);
@@ -49,11 +51,11 @@ public class HolderController {
                                                          null,
                                                          LocaleContextHolder.getLocale());
         return new ResponseEntity<>(CreateHolderResponseDto
-                                    .builder()
-                                    .user(user)
-                                    .holder(holder)
-                                    .message(successMessage)
-                                    .build(),
+                                            .builder()
+                                            .user(user)
+                                            .holder(holder)
+                                            .message(successMessage)
+                                            .build(),
                                     HttpStatus.CREATED);
     }
 
