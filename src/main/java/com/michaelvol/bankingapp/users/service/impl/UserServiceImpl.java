@@ -31,7 +31,7 @@ public class UserServiceImpl implements UserService {
 			throw new BadRequestException(messageSource.getMessage("user.exists", null, LocaleContextHolder.getLocale()));
 		}
 		User user = userMapper.toUser(dto);
-		String encodedPassword = passwordEncoder.encode(user.getPassword());
+		String encodedPassword = passwordEncoder.encode(dto.getPassword());
 		user.setHashedPassword(encodedPassword);
 		return userRepository.save(user);
 	}

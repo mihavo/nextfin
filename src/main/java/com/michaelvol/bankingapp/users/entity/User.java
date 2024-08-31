@@ -60,7 +60,7 @@ public class User implements UserDetails {
 
 	@Column(name = "isExpired", nullable = false)
 	@Builder.Default
-	private boolean isExpired = true;
+	private boolean isExpired = false;
 
 	@Column(name = "isLocked", nullable = false)
 	@Builder.Default
@@ -75,6 +75,7 @@ public class User implements UserDetails {
 	}
 
 	@Override
+	@JsonIgnore
 	public String getPassword() {
 		return this.hashedPassword;
 	}
