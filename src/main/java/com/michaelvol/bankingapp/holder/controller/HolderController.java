@@ -17,12 +17,7 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -37,7 +32,8 @@ public class HolderController {
     private final MessageSource messageSource;
 
     /**
-     * Creates a customer (holder + user) and persists it given a {@link CreateCustomerDto}
+     * Creates a customer (holder + user) and persists it given a {@link CreateCustomerDto}. To be used only by privileged users.
+     * For main user creation, use the /auth/register endpoint.
      * @param dto the request dto
      * @return a {@link ResponseEntity} containing {@link CreateHolderResponseDto}
      */

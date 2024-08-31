@@ -1,31 +1,22 @@
 package com.michaelvol.bankingapp.users.entity;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.michaelvol.bankingapp.AppConstants;
 import com.michaelvol.bankingapp.holder.entity.Holder;
 import com.michaelvol.bankingapp.users.enums.Role;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "users")
@@ -46,7 +37,11 @@ public class User implements UserDetails {
 	private String username;
 
 	@Column(name = "hashed_password", nullable = false)
-	@Size(min = 7, max = 30, message = "Password must be between 7 and 20 characters")
+	@Size(min = 8, max = 64, message = "Password must be between 8 and 64 characters")
+	@Pattern(
+			regexp = AppConstants.USER_PWD_REGEX,
+			message = "Password must contain at least one digit, one lowercase, one uppercase letter, and one special character"
+	)
 	@JsonIgnore
 	private String hashedPassword;
 

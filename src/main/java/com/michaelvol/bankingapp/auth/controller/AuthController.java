@@ -3,7 +3,11 @@ package com.michaelvol.bankingapp.auth.controller;
 import com.michaelvol.bankingapp.AppConstants;
 import com.michaelvol.bankingapp.auth.dto.LoginRequestDto;
 import com.michaelvol.bankingapp.auth.dto.LoginResponseDto;
+import com.michaelvol.bankingapp.auth.dto.RegisterRequestDto;
+import com.michaelvol.bankingapp.auth.dto.RegisterResponseDto;
 import com.michaelvol.bankingapp.auth.service.AuthService;
+import com.michaelvol.bankingapp.users.entity.User;
+import com.michaelvol.bankingapp.users.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -21,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping(name = AppConstants.API_BASE_URL + "/auth")
 @RequiredArgsConstructor
 public class AuthController {
+    private final UserService userService;
     private final AuthService authService;
 
     private final MessageSource messageSource;
@@ -33,5 +38,16 @@ public class AuthController {
                 null,
                 LocaleContextHolder.getLocale()
         )), HttpStatus.OK);
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<RegisterResponseDto> register(@Valid @RequestBody RegisterRequestDto registerRequestDto) {
+        User user = userService.createUser(registerRequestDto.user());
+        return new ResponseEntity<>(new RegisterResponseDto(messageSource.getMessage(
+                "auth.register-success",
+                null,
+                LocaleContextHolder.getLocale()
+        ),
+                user), HttpStatus.CREATED);
     }
 }

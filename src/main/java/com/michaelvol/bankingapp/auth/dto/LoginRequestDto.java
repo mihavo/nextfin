@@ -1,7 +1,9 @@
 package com.michaelvol.bankingapp.auth.dto;
 
+import jakarta.validation.constraints.NotNull;
+
 public record LoginRequestDto(
-        String username,
-        String password
+        @NotNull String username,
+        @NotNull String password
 ) {
 }
