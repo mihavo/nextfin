@@ -1,6 +1,8 @@
 package com.michaelvol.bankingapp.config.security;
 
+import com.michaelvol.bankingapp.AppConstants;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,10 +15,13 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.annotation.web.configurers.SessionManagementConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.logout.HeaderWriterLogoutHandler;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
+import org.springframework.security.web.header.writers.ClearSiteDataHeaderWriter;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
 
+@Slf4j
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -40,6 +45,14 @@ public class SecurityConfig {
         http.sessionManagement(session -> {
             session.sessionFixation(SessionManagementConfigurer.SessionFixationConfigurer::newSession);
             session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED);
+        });
+
+        http.logout(logout -> {
+            logout.logoutUrl(AppConstants.API_BASE_URL + "/auth/logout");
+            logout.logoutSuccessUrl(AppConstants.API_BASE_URL + "/auth/logout/success").permitAll();
+            ClearSiteDataHeaderWriter clearSiteDataHeader = new ClearSiteDataHeaderWriter(ClearSiteDataHeaderWriter.Directive.COOKIES);
+            logout.addLogoutHandler(new HeaderWriterLogoutHandler(clearSiteDataHeader));
+            logout.deleteCookies("JSESSIONID");
         });
 
         http.authenticationProvider(authenticationProvider);
