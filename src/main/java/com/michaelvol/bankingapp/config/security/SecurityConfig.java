@@ -35,6 +35,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable).cors(Customizer.withDefaults())
                 .authorizeHttpRequests(request -> {
                     request.requestMatchers("/api/v**/auth/login", "/api/v**/auth/register").permitAll();
+                    request.requestMatchers("api/v**/oauth2/").permitAll();
                     request.requestMatchers("/api/public/**").permitAll();
                     request.requestMatchers("/error").permitAll();
                     request.requestMatchers("/api/**", "/actuator/**").fullyAuthenticated();
@@ -57,7 +58,13 @@ public class SecurityConfig {
 
         http.authenticationProvider(authenticationProvider);
 
-        http.oauth2Login(Customizer.withDefaults());
+        http.oauth2Login(oauth2 -> {
+            String baseUrl = AppConstants.API_BASE_URL + "/oauth2";
+            oauth2.loginPage(baseUrl + "/login");
+            oauth2.authorizationEndpoint(auth -> auth.baseUri(baseUrl + "/authorization"));
+            oauth2.defaultSuccessUrl(baseUrl + "/success", true).permitAll();
+            oauth2.failureUrl(baseUrl + "/failure").permitAll();
+        });
         http.oauth2Client(Customizer.withDefaults());
         return http.build();
     }
