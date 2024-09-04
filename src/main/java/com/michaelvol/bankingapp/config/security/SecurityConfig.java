@@ -56,6 +56,9 @@ public class SecurityConfig {
         });
 
         http.authenticationProvider(authenticationProvider);
+
+        http.oauth2Login(Customizer.withDefaults());
+        http.oauth2Client(Customizer.withDefaults());
         return http.build();
     }
 
