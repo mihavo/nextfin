@@ -66,6 +66,13 @@ public class User implements UserDetails {
 	@Builder.Default
 	private boolean isLocked = false;
 
+	@Column(name = "auth_provider", nullable = false)
+	@Builder.Default
+	private String authProvider = "local";
+
+	@Column(name = "auth_provider_id")
+	private String authProviderId;
+
 	@OneToOne
 	private Holder holder;
 

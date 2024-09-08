@@ -30,18 +30,21 @@ public class OidcService extends OidcUserService {
         if (byUsername.isPresent()) {
             updateUser(byUsername.get(), oidcUser);
         } else {
-            registerUser(oidcUser);
+            registerUser(userRequest, oidcUser);
         }
         return oidcUser;
     }
 
-    private void registerUser(OidcUser oidcUser) {
+    private void registerUser(OidcUserRequest userRequest, OidcUser oidcUser) {
         log.info("User {} does not exist, registering user", oidcUser.getPreferredUsername());
         CreateUserDto userDto = CreateUserDto.builder()
                 .email(oidcUser.getEmail())
                 .username(oidcUser.getPreferredUsername())
                 .build();
-        userRepository.save(userMapper.toUser(userDto));
+        User user = userMapper.toUser(userDto);
+        user.setAuthProvider(userRequest.getClientRegistration().getClientId());
+        user.setAuthProviderId(oidcUser.getIdToken().getTokenValue());
+        userRepository.save(user);
     }
 
     private void updateUser(User existingUser, OidcUser oidcUser) {
