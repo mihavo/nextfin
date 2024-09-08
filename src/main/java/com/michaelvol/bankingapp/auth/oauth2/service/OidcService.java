@@ -12,6 +12,7 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
 import java.util.Optional;
 
 @Slf4j
@@ -36,13 +37,16 @@ public class OidcService extends OidcUserService {
     }
 
     private void registerUser(OidcUserRequest userRequest, OidcUser oidcUser) {
-        log.info("User {} does not exist, registering user", oidcUser.getPreferredUsername());
+        String preferredUsername = oidcUser.getPreferredUsername();
+        String username = Objects.requireNonNullElse(preferredUsername, oidcUser.getEmail());
+        log.info("User {} does not exist, registering user", username);
         CreateUserDto userDto = CreateUserDto.builder()
-                .email(oidcUser.getEmail())
-                .username(oidcUser.getPreferredUsername())
-                .build();
+                                             .email(oidcUser.getEmail())
+                                             .username(username)
+                                             .build();
         User user = userMapper.toUser(userDto);
         user.setAuthProvider(userRequest.getClientRegistration().getClientId());
+        user.setAuthClientName(userRequest.getClientRegistration().getClientName());
         user.setAuthProviderId(oidcUser.getIdToken().getTokenValue());
         userRepository.save(user);
     }

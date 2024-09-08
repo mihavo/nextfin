@@ -4,11 +4,23 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.michaelvol.bankingapp.AppConstants;
 import com.michaelvol.bankingapp.holder.entity.Holder;
 import com.michaelvol.bankingapp.users.enums.Role;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.hibernate.annotations.Check;
 import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -20,6 +32,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "users")
+@Check(constraints = "auth_provider == 'local' AND hashed_password IS NOT NULL")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
@@ -36,7 +49,7 @@ public class User implements UserDetails {
 	@Size(min = 7, max = 28, message = "Username must be between 7 and 28 characters")
 	private String username;
 
-	@Column(name = "hashed_password", nullable = false)
+	@Column(name = "hashed_password")
 	@Size(min = 8, max = 64, message = "Password must be between 8 and 64 characters")
 	@Pattern(
 			regexp = AppConstants.USER_PWD_REGEX,
@@ -66,11 +79,14 @@ public class User implements UserDetails {
 	@Builder.Default
 	private boolean isLocked = false;
 
-	@Column(name = "auth_provider", nullable = false)
-	@Builder.Default
-	private String authProvider = "local";
+	@Column(name = "auth_provider")
+	private String authProvider;
 
-	@Column(name = "auth_provider_id")
+	@Column(name = "auth_client_name", nullable = false)
+	@Builder.Default
+	private String authClientName = "local";
+
+	@Column(name = "auth_provider_id", columnDefinition = "TEXT")
 	private String authProviderId;
 
 	@OneToOne
