@@ -1,6 +1,7 @@
 package com.michaelvol.bankingapp.config.security;
 
 import com.michaelvol.bankingapp.AppConstants;
+import com.michaelvol.bankingapp.auth.oauth2.service.OidcService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -28,6 +29,7 @@ import org.springframework.security.web.session.HttpSessionEventPublisher;
 public class SecurityConfig {
 
     private final AuthenticationProvider authenticationProvider;
+    private final OidcService oidcUserService;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -63,6 +65,7 @@ public class SecurityConfig {
             oauth2.authorizationEndpoint(auth -> auth.baseUri(baseUrl + "/authorization"));
             oauth2.defaultSuccessUrl(baseUrl + "/success", true).permitAll();
             oauth2.failureUrl(baseUrl + "/failure").permitAll();
+            oauth2.userInfoEndpoint(userInfo -> userInfo.oidcUserService(oidcUserService));
         });
         http.oauth2Client(Customizer.withDefaults());
         return http.build();
