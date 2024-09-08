@@ -10,9 +10,10 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class WebClientConfig {
 
     @Bean
-    public WebClient webclient(OAuth2AuthorizedClientManager authorizedClientManager) {
+    public WebClient webClient(OAuth2AuthorizedClientManager authorizedClientManager) {
         ServletOAuth2AuthorizedClientExchangeFilterFunction filter = new ServletOAuth2AuthorizedClientExchangeFilterFunction(
                 authorizedClientManager);
+        filter.setDefaultOAuth2AuthorizedClient(true);
         return WebClient.builder().apply(filter.oauth2Configuration()).build();
     }
 }
