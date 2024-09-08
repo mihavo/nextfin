@@ -60,7 +60,6 @@ public class SecurityConfig {
 
         http.oauth2Login(oauth2 -> {
             String baseUrl = AppConstants.API_BASE_URL + "/oauth2";
-            oauth2.loginPage(baseUrl + "/login");
             oauth2.authorizationEndpoint(auth -> auth.baseUri(baseUrl + "/authorization"));
             oauth2.defaultSuccessUrl(baseUrl + "/success", true).permitAll();
             oauth2.failureUrl(baseUrl + "/failure").permitAll();
