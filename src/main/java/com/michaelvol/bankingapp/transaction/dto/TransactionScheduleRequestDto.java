@@ -1,4 +1,7 @@
 package com.michaelvol.bankingapp.transaction.dto;
 
-public record TransactionScheduleRequestDto(Long accountId, TransferRequestDto transactionDetails) {
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+
+public record TransactionScheduleRequestDto(@NotNull Long accountId, @Valid TransferRequestDto transactionDetails) {
 }

@@ -23,11 +23,14 @@ public class OidcService extends OidcUserService {
     private final UserMapper userMapper;
     private final UserRepository userRepository;
 
+    private String username;
+
     @Override
     public OidcUser loadUser(OidcUserRequest userRequest) throws OAuth2AuthenticationException {
         OidcUser oidcUser = super.loadUser(userRequest);
         log.trace("Received OpenID ID token: {}", oidcUser.getIdToken());
-        Optional<User> byUsername = userRepository.findByUsername(oidcUser.getPreferredUsername());
+        username = Objects.requireNonNullElse(oidcUser.getPreferredUsername(), oidcUser.getEmail());
+        Optional<User> byUsername = userRepository.findByUsername(username);
         if (byUsername.isPresent()) {
             updateUser(byUsername.get(), oidcUser);
         } else {
@@ -37,8 +40,6 @@ public class OidcService extends OidcUserService {
     }
 
     private void registerUser(OidcUserRequest userRequest, OidcUser oidcUser) {
-        String preferredUsername = oidcUser.getPreferredUsername();
-        String username = Objects.requireNonNullElse(preferredUsername, oidcUser.getEmail());
         log.info("User {} does not exist, registering user", username);
         CreateUserDto userDto = CreateUserDto.builder()
                                              .email(oidcUser.getEmail())
@@ -53,7 +54,7 @@ public class OidcService extends OidcUserService {
 
     private void updateUser(User existingUser, OidcUser oidcUser) {
         log.info("User {} already exists, updating user details", existingUser.getUsername());
-        existingUser.setUsername(oidcUser.getPreferredUsername());
+        existingUser.setUsername(username);
         existingUser.setEmail(oidcUser.getEmail());
         userRepository.save(existingUser);
     }
