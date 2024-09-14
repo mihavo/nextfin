@@ -3,6 +3,8 @@ package com.michaelvol.bankingapp.holder.controller;
 
 import com.michaelvol.bankingapp.AppConstants;
 import com.michaelvol.bankingapp.holder.dto.CreateCustomerDto;
+import com.michaelvol.bankingapp.holder.dto.CreateCustomerResponseDto;
+import com.michaelvol.bankingapp.holder.dto.CreateHolderDto;
 import com.michaelvol.bankingapp.holder.dto.CreateHolderResponseDto;
 import com.michaelvol.bankingapp.holder.entity.Holder;
 import com.michaelvol.bankingapp.holder.service.HolderService;
@@ -17,7 +19,13 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
@@ -35,24 +43,35 @@ public class HolderController {
      * Creates a customer (holder + user) and persists it given a {@link CreateCustomerDto}. To be used only by privileged users.
      * For main user creation, use the /auth/register endpoint.
      * @param dto the request dto
-     * @return a {@link ResponseEntity} containing {@link CreateHolderResponseDto}
+     * @return a {@link ResponseEntity} containing {@link CreateCustomerResponseDto}
      */
-    @PostMapping
+    @PostMapping("/register-customer")
     @Operation(summary = "Creates an app user & holder")
     @PreAuthorize("hasAnyRole('MANAGER', 'EMPLOYEE', 'ADMIN')")
-    public ResponseEntity<CreateHolderResponseDto> createCustomer(@Valid @RequestBody CreateCustomerDto dto) {
+    public ResponseEntity<CreateCustomerResponseDto> createCustomer(@Valid @RequestBody CreateCustomerDto dto) {
         User user = userService.createUser(dto.getUser());
         Holder holder = holderService.createHolder(dto.getHolder(), user);
-        String successMessage = messageSource.getMessage("holder.create.success",
-                                                         null,
+        String successMessage = messageSource.getMessage("customer.create.success",
+                                                         new String[]{holder.getId().toString(), user.getId().toString()},
                                                          LocaleContextHolder.getLocale());
-        return new ResponseEntity<>(CreateHolderResponseDto
+        return new ResponseEntity<>(CreateCustomerResponseDto
                                             .builder()
                                             .user(user)
                                             .holder(holder)
                                             .message(successMessage)
                                             .build(),
                                     HttpStatus.CREATED);
+    }
+
+    @PostMapping("register-holder")
+    @Operation(summary = "Creates a holder only")
+    public ResponseEntity<CreateHolderResponseDto> createHolder(@RequestParam String username, @Valid @RequestBody CreateHolderDto dto) {
+        User user = userService.findUserByUsername(username);
+        Holder holder = holderService.createHolder(dto, user);
+        String message = messageSource.getMessage("holder.create.success",
+                                                  new Long[]{holder.getId()},
+                                                  LocaleContextHolder.getLocale());
+        return new ResponseEntity<>(new CreateHolderResponseDto(holder, message), HttpStatus.CREATED);
     }
 
     /**

@@ -41,6 +41,13 @@ public class UserServiceImpl implements UserService {
 		return userRepository.findByUsername(username)
 							 .orElseThrow(() -> new UserNotFoundException(messageSource.getMessage("user.not-found",
 																								   new String[]{username},
-																									   LocaleContextHolder.getLocale())));
+																								   LocaleContextHolder.getLocale())));
+	}
+
+	public User findUserByUsername(String username) {
+		return userRepository.findByUsername(username)
+							 .orElseThrow(() -> new UserNotFoundException(messageSource.getMessage("user.not-found",
+																								   new String[]{username},
+																								   LocaleContextHolder.getLocale())));
 	}
 }
