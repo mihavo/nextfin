@@ -1,6 +1,7 @@
 package com.michaelvol.bankingapp.users.service.impl;
 
 import com.michaelvol.bankingapp.exceptions.exception.BadRequestException;
+import com.michaelvol.bankingapp.exceptions.exception.UserNotFoundException;
 import com.michaelvol.bankingapp.users.dto.CreateUserDto;
 import com.michaelvol.bankingapp.users.dto.UserMapper;
 import com.michaelvol.bankingapp.users.entity.User;
@@ -10,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -37,10 +37,10 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+	public UserDetails loadUserByUsername(String username) throws UserNotFoundException {
 		return userRepository.findByUsername(username)
-							 .orElseThrow(() -> new UsernameNotFoundException(messageSource.getMessage("user.not-found",
-																									   null,
+							 .orElseThrow(() -> new UserNotFoundException(messageSource.getMessage("user.not-found",
+																								   new String[]{username},
 																									   LocaleContextHolder.getLocale())));
 	}
 }

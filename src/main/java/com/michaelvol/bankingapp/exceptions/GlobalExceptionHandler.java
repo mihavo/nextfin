@@ -4,6 +4,7 @@ import com.michaelvol.bankingapp.exceptions.exception.APIErrorResponse;
 import com.michaelvol.bankingapp.exceptions.exception.BadRequestException;
 import com.michaelvol.bankingapp.exceptions.exception.NotFoundException;
 import com.michaelvol.bankingapp.exceptions.exception.TransactionTimeoutException;
+import com.michaelvol.bankingapp.exceptions.exception.UserNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -43,6 +44,15 @@ public class GlobalExceptionHandler {
                                                     .message(e.getMessage())
                                                     .timestamp(ZonedDateTime.now())
                                                     .build(), HttpStatus.SERVICE_UNAVAILABLE);
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<APIErrorResponse> handleUserNotFoundException(UserNotFoundException e) {
+        return new ResponseEntity<>(APIErrorResponse.builder()
+                                                    .status(HttpStatus.BAD_REQUEST)
+                                                    .message(e.getMessage())
+                                                    .timestamp(ZonedDateTime.now())
+                                                    .build(), HttpStatus.BAD_REQUEST);
     }
 
     protected String printStackTrace(Throwable exception) {
