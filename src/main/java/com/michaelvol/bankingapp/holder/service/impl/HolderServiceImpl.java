@@ -1,7 +1,5 @@
 package com.michaelvol.bankingapp.holder.service.impl;
 
-import java.util.NoSuchElementException;
-
 import com.michaelvol.bankingapp.common.address.dto.AddressDataDto;
 import com.michaelvol.bankingapp.common.address.entity.Address;
 import com.michaelvol.bankingapp.common.address.service.def.AddressService;
@@ -13,19 +11,18 @@ import com.michaelvol.bankingapp.holder.entity.Holder;
 import com.michaelvol.bankingapp.holder.repository.HolderRepository;
 import com.michaelvol.bankingapp.holder.service.HolderService;
 import com.michaelvol.bankingapp.users.entity.User;
-import com.michaelvol.bankingapp.users.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
+
+import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
 public class HolderServiceImpl implements HolderService {
 
     private final HolderRepository holderRepository;
-
-    private final UserRepository userRepository;
 
     private final AddressService addressService;
 
@@ -35,7 +32,7 @@ public class HolderServiceImpl implements HolderService {
 
     @Override
     public Holder createHolder(CreateHolderDto dto, User user) {
-        boolean holderMatch = userRepository.existsByHolder(user.getHolder());
+        boolean holderMatch = holderRepository.existsByUser(user);
         if (holderMatch) {
             throw new BadRequestException(messageSource.getMessage("holder.exists",
                                                                    null,
