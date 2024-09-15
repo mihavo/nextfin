@@ -1,8 +1,5 @@
 package com.michaelvol.bankingapp.holder.entity;
 
-import java.time.LocalDate;
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.michaelvol.bankingapp.account.entity.Account;
 import com.michaelvol.bankingapp.common.address.entity.Address;
@@ -16,7 +13,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
-import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -25,6 +21,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "holders")
@@ -36,10 +36,9 @@ import lombok.ToString;
 @ToString
 public class Holder {
     @Id
-    @SequenceGenerator(name = "sequence_gen", sequenceName = "holders_seq", allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequence_gen")
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", nullable = false)
-    private Long id;
+    private UUID id;
 
     @Column(name = "first-name", nullable = false)
     private String firstName;

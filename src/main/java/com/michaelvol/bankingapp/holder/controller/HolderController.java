@@ -27,6 +27,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.UUID;
+
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "Holder API", description = "Methods for user management")
@@ -69,7 +71,7 @@ public class HolderController {
         User user = userService.findUserByUsername(username);
         Holder holder = holderService.createHolder(dto, user);
         String message = messageSource.getMessage("holder.create.success",
-                                                  new Long[]{holder.getId()},
+                                                  new UUID[]{holder.getId()},
                                                   LocaleContextHolder.getLocale());
         return new ResponseEntity<>(new CreateHolderResponseDto(holder, message), HttpStatus.CREATED);
     }

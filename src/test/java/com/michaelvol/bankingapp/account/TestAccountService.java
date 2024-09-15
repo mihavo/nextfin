@@ -24,6 +24,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -58,7 +59,8 @@ public class TestAccountService {
 
     @Test
     public void createAccount() {
-        Holder sampleHolder = Holder.builder().id(1L).build();
+        UUID sampleUUID = UUID.randomUUID();
+        Holder sampleHolder = Holder.builder().id(sampleUUID).build();
         Employee sampleEmployee = Employee.builder().id(1L).build();
         Account sampleAccount = AccountSamples.sampleAccount(1L, sampleHolder,
                                                              sampleEmployee);
@@ -78,7 +80,7 @@ public class TestAccountService {
         verify(employeeService).getEmployeeById(1L);
         verify(accountRepository).save(any(Account.class));
         assertEquals(1L, returnedAccount.getManager().getId());
-        assertEquals(1L, returnedAccount.getHolder().getId());
+        assertEquals(sampleUUID, returnedAccount.getHolder().getId());
         assertEquals(sampleAccount.getCurrency(), returnedAccount.getCurrency());
         assertEquals(returnedAccount.getBalance(), BigDecimal.ZERO);
         assertEquals(returnedAccount.getAccountType(), sampleAccount.getAccountType());
