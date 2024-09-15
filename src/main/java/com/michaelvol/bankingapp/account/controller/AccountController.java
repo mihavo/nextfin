@@ -1,7 +1,18 @@
 package com.michaelvol.bankingapp.account.controller;
 
 import com.michaelvol.bankingapp.AppConstants;
-import com.michaelvol.bankingapp.account.dto.*;
+import com.michaelvol.bankingapp.account.dto.AccountBalanceResponseDto;
+import com.michaelvol.bankingapp.account.dto.CreateAccountRequestDto;
+import com.michaelvol.bankingapp.account.dto.CreateAccountResponseDto;
+import com.michaelvol.bankingapp.account.dto.DepositAmountRequestDto;
+import com.michaelvol.bankingapp.account.dto.DepositAmountResponseDto;
+import com.michaelvol.bankingapp.account.dto.GetAccountBalanceDto;
+import com.michaelvol.bankingapp.account.dto.GetAccountResponseDto;
+import com.michaelvol.bankingapp.account.dto.ToggleTransactionLimitResponseDto;
+import com.michaelvol.bankingapp.account.dto.UpdateTransactionLimitRequestDto;
+import com.michaelvol.bankingapp.account.dto.UpdateTransactionLimitResponseDto;
+import com.michaelvol.bankingapp.account.dto.WithdrawAmountRequestDto;
+import com.michaelvol.bankingapp.account.dto.WithdrawAmountResponseDto;
 import com.michaelvol.bankingapp.account.entity.Account;
 import com.michaelvol.bankingapp.account.service.core.AccountService;
 import com.michaelvol.bankingapp.transaction.dto.GetTransactionOptions;
@@ -18,12 +29,18 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
 
 @RestController
-@RequestMapping(AppConstants.API_BASE_URL + "/accounts/")
+@RequestMapping(AppConstants.API_BASE_URL + "/accounts")
 @Tag(name = "Accounts API", description = "Methods for account operations")
 @AllArgsConstructor
 public class AccountController {
@@ -32,7 +49,7 @@ public class AccountController {
     private final TransactionService transactionService;
     private final MessageSource messageSource;
 
-    @PostMapping("")
+    @PostMapping
     @Operation(summary = "Account initialization", description = "Method for creating accounts for non-employees i.e. holders")
     public ResponseEntity<CreateAccountResponseDto> createAccount(@Valid @RequestBody CreateAccountRequestDto dto) {
         Account account = accountService.createAccount(dto);

@@ -82,7 +82,7 @@ public class HolderController {
      */
     @GetMapping("/{id}")
     @Operation(summary = "Gets a holder by its ID")
-    public ResponseEntity<Holder> getHolderById(@PathVariable Long id) {
+    public ResponseEntity<Holder> getHolderById(@PathVariable UUID id) {
         Holder holder = holderService.getHolderById(id);
         return new ResponseEntity<>(holder, HttpStatus.OK);
     }

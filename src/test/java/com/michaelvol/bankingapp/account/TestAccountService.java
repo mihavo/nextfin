@@ -65,18 +65,18 @@ public class TestAccountService {
         Account sampleAccount = AccountSamples.sampleAccount(1L, sampleHolder,
                                                              sampleEmployee);
 
-        when(holderService.getHolderById(1L)).thenReturn(sampleHolder);
+        when(holderService.getHolderById(sampleUUID)).thenReturn(sampleHolder);
         when(employeeService.getEmployeeById(1L)).thenReturn(sampleEmployee);
         when(accountRepository.save(any(Account.class))).thenReturn(sampleAccount);
 
         CreateAccountRequestDto input = CreateAccountRequestDto.builder()
                                                                .accountType(sampleAccount.getAccountType())
                                                                .managerId(1L)
-                                                               .holderId(1L)
+                                                               .holderId(sampleUUID)
                                                                .currencyCode("EUR").build();
 
         Account returnedAccount = accountService.createAccount(input);
-        verify(holderService).getHolderById(1L);
+        verify(holderService).getHolderById(sampleUUID);
         verify(employeeService).getEmployeeById(1L);
         verify(accountRepository).save(any(Account.class));
         assertEquals(1L, returnedAccount.getManager().getId());

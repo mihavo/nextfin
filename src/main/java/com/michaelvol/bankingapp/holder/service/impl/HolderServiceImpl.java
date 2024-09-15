@@ -17,6 +17,7 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.NoSuchElementException;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -51,7 +52,7 @@ public class HolderServiceImpl implements HolderService {
     }
 
     @Override
-    public Holder getHolderById(Long holderId) throws NoSuchElementException {
+    public Holder getHolderById(UUID holderId) throws NoSuchElementException {
         return holderRepository.findById(holderId)
                                .orElseThrow(() -> new NotFoundException("Holder with id " + holderId + " not found"));
     }

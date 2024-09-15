@@ -13,6 +13,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.extern.jackson.Jacksonized;
 
+import java.util.UUID;
+
 @Data
 @Builder
 @Jacksonized
@@ -22,8 +24,8 @@ public class CreateAccountRequestDto {
      * Represents the id of the {@link Holder Account Holder}
      */
     @NotNull
-    @Positive(message = "{account.id.positive}")
-    public Long holderId;
+    @com.michaelvol.bankingapp.annotations.constraints.UUID(message = "{account.id.uuid}")
+    public UUID holderId;
 
     /**
      * Represents the id of the Manager
