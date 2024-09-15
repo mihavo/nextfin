@@ -24,7 +24,6 @@ public class CreateAccountRequestDto {
      * Represents the id of the {@link Holder Account Holder}
      */
     @NotNull
-    @com.michaelvol.bankingapp.annotations.constraints.UUID(message = "{account.id.uuid}")
     public UUID holderId;
 
     /**
