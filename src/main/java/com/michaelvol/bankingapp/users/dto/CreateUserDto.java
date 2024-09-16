@@ -25,6 +25,10 @@ public class CreateUserDto {
 	@Email(message = "Email must have the form user@example.com")
 	public String email;
 
+	@NotEmpty(message = "Phone Number is required")
+	@Size(min = 10, max = 15, message = "Phone number should be between 10 and 15 digits")
+	public String phoneNumber;
+
 	@NotEmpty(message = "Social security number is required")
 	@Size(min = 9, max = 9, message = "Social Security Number must be 9 digits")
 	public String socialSecurityNumber;

@@ -62,6 +62,10 @@ public class User implements UserDetails {
 	@Email
 	private String email;
 
+	@Column(name = "preferred-phone-number", unique = true)
+	@Size(min = 10, max = 15, message = "Phone number should be between 10 and 15 digits")
+	private String preferredPhoneNumber;
+
 	@Column(name = "social-security-number")
 	@Size(min = 9, max = 9, message = "Social security number must be 9 digits")
 	private String socialSecurityNumber;

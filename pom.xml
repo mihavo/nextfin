@@ -112,6 +112,12 @@
             <artifactId>jobrunr-spring-boot-3-starter</artifactId>
             <version>7.2.3</version>
         </dependency>
+        <dependency>
+            <groupId>com.twilio.sdk</groupId>
+            <artifactId>twilio</artifactId>
+            <version>10.4.1</version>
+        </dependency>
+
 
     </dependencies>
 
