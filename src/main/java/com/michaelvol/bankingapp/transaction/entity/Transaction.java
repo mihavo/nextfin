@@ -57,7 +57,7 @@ public class Transaction {
     @Enumerated
     @Column(name = "transaction_status", nullable = false)
     @Builder.Default
-    private TransactionStatus transactionStatus = TransactionStatus.PENDING;
+    private TransactionStatus transactionStatus = TransactionStatus.CREATED;
 
     @Column(name = "fee", nullable = false)
     @Builder.Default

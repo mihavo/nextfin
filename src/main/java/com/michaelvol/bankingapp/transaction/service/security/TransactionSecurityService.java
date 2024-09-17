@@ -40,10 +40,10 @@ public class TransactionSecurityService {
     }
 
     public Verification sendOTP(Transaction transaction) {
-        String recipient = transaction.getSourceAccount().getHolder().getUser().getPreferredPhoneNumber();
-        Verification verification = Verification.creator(verificationSid, recipient, "sms").create();
+        String sourcePhone = transaction.getSourceAccount().getHolder().getUser().getPreferredPhoneNumber();
+        Verification verification = Verification.creator(verificationSid, sourcePhone, "sms").create();
         log.info("(OTP sent to {} for transaction {}, status: {}",
-                 recipient,
+                 sourcePhone,
                  transaction.getId(),
                  verification.getStatus());
         transaction.setTransactionStatus(TransactionStatus.OTP_SENT);

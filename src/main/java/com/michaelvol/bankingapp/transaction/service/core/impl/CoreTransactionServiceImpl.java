@@ -15,7 +15,6 @@ import com.michaelvol.bankingapp.transaction.service.core.TransactionService;
 import com.michaelvol.bankingapp.transaction.service.processor.TransactionProcessor;
 import com.michaelvol.bankingapp.transaction.service.security.TransactionSecurityService;
 import com.michaelvol.bankingapp.transaction.service.validator.TransactionValidator;
-import com.michaelvol.bankingapp.users.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -97,23 +96,26 @@ public class CoreTransactionServiceImpl implements TransactionService {
         return transactionRepository.getTransactionsByAccountAndDate(sourceAccount.getId(), instant);
     }
 
-    private @NotNull Transaction processTransaction(Transaction transaction) {
-        transactionProcessor.process(transaction);
-        confirmTransaction(transaction, transaction.getTargetAccount().getHolder().getUser());
-        return transaction;
-    }
-
     @Override
-    public Transaction processTransaction(UUID transactionId) {
+    public @NotNull Transaction processTransaction(UUID transactionId) {
         Transaction transaction = transactionRepository.findById(transactionId)
                                                        .orElseThrow(getNotFoundExceptionSupplier(transactionId));
         return processTransaction(transaction);
     }
 
+    public @NotNull Transaction processTransaction(Transaction transaction) {
+        transactionProcessor.process(transaction);
+        String recipient = transaction.getTargetAccount().getHolder().getUser().getPreferredPhoneNumber();
+        confirmationService.sendSMS(recipient, transaction);
+        return transaction;
+    }
+
+
     private @NotNull Transaction storeTransaction(TransferRequestDto dto) {
         Transaction transaction = Transaction.builder()
                                              .amount(dto.getAmount())
                                              .currency(dto.getCurrency())
+                                             .transactionStatus(TransactionStatus.CREATED)
                                              .sourceAccount(accountService.getAccount(dto.getSourceAccountId()))
                                              .targetAccount(accountService.getAccount(dto.getTargetAccountId()))
                                              .build();
@@ -126,10 +128,5 @@ public class CoreTransactionServiceImpl implements TransactionService {
                 "transaction.notfound",
                 new UUID[]{transactionId},
                 LocaleContextHolder.getLocale()));
-    }
-
-
-    private void confirmTransaction(Transaction transaction, User recipient) {
-        confirmationService.sendSMS(recipient.getPreferredPhoneNumber(), transaction);
     }
 }

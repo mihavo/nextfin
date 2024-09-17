@@ -45,6 +45,13 @@ public interface TransactionService {
     Transaction processTransaction(UUID transactionId);
 
     /**
+     * Processes a transaction and updates its status
+     * @param transaction the transaction to process
+     * @return the updated (processed) transaction
+     */
+    Transaction processTransaction(Transaction transaction);
+
+    /**
      * Gets a subset of transactions of a specified account based on a {@link PageRequest}
      * @param account the account that contains the transactions
      * @param options the {@link GetTransactionOptions}
