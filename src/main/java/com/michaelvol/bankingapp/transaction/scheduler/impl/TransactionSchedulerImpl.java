@@ -19,7 +19,7 @@ public class TransactionSchedulerImpl implements TransactionScheduler {
     public void scheduleTransaction(TransactionScheduleRequestDto scheduleRequest) {
         jobScheduler.schedule(scheduleRequest.timestamp(), () -> {
             TransferRequestDto transferRequest = scheduleRequest.transactionDetails();
-            transactionService.transferAmount(transferRequest);
+            transactionService.initiateTransaction(transferRequest);
         });
     }
 }

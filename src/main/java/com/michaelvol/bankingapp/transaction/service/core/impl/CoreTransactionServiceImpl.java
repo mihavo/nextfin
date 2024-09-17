@@ -6,8 +6,8 @@ import com.michaelvol.bankingapp.exceptions.exception.NotFoundException;
 import com.michaelvol.bankingapp.messaging.transaction.service.TransactionConfirmationService;
 import com.michaelvol.bankingapp.transaction.dto.GetTransactionOptions;
 import com.michaelvol.bankingapp.transaction.dto.TransactionDirection;
+import com.michaelvol.bankingapp.transaction.dto.TransactionResultDto;
 import com.michaelvol.bankingapp.transaction.dto.TransferRequestDto;
-import com.michaelvol.bankingapp.transaction.dto.TransferResultDto;
 import com.michaelvol.bankingapp.transaction.entity.Transaction;
 import com.michaelvol.bankingapp.transaction.enums.TransactionStatus;
 import com.michaelvol.bankingapp.transaction.repository.TransactionRepository;
@@ -17,6 +17,7 @@ import com.michaelvol.bankingapp.transaction.service.security.TransactionSecurit
 import com.michaelvol.bankingapp.transaction.service.validator.TransactionValidator;
 import com.michaelvol.bankingapp.users.entity.User;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Lazy;
@@ -31,6 +32,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.function.Supplier;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor(onConstructor_ = {@Lazy})
 public class CoreTransactionServiceImpl implements TransactionService {
@@ -47,18 +49,16 @@ public class CoreTransactionServiceImpl implements TransactionService {
     private final MessageSource messageSource;
 
     @Override
-    public TransferResultDto transferAmount(TransferRequestDto dto) {
+    public TransactionResultDto initiateTransaction(TransferRequestDto dto) {
         transactionValidator.validate(dto);
         Transaction transaction = storeTransaction(dto);
-        securityService.authenticateTransaction(transaction);
-        processTransaction(transaction);
-        confirmTransaction(transaction, transaction.getTargetAccount().getHolder().getUser());
-        return TransferResultDto.builder()
-                                .transaction(transaction)
-                                .message(messageSource.getMessage("transaction.transfer.processed",
+        securityService.sendOTP(transaction);
+        return TransactionResultDto.builder()
+                                   .transaction(transaction)
+                                   .message(messageSource.getMessage("transaction.transfer.awaiting-validation",
                                                                   new UUID[]{transaction.getId()},
                                                                   LocaleContextHolder.getLocale()))
-                                .build();
+                                   .build();
     }
 
 
@@ -98,7 +98,9 @@ public class CoreTransactionServiceImpl implements TransactionService {
     }
 
     private @NotNull Transaction processTransaction(Transaction transaction) {
-        return transactionProcessor.process(transaction);
+        transactionProcessor.process(transaction);
+        confirmTransaction(transaction, transaction.getTargetAccount().getHolder().getUser());
+        return transaction;
     }
 
     @Override

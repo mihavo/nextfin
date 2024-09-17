@@ -1,10 +1,10 @@
 package com.michaelvol.bankingapp.transaction.controller;
 
 import com.michaelvol.bankingapp.AppConstants;
+import com.michaelvol.bankingapp.transaction.dto.TransactionResultDto;
 import com.michaelvol.bankingapp.transaction.dto.TransactionScheduleRequestDto;
 import com.michaelvol.bankingapp.transaction.dto.TransactionScheduleResponseDto;
 import com.michaelvol.bankingapp.transaction.dto.TransferRequestDto;
-import com.michaelvol.bankingapp.transaction.dto.TransferResultDto;
 import com.michaelvol.bankingapp.transaction.entity.Transaction;
 import com.michaelvol.bankingapp.transaction.enums.TransactionStatus;
 import com.michaelvol.bankingapp.transaction.scheduler.TransactionScheduler;
@@ -38,8 +38,8 @@ public class TransactionController {
     @Operation(summary = "Transfers amount from one account to another",
             description = "Transfers a specified amount provided that the source account has" +
                     " the required funds and the source and target accounts differ.")
-    public ResponseEntity<TransferResultDto> transferAmount(@Valid @RequestBody TransferRequestDto dto) {
-        TransferResultDto result = transactionService.transferAmount(dto);
+    public ResponseEntity<TransactionResultDto> transferAmount(@Valid @RequestBody TransferRequestDto dto) {
+        TransactionResultDto result = transactionService.initiateTransaction(dto);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 

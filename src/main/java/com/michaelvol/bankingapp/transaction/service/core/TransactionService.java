@@ -2,8 +2,8 @@ package com.michaelvol.bankingapp.transaction.service.core;
 
 import com.michaelvol.bankingapp.account.entity.Account;
 import com.michaelvol.bankingapp.transaction.dto.GetTransactionOptions;
+import com.michaelvol.bankingapp.transaction.dto.TransactionResultDto;
 import com.michaelvol.bankingapp.transaction.dto.TransferRequestDto;
-import com.michaelvol.bankingapp.transaction.dto.TransferResultDto;
 import com.michaelvol.bankingapp.transaction.entity.Transaction;
 import com.michaelvol.bankingapp.transaction.enums.TransactionStatus;
 import org.springframework.data.domain.Page;
@@ -21,7 +21,7 @@ public interface TransactionService {
      * @param dto the dto containing the transfer details
      * @return a dto containing the transfer results
      */
-    TransferResultDto transferAmount(TransferRequestDto dto);
+    TransactionResultDto initiateTransaction(TransferRequestDto dto);
 
     /**
      * Fetches a transaction

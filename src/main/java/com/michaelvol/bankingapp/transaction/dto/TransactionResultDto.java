@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Builder
 @Data
-public class TransferResultDto {
+public class TransactionResultDto {
     Transaction transaction;
     String message;
 }
