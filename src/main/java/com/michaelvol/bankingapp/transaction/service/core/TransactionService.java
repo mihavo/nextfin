@@ -2,7 +2,6 @@ package com.michaelvol.bankingapp.transaction.service.core;
 
 import com.michaelvol.bankingapp.account.entity.Account;
 import com.michaelvol.bankingapp.transaction.dto.GetTransactionOptions;
-import com.michaelvol.bankingapp.transaction.dto.TransactionResultDto;
 import com.michaelvol.bankingapp.transaction.dto.TransferRequestDto;
 import com.michaelvol.bankingapp.transaction.entity.Transaction;
 import com.michaelvol.bankingapp.transaction.enums.TransactionStatus;
@@ -21,7 +20,7 @@ public interface TransactionService {
      * @param dto the dto containing the transfer details
      * @return a dto containing the transfer results
      */
-    TransactionResultDto initiateTransaction(TransferRequestDto dto);
+    Transaction initiateTransaction(TransferRequestDto dto);
 
     /**
      * Fetches a transaction

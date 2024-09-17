@@ -5,6 +5,7 @@ import com.michaelvol.bankingapp.transaction.dto.TransactionConfirmDto;
 import com.michaelvol.bankingapp.transaction.dto.TransactionResultDto;
 import com.michaelvol.bankingapp.transaction.dto.TransactionScheduleRequestDto;
 import com.michaelvol.bankingapp.transaction.dto.TransactionScheduleResponseDto;
+import com.michaelvol.bankingapp.transaction.dto.TransactionScheduleResultDto;
 import com.michaelvol.bankingapp.transaction.dto.TransferRequestDto;
 import com.michaelvol.bankingapp.transaction.entity.Transaction;
 import com.michaelvol.bankingapp.transaction.enums.TransactionStatus;
@@ -47,8 +48,15 @@ public class TransactionController {
             description = "Transfers a specified amount provided that the source account has" +
                     " the required funds and the source and target accounts differ. Sends OTP for validating the source.")
     public ResponseEntity<TransactionResultDto> transferAmount(@Valid @RequestBody TransferRequestDto dto) {
-        TransactionResultDto result = transactionService.initiateTransaction(dto);
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        Transaction transaction = transactionService.initiateTransaction(dto);
+        TransactionResultDto resultDto = TransactionResultDto.builder()
+                                                             .transaction(transaction)
+                                                             .message(messageSource.getMessage(
+                                                                     "transaction.transfer.awaiting-validation",
+                                                                     new UUID[]{transaction.getId()},
+                                                                     LocaleContextHolder.getLocale()))
+                                                             .build();
+        return new ResponseEntity<>(resultDto, HttpStatus.OK);
     }
 
     @PostMapping("/confirm")
@@ -85,8 +93,12 @@ public class TransactionController {
     @PostMapping("/schedule")
     @Operation(summary = "Schedule a transaction to be processed at a later time")
     public ResponseEntity<TransactionScheduleResponseDto> scheduleTransaction(@RequestBody TransactionScheduleRequestDto dto) {
-        transactionScheduler.scheduleTransaction(dto);
-        return null;
+        TransactionScheduleResultDto scheduleResult = transactionScheduler.scheduleTransaction(dto);
+        String message = messageSource.getMessage("transaction.schedule.success",
+                                                  new String[]{scheduleResult.transactionId().toString(), scheduleResult.timestamp().toString(), scheduleResult.scheduleId().toString()},
+                                                  LocaleContextHolder.getLocale());
+        return new ResponseEntity<>(new TransactionScheduleResponseDto(message, scheduleResult.scheduleId()),
+                                    HttpStatus.CREATED);
     }
 
 }

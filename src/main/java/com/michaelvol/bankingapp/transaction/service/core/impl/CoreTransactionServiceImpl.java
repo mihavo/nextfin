@@ -6,7 +6,6 @@ import com.michaelvol.bankingapp.exceptions.exception.NotFoundException;
 import com.michaelvol.bankingapp.messaging.transaction.service.TransactionConfirmationService;
 import com.michaelvol.bankingapp.transaction.dto.GetTransactionOptions;
 import com.michaelvol.bankingapp.transaction.dto.TransactionDirection;
-import com.michaelvol.bankingapp.transaction.dto.TransactionResultDto;
 import com.michaelvol.bankingapp.transaction.dto.TransferRequestDto;
 import com.michaelvol.bankingapp.transaction.entity.Transaction;
 import com.michaelvol.bankingapp.transaction.enums.TransactionStatus;
@@ -48,16 +47,11 @@ public class CoreTransactionServiceImpl implements TransactionService {
     private final MessageSource messageSource;
 
     @Override
-    public TransactionResultDto initiateTransaction(TransferRequestDto dto) {
+    public Transaction initiateTransaction(TransferRequestDto dto) {
         transactionValidator.validate(dto);
         Transaction transaction = storeTransaction(dto);
         securityService.sendOTP(transaction);
-        return TransactionResultDto.builder()
-                                   .transaction(transaction)
-                                   .message(messageSource.getMessage("transaction.transfer.awaiting-validation",
-                                                                  new UUID[]{transaction.getId()},
-                                                                  LocaleContextHolder.getLocale()))
-                                   .build();
+        return transaction;
     }
 
 
