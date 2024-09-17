@@ -42,7 +42,7 @@ public class TransactionSecurityService {
     public Verification sendOTP(Transaction transaction) {
         String sourcePhone = transaction.getSourceAccount().getHolder().getUser().getPreferredPhoneNumber();
         Verification verification = Verification.creator(verificationSid, sourcePhone, "sms").create();
-        log.info("(OTP sent to {} for transaction {}, status: {}",
+        log.info("OTP sent to {} for transaction {}, status: {}",
                  sourcePhone,
                  transaction.getId(),
                  verification.getStatus());
@@ -51,9 +51,9 @@ public class TransactionSecurityService {
         return verification;
     }
 
-    public void validateOTP(@Size(min = 10, max = 15, message = "Phone number should be between 10 and 15 digits") String recipient,
+    public void validateOTP(@Size(min = 10, max = 15, message = "Phone number should be between 10 and 15 digits") String sourcePhone,
                             @Digits(integer = 6, fraction = 0, message = "The OTP Code must be exactly 6 digits") String code) {
-        VerificationCheck.creator(verificationSid).setTo(recipient).setCode(code).create();
+        VerificationCheck.creator(verificationSid).setTo(sourcePhone).setCode(code).create();
     }
 
 }

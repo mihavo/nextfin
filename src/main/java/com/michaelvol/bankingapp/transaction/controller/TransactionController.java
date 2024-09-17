@@ -55,7 +55,7 @@ public class TransactionController {
     @Operation(summary = "Confirms a transaction by providing the OTP sent to the source account")
     public ResponseEntity<TransactionResultDto> confirmTransaction(@Valid @RequestBody TransactionConfirmDto dto) {
         Transaction transaction = transactionService.getTransaction(dto.transactionId());
-        String sourcePhone = transaction.getSourceAccount().getHolder().getPhoneNumber();
+        String sourcePhone = transaction.getSourceAccount().getHolder().getUser().getPreferredPhoneNumber();
         securityService.validateOTP(sourcePhone, dto.otp());
         Transaction processed = transactionService.processTransaction(transaction);
         return new ResponseEntity<>(TransactionResultDto
