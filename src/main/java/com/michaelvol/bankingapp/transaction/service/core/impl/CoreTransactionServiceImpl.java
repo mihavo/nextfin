@@ -3,7 +3,7 @@ package com.michaelvol.bankingapp.transaction.service.core.impl;
 import com.michaelvol.bankingapp.account.entity.Account;
 import com.michaelvol.bankingapp.account.service.core.AccountService;
 import com.michaelvol.bankingapp.exceptions.exception.NotFoundException;
-import com.michaelvol.bankingapp.messaging.sms.service.SendSMSService;
+import com.michaelvol.bankingapp.messaging.transaction.service.TransactionConfirmationService;
 import com.michaelvol.bankingapp.transaction.dto.GetTransactionOptions;
 import com.michaelvol.bankingapp.transaction.dto.TransactionDirection;
 import com.michaelvol.bankingapp.transaction.dto.TransferRequestDto;
@@ -13,6 +13,7 @@ import com.michaelvol.bankingapp.transaction.enums.TransactionStatus;
 import com.michaelvol.bankingapp.transaction.repository.TransactionRepository;
 import com.michaelvol.bankingapp.transaction.service.core.TransactionService;
 import com.michaelvol.bankingapp.transaction.service.processor.TransactionProcessor;
+import com.michaelvol.bankingapp.transaction.service.security.TransactionSecurityService;
 import com.michaelvol.bankingapp.transaction.service.validator.TransactionValidator;
 import com.michaelvol.bankingapp.users.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -26,9 +27,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Supplier;
@@ -39,10 +37,12 @@ public class CoreTransactionServiceImpl implements TransactionService {
 
     private final TransactionRepository transactionRepository;
     private final TransactionProcessor transactionProcessor;
+
     @Lazy private final TransactionValidator transactionValidator;
+    private final TransactionSecurityService securityService;
 
     private final AccountService accountService;
-    private final SendSMSService sendSMSService;
+    private final TransactionConfirmationService confirmationService;
 
     private final MessageSource messageSource;
 
@@ -50,13 +50,17 @@ public class CoreTransactionServiceImpl implements TransactionService {
     public TransferResultDto transferAmount(TransferRequestDto dto) {
         transactionValidator.validate(dto);
         Transaction transaction = storeTransaction(dto);
+        securityService.authenticateTransaction(transaction);
         processTransaction(transaction);
         confirmTransaction(transaction, transaction.getTargetAccount().getHolder().getUser());
-        return TransferResultDto.builder().transaction(transaction)
+        return TransferResultDto.builder()
+                                .transaction(transaction)
                                 .message(messageSource.getMessage("transaction.transfer.processed",
                                                                   new UUID[]{transaction.getId()},
-                                                                  LocaleContextHolder.getLocale())).build();
+                                                                  LocaleContextHolder.getLocale()))
+                                .build();
     }
+
 
     @Override
     public Transaction getTransaction(UUID transactionId) {
@@ -124,18 +128,6 @@ public class CoreTransactionServiceImpl implements TransactionService {
 
 
     private void confirmTransaction(Transaction transaction, User recipient) {
-        ZonedDateTime zonedTimestamp = transaction.getUpdatedAt().atZone(ZoneId.systemDefault());
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyy HH:mm:ss");
-        String formattedTimestamp = zonedTimestamp.format(formatter);
-
-        String message = messageSource.getMessage("transaction.transfer.sms-confirmation",
-                                                  new String[]{
-                                                          formattedTimestamp,
-                                                          transaction.getAmount().toString(),
-                                                          transaction.getCurrency().getCurrencyCode(),
-                                                          transaction.getTargetAccount().getHolder().getFullName()
-                                                  },
-                                                  LocaleContextHolder.getLocale());
-        sendSMSService.sendSMS(recipient.getPreferredPhoneNumber(), message);
+        confirmationService.sendSMS(recipient.getPreferredPhoneNumber(), transaction);
     }
 }
