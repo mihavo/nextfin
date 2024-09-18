@@ -2,6 +2,7 @@ package com.michaelvol.bankingapp.transaction.service.core;
 
 import com.michaelvol.bankingapp.account.entity.Account;
 import com.michaelvol.bankingapp.transaction.dto.GetTransactionOptions;
+import com.michaelvol.bankingapp.transaction.dto.TransactionScheduleRequestDto;
 import com.michaelvol.bankingapp.transaction.dto.TransferRequestDto;
 import com.michaelvol.bankingapp.transaction.entity.Transaction;
 import com.michaelvol.bankingapp.transaction.enums.TransactionStatus;
@@ -22,6 +23,12 @@ public interface TransactionService {
      */
     Transaction initiateTransaction(TransferRequestDto dto);
 
+    /**
+     * Initiates a scheduled transaction and follows the same rules as {@link #initiateTransaction(TransferRequestDto)}
+     * @param dto the dto containing the transfer details
+     * @return the scheduled transaction
+     */
+    Transaction initiateScheduledTransaction(TransactionScheduleRequestDto dto);
     /**
      * Fetches a transaction
      * @param transactionId the transactionID

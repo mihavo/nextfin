@@ -24,7 +24,6 @@ public class TransactionSchedulerImpl implements TransactionScheduler {
     public TransactionScheduleResultDto scheduleTransaction(TransactionScheduleRequestDto scheduleRequest) {
         CompletableFuture<Transaction> transactionResult = new CompletableFuture<>();
         JobId jobId = jobScheduler.schedule(scheduleRequest.timestamp(), () -> {
-            Transaction transaction = transactionService.initiateTransaction(scheduleRequest.transactionDetails());
             transactionResult.complete(transaction);
         });
         try {
@@ -33,6 +32,5 @@ public class TransactionSchedulerImpl implements TransactionScheduler {
         } catch (InterruptedException | ExecutionException e) {
             throw new RuntimeException(e);
         }
-
     }
 }

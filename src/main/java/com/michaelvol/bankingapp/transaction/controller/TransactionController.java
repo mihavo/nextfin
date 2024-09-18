@@ -5,7 +5,6 @@ import com.michaelvol.bankingapp.transaction.dto.TransactionConfirmDto;
 import com.michaelvol.bankingapp.transaction.dto.TransactionResultDto;
 import com.michaelvol.bankingapp.transaction.dto.TransactionScheduleRequestDto;
 import com.michaelvol.bankingapp.transaction.dto.TransactionScheduleResponseDto;
-import com.michaelvol.bankingapp.transaction.dto.TransactionScheduleResultDto;
 import com.michaelvol.bankingapp.transaction.dto.TransferRequestDto;
 import com.michaelvol.bankingapp.transaction.entity.Transaction;
 import com.michaelvol.bankingapp.transaction.enums.TransactionStatus;
@@ -93,7 +92,7 @@ public class TransactionController {
     @PostMapping("/schedule")
     @Operation(summary = "Schedule a transaction to be processed at a later time")
     public ResponseEntity<TransactionScheduleResponseDto> scheduleTransaction(@RequestBody TransactionScheduleRequestDto dto) {
-        TransactionScheduleResultDto scheduleResult = transactionScheduler.scheduleTransaction(dto);
+        transactionService.initiateTransaction(dto.transactionDetails());
         String message = messageSource.getMessage("transaction.schedule.success",
                                                   new String[]{scheduleResult.transactionId().toString(), scheduleResult.timestamp().toString(), scheduleResult.scheduleId().toString()},
                                                   LocaleContextHolder.getLocale());

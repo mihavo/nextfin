@@ -6,6 +6,7 @@ import com.michaelvol.bankingapp.exceptions.exception.NotFoundException;
 import com.michaelvol.bankingapp.messaging.transaction.service.TransactionConfirmationService;
 import com.michaelvol.bankingapp.transaction.dto.GetTransactionOptions;
 import com.michaelvol.bankingapp.transaction.dto.TransactionDirection;
+import com.michaelvol.bankingapp.transaction.dto.TransactionScheduleRequestDto;
 import com.michaelvol.bankingapp.transaction.dto.TransferRequestDto;
 import com.michaelvol.bankingapp.transaction.entity.Transaction;
 import com.michaelvol.bankingapp.transaction.enums.TransactionStatus;
@@ -52,6 +53,11 @@ public class CoreTransactionServiceImpl implements TransactionService {
         Transaction transaction = storeTransaction(dto);
         securityService.sendOTP(transaction);
         return transaction;
+    }
+
+    @Override
+    public Transaction initiateScheduledTransaction(TransactionScheduleRequestDto dto) {
+        initiateTransaction(dto.transactionDetails());
     }
 
 
