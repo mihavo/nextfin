@@ -2,6 +2,7 @@ package com.michaelvol.bankingapp.transaction.entity;
 
 import com.michaelvol.bankingapp.account.entity.Account;
 import com.michaelvol.bankingapp.transaction.enums.TransactionStatus;
+import com.michaelvol.bankingapp.transaction.enums.TransactionType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Enumerated;
@@ -23,6 +24,7 @@ import org.hibernate.annotations.UuidGenerator;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Currency;
 import java.util.UUID;
 
@@ -58,6 +60,14 @@ public class Transaction {
     @Column(name = "transaction_status", nullable = false)
     @Builder.Default
     private TransactionStatus transactionStatus = TransactionStatus.CREATED;
+
+    @Enumerated
+    @Column(name = "transaction_type", nullable = false)
+    @Builder.Default
+    private TransactionType transactionType = TransactionType.INSTANT;
+
+    @Column(name = "scheduled_at")
+    private LocalDateTime scheduledAt;
 
     @Column(name = "fee", nullable = false)
     @Builder.Default

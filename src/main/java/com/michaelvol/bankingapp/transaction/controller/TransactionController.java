@@ -1,16 +1,14 @@
 package com.michaelvol.bankingapp.transaction.controller;
 
 import com.michaelvol.bankingapp.AppConstants;
+import com.michaelvol.bankingapp.transaction.dto.InitiatedTransactionResultDto;
 import com.michaelvol.bankingapp.transaction.dto.TransactionConfirmDto;
 import com.michaelvol.bankingapp.transaction.dto.TransactionResultDto;
 import com.michaelvol.bankingapp.transaction.dto.TransactionScheduleRequestDto;
-import com.michaelvol.bankingapp.transaction.dto.TransactionScheduleResponseDto;
 import com.michaelvol.bankingapp.transaction.dto.TransferRequestDto;
 import com.michaelvol.bankingapp.transaction.entity.Transaction;
 import com.michaelvol.bankingapp.transaction.enums.TransactionStatus;
-import com.michaelvol.bankingapp.transaction.scheduler.TransactionScheduler;
 import com.michaelvol.bankingapp.transaction.service.core.TransactionService;
-import com.michaelvol.bankingapp.transaction.service.security.TransactionSecurityService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -36,10 +34,6 @@ public class TransactionController {
 
     private final TransactionService transactionService;
 
-    private final TransactionSecurityService securityService;
-
-    private final TransactionScheduler transactionScheduler;
-
     private final MessageSource messageSource;
 
     @PostMapping("/initiate")
@@ -48,30 +42,21 @@ public class TransactionController {
                     " the required funds and the source and target accounts differ. Sends OTP for validating the source.")
     public ResponseEntity<TransactionResultDto> transferAmount(@Valid @RequestBody TransferRequestDto dto) {
         Transaction transaction = transactionService.initiateTransaction(dto);
-        TransactionResultDto resultDto = TransactionResultDto.builder()
-                                                             .transaction(transaction)
-                                                             .message(messageSource.getMessage(
-                                                                     "transaction.transfer.awaiting-validation",
-                                                                     new UUID[]{transaction.getId()},
-                                                                     LocaleContextHolder.getLocale()))
-                                                             .build();
-        return new ResponseEntity<>(resultDto, HttpStatus.OK);
+        TransactionResultDto resultDto = new InitiatedTransactionResultDto(
+                transaction,
+                messageSource.getMessage(
+                        "transaction.transfer.awaiting-validation",
+                        new UUID[]{transaction.getId()},
+                        LocaleContextHolder.getLocale()));
+        return new ResponseEntity<>(resultDto, HttpStatus.CREATED);
     }
 
     @PostMapping("/confirm")
     @Operation(summary = "Confirms a transaction by providing the OTP sent to the source account")
     public ResponseEntity<TransactionResultDto> confirmTransaction(@Valid @RequestBody TransactionConfirmDto dto) {
-        Transaction transaction = transactionService.getTransaction(dto.transactionId());
-        String sourcePhone = transaction.getSourceAccount().getHolder().getUser().getPreferredPhoneNumber();
-        securityService.validateOTP(sourcePhone, dto.otp());
-        Transaction processed = transactionService.processTransaction(transaction);
-        return new ResponseEntity<>(TransactionResultDto
-                                            .builder()
-                                            .transaction(processed)
-                                            .message(messageSource.getMessage("transaction.transfer.processed",
-                                                                              null,
-                                                                              LocaleContextHolder.getLocale()))
-                                            .build(), HttpStatus.OK);
+        Transaction transaction = transactionService.confirmTransaction(dto);
+        TransactionResultDto transactionResultDto = transactionService.processTransaction(transaction);
+        return new ResponseEntity<>(transactionResultDto, HttpStatus.CREATED);
     }
 
 
@@ -91,13 +76,15 @@ public class TransactionController {
 
     @PostMapping("/schedule")
     @Operation(summary = "Schedule a transaction to be processed at a later time")
-    public ResponseEntity<TransactionScheduleResponseDto> scheduleTransaction(@RequestBody TransactionScheduleRequestDto dto) {
-        transactionService.initiateTransaction(dto.transactionDetails());
-        String message = messageSource.getMessage("transaction.schedule.success",
-                                                  new String[]{scheduleResult.transactionId().toString(), scheduleResult.timestamp().toString(), scheduleResult.scheduleId().toString()},
-                                                  LocaleContextHolder.getLocale());
-        return new ResponseEntity<>(new TransactionScheduleResponseDto(message, scheduleResult.scheduleId()),
-                                    HttpStatus.CREATED);
+    public ResponseEntity<TransactionResultDto> scheduleTransaction(@RequestBody TransactionScheduleRequestDto dto) {
+        Transaction transaction = transactionService.initiateScheduledTransaction(dto);
+        TransactionResultDto resultDto = new InitiatedTransactionResultDto(
+                transaction,
+                messageSource.getMessage(
+                        "transaction.transfer.awaiting-validation",
+                        new UUID[]{transaction.getId()},
+                        LocaleContextHolder.getLocale()));
+        return new ResponseEntity<>(resultDto, HttpStatus.OK);
     }
 
 }

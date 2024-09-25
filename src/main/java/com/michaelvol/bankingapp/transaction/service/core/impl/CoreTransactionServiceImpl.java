@@ -5,12 +5,18 @@ import com.michaelvol.bankingapp.account.service.core.AccountService;
 import com.michaelvol.bankingapp.exceptions.exception.NotFoundException;
 import com.michaelvol.bankingapp.messaging.transaction.service.TransactionConfirmationService;
 import com.michaelvol.bankingapp.transaction.dto.GetTransactionOptions;
+import com.michaelvol.bankingapp.transaction.dto.InstantTransactionResultDto;
+import com.michaelvol.bankingapp.transaction.dto.ScheduledTransactionResultDto;
+import com.michaelvol.bankingapp.transaction.dto.TransactionConfirmDto;
 import com.michaelvol.bankingapp.transaction.dto.TransactionDirection;
+import com.michaelvol.bankingapp.transaction.dto.TransactionResultDto;
 import com.michaelvol.bankingapp.transaction.dto.TransactionScheduleRequestDto;
 import com.michaelvol.bankingapp.transaction.dto.TransferRequestDto;
 import com.michaelvol.bankingapp.transaction.entity.Transaction;
 import com.michaelvol.bankingapp.transaction.enums.TransactionStatus;
+import com.michaelvol.bankingapp.transaction.enums.TransactionType;
 import com.michaelvol.bankingapp.transaction.repository.TransactionRepository;
+import com.michaelvol.bankingapp.transaction.scheduler.TransactionScheduler;
 import com.michaelvol.bankingapp.transaction.service.core.TransactionService;
 import com.michaelvol.bankingapp.transaction.service.processor.TransactionProcessor;
 import com.michaelvol.bankingapp.transaction.service.security.TransactionSecurityService;
@@ -27,6 +33,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Supplier;
@@ -40,6 +47,7 @@ public class CoreTransactionServiceImpl implements TransactionService {
     private final TransactionProcessor transactionProcessor;
 
     @Lazy private final TransactionValidator transactionValidator;
+    @Lazy private final TransactionScheduler transactionScheduler;
     private final TransactionSecurityService securityService;
 
     private final AccountService accountService;
@@ -50,14 +58,19 @@ public class CoreTransactionServiceImpl implements TransactionService {
     @Override
     public Transaction initiateTransaction(TransferRequestDto dto) {
         transactionValidator.validate(dto);
-        Transaction transaction = storeTransaction(dto);
+        Transaction transaction = storeTransaction(dto, TransactionType.INSTANT, null);
         securityService.sendOTP(transaction);
         return transaction;
     }
 
     @Override
     public Transaction initiateScheduledTransaction(TransactionScheduleRequestDto dto) {
-        initiateTransaction(dto.transactionDetails());
+        transactionValidator.validate(dto.transactionDetails());
+        Transaction transaction = storeTransaction(dto.transactionDetails(),
+                                                   TransactionType.SCHEDULED,
+                                                   dto.timestamp());
+        securityService.sendOTP(transaction);
+        return transaction;
     }
 
 
@@ -97,25 +110,51 @@ public class CoreTransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public @NotNull Transaction processTransaction(UUID transactionId) {
+    public Transaction confirmTransaction(TransactionConfirmDto dto) {
+        Transaction transaction = getTransaction(dto.transactionId());
+        String sourcePhone = transaction.getSourceAccount().getHolder().getUser().getPreferredPhoneNumber();
+        securityService.validateOTP(sourcePhone, dto.otp());
+        return transaction;
+    }
+
+    @Override
+    public @NotNull TransactionResultDto processTransaction(UUID transactionId) {
         Transaction transaction = transactionRepository.findById(transactionId)
                                                        .orElseThrow(getNotFoundExceptionSupplier(transactionId));
         return processTransaction(transaction);
     }
 
-    public @NotNull Transaction processTransaction(Transaction transaction) {
-        transactionProcessor.process(transaction);
-        String recipient = transaction.getTargetAccount().getHolder().getUser().getPreferredPhoneNumber();
-        confirmationService.sendSMS(recipient, transaction);
-        return transaction;
+    public @NotNull TransactionResultDto processTransaction(Transaction transaction) {
+        if (transaction.getTransactionType() == TransactionType.SCHEDULED) {
+            ScheduledTransactionResultDto scheduleResultDto = transactionScheduler.scheduleTransaction(transaction);
+            return scheduleResultDto;
+        } else {
+            Transaction processedTransaction = processInstantTransaction(transaction);
+            return new InstantTransactionResultDto(processedTransaction,
+                                                   messageSource.getMessage(
+                                                           "transaction.transfer.processed",
+                                                           null,
+                                                           LocaleContextHolder.getLocale())
+            );
+        }
     }
 
 
-    private @NotNull Transaction storeTransaction(TransferRequestDto dto) {
+    public @NotNull Transaction processInstantTransaction(Transaction transaction) {
+        Transaction processedTransaction = transactionProcessor.process(transaction);
+        String recipient = transaction.getTargetAccount().getHolder().getUser().getPreferredPhoneNumber();
+        confirmationService.sendSMS(recipient, transaction);
+        return processedTransaction;
+    }
+
+
+    private @NotNull Transaction storeTransaction(TransferRequestDto dto, TransactionType type, LocalDateTime scheduledAt) {
         Transaction transaction = Transaction.builder()
                                              .amount(dto.getAmount())
                                              .currency(dto.getCurrency())
                                              .transactionStatus(TransactionStatus.CREATED)
+                                             .transactionType(type)
+                                             .scheduledAt(scheduledAt)
                                              .sourceAccount(accountService.getAccount(dto.getSourceAccountId()))
                                              .targetAccount(accountService.getAccount(dto.getTargetAccountId()))
                                              .build();

@@ -1,12 +1,13 @@
 package com.michaelvol.bankingapp.transaction.dto;
 
 import com.michaelvol.bankingapp.transaction.entity.Transaction;
-import lombok.Builder;
-import lombok.Data;
 
-@Builder
-@Data
-public class TransactionResultDto {
-    Transaction transaction;
-    String message;
+public interface TransactionResultDto {
+    Transaction getTransaction();
+    
+    void setTransaction(Transaction transaction);
+
+    String getMessage();
+
+    void setMessage(String message);
 }

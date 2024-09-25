@@ -2,10 +2,14 @@ package com.michaelvol.bankingapp.transaction.service.core;
 
 import com.michaelvol.bankingapp.account.entity.Account;
 import com.michaelvol.bankingapp.transaction.dto.GetTransactionOptions;
+import com.michaelvol.bankingapp.transaction.dto.TransactionConfirmDto;
+import com.michaelvol.bankingapp.transaction.dto.TransactionResultDto;
 import com.michaelvol.bankingapp.transaction.dto.TransactionScheduleRequestDto;
 import com.michaelvol.bankingapp.transaction.dto.TransferRequestDto;
 import com.michaelvol.bankingapp.transaction.entity.Transaction;
 import com.michaelvol.bankingapp.transaction.enums.TransactionStatus;
+import com.michaelvol.bankingapp.transaction.enums.TransactionType;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
@@ -48,14 +52,28 @@ public interface TransactionService {
      * @param transactionId the transactionID
      * @return the updated (processed) transaction
      */
-    Transaction processTransaction(UUID transactionId);
+    TransactionResultDto processTransaction(UUID transactionId);
+
+
+    /**
+     * Depending on the {@link TransactionType}:
+     * <ul>
+     *   <li>{@link TransactionType#SCHEDULED} schedules the transaction to be processed at a later time</li>
+     *   <li>{@link TransactionType#INSTANT} processes the transaction immediately using {@link #processInstantTransaction(Transaction)}</li>
+     * </ul>
+     * @param transaction the transaction to process
+     * @return the result of the transaction processing
+     */
+    TransactionResultDto processTransaction(Transaction transaction);
+
 
     /**
      * Processes a transaction and updates its status
      * @param transaction the transaction to process
      * @return the updated (processed) transaction
      */
-    Transaction processTransaction(Transaction transaction);
+    Transaction processInstantTransaction(Transaction transaction);
+
 
     /**
      * Gets a subset of transactions of a specified account based on a {@link PageRequest}
@@ -72,4 +90,11 @@ public interface TransactionService {
      * @return the list of found transactions
      */
     List<Transaction> getLatestSourceAccountTransactionsByDate(Account sourceAccount, Instant instant);
+
+    /**
+     * Confirms a transaction by validating the OTP sent to the source account.
+     * @param dto the {@link TransactionConfirmDto} containing the transactionID and the OTP
+     * @return the confirmed transaction
+     */
+    Transaction confirmTransaction(@Valid TransactionConfirmDto dto);
 }
