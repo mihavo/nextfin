@@ -22,6 +22,8 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -81,6 +83,15 @@ public class AccountServiceImpl implements AccountService {
                                                    "account.notfound",
                                                    new Long[]{accountId},
                                                    LocaleContextHolder.getLocale())));
+        log.trace("Account fetched: {}", account);
+        UserDetails authenticatedUserDetails = (UserDetails) SecurityContextHolder.getContext()
+                                                                                  .getAuthentication()
+                                                                                  .getPrincipal();
+        if (!account.getHolder().getUser().equals(authenticatedUserDetails)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                                              messageSource.getMessage("account.forbidden", null,
+                                                                       LocaleContextHolder.getLocale()));
+        }
         return account;
     }
 

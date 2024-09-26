@@ -33,7 +33,7 @@ public class UserAuthProvider implements AuthenticationProvider {
                                                                        null,
                                                                        LocaleContextHolder.getLocale()));
         }
-        return new UsernamePasswordAuthenticationToken(username, password, userDetails.getAuthorities());
+        return new UsernamePasswordAuthenticationToken(userDetails, password, userDetails.getAuthorities());
     }
 
     @Override
