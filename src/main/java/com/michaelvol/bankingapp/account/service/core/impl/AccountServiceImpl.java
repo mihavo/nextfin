@@ -76,10 +76,12 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Account getAccount(Long accountId) {
-        return accountRepository.findById(accountId)
-                                .orElseThrow(() -> new NotFoundException(messageSource.getMessage("account.notfound",
-                                                                                                  new Long[]{accountId},
-                                                                                                  LocaleContextHolder.getLocale())));
+        Account account = accountRepository.findById(accountId)
+                                           .orElseThrow(() -> new NotFoundException(messageSource.getMessage(
+                                                   "account.notfound",
+                                                   new Long[]{accountId},
+                                                   LocaleContextHolder.getLocale())));
+        return account;
     }
 
     @Override
@@ -144,6 +146,13 @@ public class AccountServiceImpl implements AccountService {
         account.setTransactionLimitEnabled(!account.getTransactionLimitEnabled());
         accountRepository.save(account);
         return account.getTransactionLimitEnabled();
+    }
+
+    @Override
+    public Boolean toggleTransaction2FA(Account account) {
+        account.setTransaction2FAEnabled(!account.getTransaction2FAEnabled());
+        accountRepository.save(account);
+        return account.getTransaction2FAEnabled();
     }
 
 }

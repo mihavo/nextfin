@@ -84,4 +84,10 @@ public interface AccountService {
      */
     Boolean toggleTransactionLimit(Account account);
 
+    /**
+     * Toggles 2FA verification for transactions
+     * @param account the account to toggle 2FA
+     * @return the new state of the transaction 2FA
+     */
+    Boolean toggleTransaction2FA(Account account);
 }

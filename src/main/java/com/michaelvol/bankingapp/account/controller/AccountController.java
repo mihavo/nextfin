@@ -8,6 +8,7 @@ import com.michaelvol.bankingapp.account.dto.DepositAmountRequestDto;
 import com.michaelvol.bankingapp.account.dto.DepositAmountResponseDto;
 import com.michaelvol.bankingapp.account.dto.GetAccountBalanceDto;
 import com.michaelvol.bankingapp.account.dto.GetAccountResponseDto;
+import com.michaelvol.bankingapp.account.dto.ToggleTransaction2FAResponseDto;
 import com.michaelvol.bankingapp.account.dto.ToggleTransactionLimitResponseDto;
 import com.michaelvol.bankingapp.account.dto.UpdateTransactionLimitRequestDto;
 import com.michaelvol.bankingapp.account.dto.UpdateTransactionLimitResponseDto;
@@ -126,4 +127,17 @@ public class AccountController {
                                                   LocaleContextHolder.getLocale());
         return new ResponseEntity<>(new ToggleTransactionLimitResponseDto(enabled, message), HttpStatus.OK);
     }
+
+    @PatchMapping("/{id}/transactions/toggle-2fa")
+    @Operation(summary = "Toggles transaction 2FA", description = "Method for toggling transaction 2FA of an account")
+    public ResponseEntity<ToggleTransaction2FAResponseDto> toggleTransactionOTP(@PathVariable @NotNull Long id) {
+        Account account = accountService.getAccount(id);
+        Boolean enabled = accountService.toggleTransaction2FA(account);
+        String message = messageSource.getMessage("account.transaction.2fa.toggle",
+                                                  new String[]{enabled ? "enabled" : "disabled"},
+                                                  LocaleContextHolder.getLocale());
+        return new ResponseEntity<>(new ToggleTransaction2FAResponseDto(enabled, message), HttpStatus.OK);
+
+    }
+
 }
