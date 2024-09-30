@@ -25,4 +25,6 @@ public interface HolderService {
      * @return the holder
      */
     Holder getHolderById(UUID holderId) throws NoSuchElementException;
+
+    Holder getHolderByCurrentUser();
 }

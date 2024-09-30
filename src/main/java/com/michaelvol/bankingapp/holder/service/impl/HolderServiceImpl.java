@@ -14,6 +14,7 @@ import com.michaelvol.bankingapp.users.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.NoSuchElementException;
@@ -55,5 +56,12 @@ public class HolderServiceImpl implements HolderService {
     public Holder getHolderById(UUID holderId) throws NoSuchElementException {
         return holderRepository.findById(holderId)
                                .orElseThrow(() -> new NotFoundException("Holder with id " + holderId + " not found"));
+    }
+
+    @Override
+    public Holder getHolderByCurrentUser() {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return holderRepository.getByUser(user)
+                               .orElseThrow(() -> new NotFoundException("Holder not found for current user"));
     }
 }

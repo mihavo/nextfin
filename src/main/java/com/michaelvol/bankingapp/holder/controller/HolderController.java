@@ -77,13 +77,21 @@ public class HolderController {
     }
 
     /**
-     * Fetches a holder by its id
+     * Fetches a holder by its ID. Requires the user role to be MANAGER, EMPLOYEE or ADMIN.
      * @return a {@link ResponseEntity} containing the Holder
      */
-    @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('MANAGER', 'EMPLOYEE', 'ADMIN')")
     @Operation(summary = "Gets a holder by its ID")
+    @GetMapping("/{id}")
     public ResponseEntity<Holder> getHolderById(@PathVariable UUID id) {
         Holder holder = holderService.getHolderById(id);
+        return new ResponseEntity<>(holder, HttpStatus.OK);
+    }
+
+    @Operation(summary = "Gets the current user's folder")
+    @GetMapping("/me")
+    public ResponseEntity<Holder> getMyHolder() {
+        Holder holder = holderService.getHolderByCurrentUser();
         return new ResponseEntity<>(holder, HttpStatus.OK);
     }
 }
