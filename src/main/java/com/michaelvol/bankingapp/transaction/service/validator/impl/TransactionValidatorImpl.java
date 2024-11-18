@@ -14,7 +14,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.util.Currency;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -27,12 +26,15 @@ public class TransactionValidatorImpl implements TransactionValidator {
     @Override
     public void validate(TransferRequestDto dto) {
         BigDecimal amount = dto.getAmount();
+
+        //Also validates that the source account id belongs to the currently authenticated user
         Long sourceAccountId = dto.getSourceAccountId();
+        Account sourceAccount = accountService.getAccount(sourceAccountId);
+
         Long targetAccountId = dto.getTargetAccountId();
         Currency currency = dto.getCurrency();
 
-        List<Account> accounts = accountService.getAccounts(sourceAccountId, targetAccountId);
-        Account sourceAccount = accounts.get(0);
+        accountService.checkExistence(targetAccountId);
 
         if (sourceAccountId.equals(targetAccountId)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
