@@ -1,5 +1,7 @@
 package com.michaelvol.bankingapp.holder.service.impl;
 
+import com.michaelvol.bankingapp.account.entity.Account;
+import com.michaelvol.bankingapp.account.enums.AccountType;
 import com.michaelvol.bankingapp.common.address.dto.AddressDataDto;
 import com.michaelvol.bankingapp.common.address.entity.Address;
 import com.michaelvol.bankingapp.common.address.service.def.AddressService;
@@ -17,6 +19,7 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
@@ -53,6 +56,12 @@ public class HolderServiceImpl implements HolderService {
     }
 
     @Override
+    public List<Account> getAccounts(AccountType type) {
+        List<Account> accounts = getHolderByCurrentUser().getAccounts();
+        return type == null ? accounts : accounts.stream().filter(account -> account.getAccountType().equals(type)).toList();
+    }
+
+    @Override
     public Holder getHolderById(UUID holderId) throws NoSuchElementException {
         return holderRepository.findById(holderId)
                                .orElseThrow(() -> new NotFoundException("Holder with id " + holderId + " not found"));
@@ -64,4 +73,5 @@ public class HolderServiceImpl implements HolderService {
         return holderRepository.getByUser(user)
                                .orElseThrow(() -> new NotFoundException("Holder not found for current user"));
     }
+
 }

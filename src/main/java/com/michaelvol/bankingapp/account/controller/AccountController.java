@@ -1,21 +1,11 @@
 package com.michaelvol.bankingapp.account.controller;
 
 import com.michaelvol.bankingapp.AppConstants;
-import com.michaelvol.bankingapp.account.dto.AccountBalanceResponseDto;
-import com.michaelvol.bankingapp.account.dto.CreateAccountRequestDto;
-import com.michaelvol.bankingapp.account.dto.CreateAccountResponseDto;
-import com.michaelvol.bankingapp.account.dto.DepositAmountRequestDto;
-import com.michaelvol.bankingapp.account.dto.DepositAmountResponseDto;
-import com.michaelvol.bankingapp.account.dto.GetAccountBalanceDto;
-import com.michaelvol.bankingapp.account.dto.GetAccountResponseDto;
-import com.michaelvol.bankingapp.account.dto.ToggleTransaction2FAResponseDto;
-import com.michaelvol.bankingapp.account.dto.ToggleTransactionLimitResponseDto;
-import com.michaelvol.bankingapp.account.dto.UpdateTransactionLimitRequestDto;
-import com.michaelvol.bankingapp.account.dto.UpdateTransactionLimitResponseDto;
-import com.michaelvol.bankingapp.account.dto.WithdrawAmountRequestDto;
-import com.michaelvol.bankingapp.account.dto.WithdrawAmountResponseDto;
+import com.michaelvol.bankingapp.account.dto.*;
 import com.michaelvol.bankingapp.account.entity.Account;
+import com.michaelvol.bankingapp.account.enums.AccountType;
 import com.michaelvol.bankingapp.account.service.core.AccountService;
+import com.michaelvol.bankingapp.holder.service.HolderService;
 import com.michaelvol.bankingapp.transaction.dto.GetTransactionOptions;
 import com.michaelvol.bankingapp.transaction.entity.Transaction;
 import com.michaelvol.bankingapp.transaction.service.core.TransactionService;
@@ -30,15 +20,10 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @RestController
 @RequestMapping(AppConstants.API_BASE_URL + "/accounts")
@@ -49,6 +34,7 @@ public class AccountController {
     private final AccountService accountService;
     private final TransactionService transactionService;
     private final MessageSource messageSource;
+    private final HolderService holderService;
 
     @PostMapping
     @Operation(summary = "Account initialization", description = "Method for creating accounts for non-employees i.e. holders")
@@ -65,6 +51,13 @@ public class AccountController {
         Account account = accountService.getAccount(accountId);
         GetAccountResponseDto responseDto = new GetAccountResponseDto(account, "Fetched account successfully");
         return new ResponseEntity<>(responseDto, HttpStatus.OK);
+    }
+
+    @GetMapping("")
+    public ResponseEntity<GetMyAccountsResponseDto> getMyAccounts(@RequestParam(name = "type", required = false) AccountType type) {
+        List<Account> accounts = holderService.getAccounts(type);
+        return new ResponseEntity<>(new GetMyAccountsResponseDto(accounts, messageSource.getMessage("account" +
+                ".get-accounts-success", new Integer[]{accounts.size()}, LocaleContextHolder.getLocale())), HttpStatus.OK);
     }
 
     @PostMapping("/{id}/deposit")

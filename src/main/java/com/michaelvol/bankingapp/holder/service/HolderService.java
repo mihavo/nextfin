@@ -1,9 +1,12 @@
 package com.michaelvol.bankingapp.holder.service;
 
+import com.michaelvol.bankingapp.account.entity.Account;
+import com.michaelvol.bankingapp.account.enums.AccountType;
 import com.michaelvol.bankingapp.holder.dto.CreateHolderDto;
 import com.michaelvol.bankingapp.holder.entity.Holder;
 import com.michaelvol.bankingapp.users.entity.User;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
@@ -27,4 +30,12 @@ public interface HolderService {
     Holder getHolderById(UUID holderId) throws NoSuchElementException;
 
     Holder getHolderByCurrentUser();
+
+    /**
+     * Fetches all accounts associated with the holder
+     *
+     * @param type the type of the accounts to filter by
+     * @return the list of accounts found
+     */
+    List<Account> getAccounts(AccountType type);
 }
