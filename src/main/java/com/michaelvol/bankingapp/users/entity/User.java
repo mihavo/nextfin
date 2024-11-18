@@ -4,22 +4,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.michaelvol.bankingapp.AppConstants;
 import com.michaelvol.bankingapp.holder.entity.Holder;
 import com.michaelvol.bankingapp.users.enums.Role;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.Check;
 import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.security.core.GrantedAuthority;
@@ -75,11 +64,11 @@ public class User implements UserDetails {
 	@Builder.Default
 	private Role role = Role.USER;
 
-	@Column(name = "isExpired", nullable = false)
+	@Column(name = "is_expired", nullable = false)
 	@Builder.Default
 	private boolean isExpired = false;
 
-	@Column(name = "isLocked", nullable = false)
+	@Column(name = "is_locked", nullable = false)
 	@Builder.Default
 	private boolean isLocked = false;
 
@@ -93,7 +82,8 @@ public class User implements UserDetails {
 	@Column(name = "auth_provider_id", columnDefinition = "TEXT")
 	private String authProviderId;
 
-	@OneToOne
+	@Getter(onMethod = @__(@JsonIgnore))
+	@OneToOne(mappedBy = "user")
 	private Holder holder;
 
 	@Override
@@ -120,10 +110,5 @@ public class User implements UserDetails {
 	@Override
 	public boolean isCredentialsNonExpired() {
 		return false;
-	}
-
-	@Override
-	public boolean isEnabled() {
-		return true;
 	}
 }

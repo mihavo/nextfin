@@ -23,4 +23,10 @@ public interface UserService extends UserDetailsService {
 	 * @return the user found
 	 */
 	User findUserByUsername(String username) throws UserNotFoundException;
+
+	/**
+	 * Should return the currently authenticated user
+	 * @return the current user
+	 */
+	User getCurrentUser();
 }

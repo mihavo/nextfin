@@ -15,6 +15,7 @@ import com.michaelvol.bankingapp.employee.service.EmployeeService;
 import com.michaelvol.bankingapp.exceptions.exception.NotFoundException;
 import com.michaelvol.bankingapp.holder.entity.Holder;
 import com.michaelvol.bankingapp.holder.service.HolderService;
+import com.michaelvol.bankingapp.users.entity.User;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -62,6 +63,12 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public Account createAccount(CreateAccountRequestDto dto) {
         Holder holder = holderService.getHolderById(dto.holderId);
+        User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (currentUser.getHolder() == null || !currentUser.getHolder().getId().equals(dto.getHolderId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                                              messageSource.getMessage("account.holder.forbidden", null,
+                                                                       LocaleContextHolder.getLocale()));
+        }
         Employee manager = employeeService.getEmployeeById(dto.managerId);
         Account account = Account.builder()
                                  .balance(BigDecimal.ZERO)

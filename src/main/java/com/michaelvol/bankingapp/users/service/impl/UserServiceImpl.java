@@ -10,6 +10,7 @@ import com.michaelvol.bankingapp.users.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -38,10 +39,7 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UserNotFoundException {
-		return userRepository.findByUsername(username)
-							 .orElseThrow(() -> new UserNotFoundException(messageSource.getMessage("user.not-found",
-																								   new String[]{username},
-																								   LocaleContextHolder.getLocale())));
+		return findUserByUsername(username);
 	}
 
 	public User findUserByUsername(String username) {
@@ -49,5 +47,16 @@ public class UserServiceImpl implements UserService {
 							 .orElseThrow(() -> new UserNotFoundException(messageSource.getMessage("user.not-found",
 																								   new String[]{username},
 																								   LocaleContextHolder.getLocale())));
+	}
+
+	@Override
+	public User getCurrentUser() {
+		User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		if (currentUser == null) {
+			throw new UserNotFoundException(messageSource.getMessage("user.not-found",
+																	 new String[]{"current user"},
+																	 LocaleContextHolder.getLocale()));
+		}
+		return currentUser;
 	}
 }

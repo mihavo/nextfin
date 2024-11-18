@@ -60,4 +60,9 @@ public class AuthController {
                 LocaleContextHolder.getLocale()
         ), HttpStatus.OK);
     }
+
+    @GetMapping("me")
+    public ResponseEntity<User> getMe() {
+        return new ResponseEntity<>(userService.getCurrentUser(), HttpStatus.OK);
+    }
 }

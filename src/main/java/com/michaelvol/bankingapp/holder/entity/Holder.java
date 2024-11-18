@@ -4,23 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.michaelvol.bankingapp.account.entity.Account;
 import com.michaelvol.bankingapp.common.address.entity.Address;
 import com.michaelvol.bankingapp.users.entity.User;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -50,7 +36,7 @@ public class Holder {
     private LocalDate dateOfBirth;
 
     @Column(name = "phone-number", nullable = false)
-    @Size(min = 10, max = 15, message = "Phone number should have at least 10 or less than 15 digits")
+    @Size(min = 7, max = 15, message = "Phone number should have at least 10 or less than 15 digits")
     private String phoneNumber;
 
     @ManyToOne
@@ -64,6 +50,8 @@ public class Holder {
     private List<Account> accounts;
 
     @OneToOne
+    @Getter(onMethod = @__(@JsonIgnore))
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
     public String getFullName() {
