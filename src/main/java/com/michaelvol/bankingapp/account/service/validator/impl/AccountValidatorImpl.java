@@ -4,6 +4,7 @@ import com.michaelvol.bankingapp.account.dto.ValidateWithdrawalDto;
 import com.michaelvol.bankingapp.account.entity.Account;
 import com.michaelvol.bankingapp.account.service.validator.AccountValidator;
 import com.michaelvol.bankingapp.exceptions.exception.BadRequestException;
+import com.michaelvol.bankingapp.exceptions.exception.ForbiddenException;
 import com.michaelvol.bankingapp.transaction.entity.Transaction;
 import com.michaelvol.bankingapp.transaction.service.core.TransactionService;
 import lombok.RequiredArgsConstructor;
@@ -11,16 +12,17 @@ import org.javamoney.moneta.Money;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.money.convert.MonetaryConversions;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Currency;
 import java.util.List;
-
-import javax.money.convert.MonetaryConversions;
 
 @Service
 @RequiredArgsConstructor
@@ -60,6 +62,23 @@ public class AccountValidatorImpl implements AccountValidator {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                                               messageSource.getMessage("account.withdraw.insufficient", null,
                                                                        LocaleContextHolder.getLocale()));
+        }
+    }
+
+
+    @Override
+    public void validateAccountOwnership(Account account) {
+        if (account == null) {
+            throw new BadRequestException(messageSource.getMessage("account.notfound", null,
+                    LocaleContextHolder.getLocale()));
+        }
+        UserDetails authenticatedUserDetails = (UserDetails) SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getPrincipal();
+        if (!account.getHolder().getUser().equals(authenticatedUserDetails)) {
+            throw new ForbiddenException(
+                    messageSource.getMessage("account.forbidden", null,
+                            LocaleContextHolder.getLocale()));
         }
     }
 }

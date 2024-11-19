@@ -111,4 +111,9 @@ public class User implements UserDetails {
 	public boolean isCredentialsNonExpired() {
 		return false;
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return obj instanceof User && ((User) obj).getId().equals(this.id);
+	}
 }

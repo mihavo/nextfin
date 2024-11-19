@@ -51,7 +51,6 @@ public class Holder implements Serializable {
     private List<Account> accounts;
 
     @OneToOne
-    @Getter(onMethod = @__(@JsonIgnore))
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 

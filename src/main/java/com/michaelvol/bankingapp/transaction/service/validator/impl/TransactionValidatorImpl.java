@@ -3,6 +3,7 @@ package com.michaelvol.bankingapp.transaction.service.validator.impl;
 import com.michaelvol.bankingapp.account.dto.ValidateWithdrawalDto;
 import com.michaelvol.bankingapp.account.entity.Account;
 import com.michaelvol.bankingapp.account.service.core.AccountService;
+import com.michaelvol.bankingapp.account.service.validator.AccountValidator;
 import com.michaelvol.bankingapp.transaction.dto.TransferRequestDto;
 import com.michaelvol.bankingapp.transaction.service.validator.TransactionValidator;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ import java.util.Currency;
 public class TransactionValidatorImpl implements TransactionValidator {
 
     private final AccountService accountService;
+    private final AccountValidator accountValidator;
 
     private final MessageSource messageSource;
 
@@ -27,13 +29,12 @@ public class TransactionValidatorImpl implements TransactionValidator {
     public void validate(TransferRequestDto dto) {
         BigDecimal amount = dto.getAmount();
 
-        //Also validates that the source account id belongs to the currently authenticated user
         Long sourceAccountId = dto.getSourceAccountId();
-        Account sourceAccount = accountService.getAccount(sourceAccountId);
-
         Long targetAccountId = dto.getTargetAccountId();
         Currency currency = dto.getCurrency();
 
+        Account sourceAccount = accountService.getAccount(sourceAccountId);
+        accountValidator.validateAccountOwnership(sourceAccount);
         accountService.checkExistence(targetAccountId);
 
         if (sourceAccountId.equals(targetAccountId)) {

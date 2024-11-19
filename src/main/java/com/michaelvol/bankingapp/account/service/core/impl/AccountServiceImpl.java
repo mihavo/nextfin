@@ -1,10 +1,6 @@
 package com.michaelvol.bankingapp.account.service.core.impl;
 
-import com.michaelvol.bankingapp.account.dto.CreateAccountRequestDto;
-import com.michaelvol.bankingapp.account.dto.DepositAmountRequestDto;
-import com.michaelvol.bankingapp.account.dto.GetAccountBalanceDto;
-import com.michaelvol.bankingapp.account.dto.ValidateWithdrawalDto;
-import com.michaelvol.bankingapp.account.dto.WithdrawAmountRequestDto;
+import com.michaelvol.bankingapp.account.dto.*;
 import com.michaelvol.bankingapp.account.entity.Account;
 import com.michaelvol.bankingapp.account.enums.AccountStatus;
 import com.michaelvol.bankingapp.account.repository.AccountRepository;
@@ -24,7 +20,6 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -91,14 +86,6 @@ public class AccountServiceImpl implements AccountService {
                                                    new Long[]{accountId},
                                                    LocaleContextHolder.getLocale())));
         log.trace("Account fetched: {}", account);
-        UserDetails authenticatedUserDetails = (UserDetails) SecurityContextHolder.getContext()
-                                                                                  .getAuthentication()
-                                                                                  .getPrincipal();
-        if (!account.getHolder().getUser().equals(authenticatedUserDetails)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
-                                              messageSource.getMessage("account.forbidden", null,
-                                                                       LocaleContextHolder.getLocale()));
-        }
         return account;
     }
 

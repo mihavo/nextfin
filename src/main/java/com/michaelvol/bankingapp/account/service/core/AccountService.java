@@ -1,12 +1,9 @@
 package com.michaelvol.bankingapp.account.service.core;
 
-import com.michaelvol.bankingapp.account.dto.CreateAccountRequestDto;
-import com.michaelvol.bankingapp.account.dto.DepositAmountRequestDto;
-import com.michaelvol.bankingapp.account.dto.GetAccountBalanceDto;
-import com.michaelvol.bankingapp.account.dto.ValidateWithdrawalDto;
-import com.michaelvol.bankingapp.account.dto.WithdrawAmountRequestDto;
+import com.michaelvol.bankingapp.account.dto.*;
 import com.michaelvol.bankingapp.account.entity.Account;
 import com.michaelvol.bankingapp.account.service.validator.AccountValidator;
+import com.michaelvol.bankingapp.exceptions.exception.NotFoundException;
 import jakarta.persistence.EntityNotFoundException;
 
 import java.math.BigDecimal;
@@ -32,7 +29,7 @@ public interface AccountService {
      * @param accountId the accountId
      * @return the fetched account
      */
-    Account getAccount(Long accountId) throws EntityNotFoundException;
+    Account getAccount(Long accountId) throws NotFoundException;
 
     /**
      * Gets a set of accounts based on the provided accountIds. If an account is not found / doesn't exist a {@link EntityNotFoundException} is thrown

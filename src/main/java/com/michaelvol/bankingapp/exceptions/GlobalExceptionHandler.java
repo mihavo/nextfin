@@ -1,10 +1,6 @@
 package com.michaelvol.bankingapp.exceptions;
 
-import com.michaelvol.bankingapp.exceptions.exception.APIErrorResponse;
-import com.michaelvol.bankingapp.exceptions.exception.BadRequestException;
-import com.michaelvol.bankingapp.exceptions.exception.NotFoundException;
-import com.michaelvol.bankingapp.exceptions.exception.TransactionTimeoutException;
-import com.michaelvol.bankingapp.exceptions.exception.UserNotFoundException;
+import com.michaelvol.bankingapp.exceptions.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -53,6 +49,15 @@ public class GlobalExceptionHandler {
                                                     .message(e.getMessage())
                                                     .timestamp(ZonedDateTime.now())
                                                     .build(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<APIErrorResponse> handleForbiddenException(ForbiddenException e) {
+        return new ResponseEntity<>(APIErrorResponse.builder()
+                .status(HttpStatus.FORBIDDEN)
+                .message(e.getMessage())
+                .timestamp(ZonedDateTime.now())
+                .build(), HttpStatus.FORBIDDEN);
     }
 
     protected String printStackTrace(Throwable exception) {
