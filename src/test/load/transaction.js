@@ -18,19 +18,20 @@ export default function () {
     const HOSTNAME = __ENV.HOSTNAME || 'http://localhost';
     const PORT = __ENV.PORT || 8080;
     const API_VERSION = __ENV.API_VERSION || 'v1';
-    const ENDPOINT = __ENV.ENDPOINT || `api/${API_VERSION}/transactions/transfer`;
+    const ENDPOINT = __ENV.ENDPOINT || `api/${API_VERSION}/transactions/initiate`;
     const url = `${HOSTNAME}:${PORT}/${ENDPOINT}`;
 
 
     const params = {
         headers: {
             'Content-Type': 'application/json',
+            'Cookie': __ENV.SESSION_COOKIE
         }
     }
 
     const payload = JSON.stringify(__ENV.PAYLOAD || {
-        "sourceAccountId": 2,
-        "targetAccountId": 1,
+        "sourceAccountId": 12501,
+        "targetAccountId": 7507,
         "amount": 1,
         "currency": "EUR",
         "transactionType": "CARD"
