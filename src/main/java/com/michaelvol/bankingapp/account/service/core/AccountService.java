@@ -87,4 +87,12 @@ public interface AccountService {
      * @return the new state of the transaction 2FA
      */
     Boolean toggleTransaction2FA(Account account);
+
+    /**
+     * Toggles SMS confirmation for transactions
+     *
+     * @param account the account to toggle SMS confirmation
+     * @return the new state of the transaction SMS confirmation
+     */
+    Boolean toggleTransactionSMSConfirmation(Account account);
 }

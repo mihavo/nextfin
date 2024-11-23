@@ -153,8 +153,11 @@ public class CoreTransactionServiceImpl implements TransactionService {
 
     @NotNull
     private TransactionResultDto finalizeTransaction(Transaction transaction, Transaction processedTransaction) {
-        String recipient = transaction.getTargetAccount().getHolder().getUser().getPreferredPhoneNumber();
-        confirmationService.sendSMS(recipient, processedTransaction);
+        Account sourceAccount = transaction.getSourceAccount();
+        if (sourceAccount.getTransactionSMSConfirmationEnabled()) {
+            String initiator = sourceAccount.getHolder().getUser().getPreferredPhoneNumber();
+            confirmationService.sendSMS(initiator, processedTransaction);
+        }
         return new TransactionResultDto(processedTransaction, messageSource.getMessage(
                 "transaction.transfer.processed", new UUID[]{transaction.getId()}, LocaleContextHolder.getLocale()));
     }

@@ -5,22 +5,8 @@ import com.michaelvol.bankingapp.account.enums.AccountStatus;
 import com.michaelvol.bankingapp.account.enums.AccountType;
 import com.michaelvol.bankingapp.employee.entity.Employee;
 import com.michaelvol.bankingapp.holder.entity.Holder;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.SequenceGenerator;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import jakarta.persistence.*;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -82,6 +68,10 @@ public class Account {
     @Column(name = "transaction_2fa_enabled")
     @Builder.Default
     Boolean transaction2FAEnabled = true;
+
+    @Column(name = "transaction_sms_confirmation_enabled")
+    @Builder.Default
+    Boolean transactionSMSConfirmationEnabled = true;
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)

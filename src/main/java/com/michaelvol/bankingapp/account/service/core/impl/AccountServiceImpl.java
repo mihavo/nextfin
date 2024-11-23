@@ -155,9 +155,18 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Boolean toggleTransaction2FA(Account account) {
+        accountValidator.validateAccountOwnership(account);
         account.setTransaction2FAEnabled(!account.getTransaction2FAEnabled());
         accountRepository.save(account);
         return account.getTransaction2FAEnabled();
+    }
+
+    @Override
+    public Boolean toggleTransactionSMSConfirmation(Account account) {
+        accountValidator.validateAccountOwnership(account);
+        account.setTransactionSMSConfirmationEnabled(!account.getTransactionSMSConfirmationEnabled());
+        accountRepository.save(account);
+        return account.getTransactionSMSConfirmationEnabled();
     }
 
 }

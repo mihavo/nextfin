@@ -123,14 +123,25 @@ public class AccountController {
 
     @PatchMapping("/{id}/transactions/toggle-2fa")
     @Operation(summary = "Toggles transaction 2FA", description = "Method for toggling transaction 2FA of an account")
-    public ResponseEntity<ToggleTransaction2FAResponseDto> toggleTransactionOTP(@PathVariable @NotNull Long id) {
+    public ResponseEntity<ToggleTransaction2FADto> toggleTransactionOTP(@PathVariable @NotNull Long id) {
         Account account = accountService.getAccount(id);
         Boolean enabled = accountService.toggleTransaction2FA(account);
         String message = messageSource.getMessage("account.transaction.2fa.toggle",
                                                   new String[]{enabled ? "enabled" : "disabled"},
                                                   LocaleContextHolder.getLocale());
-        return new ResponseEntity<>(new ToggleTransaction2FAResponseDto(enabled, message), HttpStatus.OK);
+        return new ResponseEntity<>(new ToggleTransaction2FADto(enabled, message), HttpStatus.OK);
 
+    }
+
+    @PatchMapping("/{id}/transactions/toggle-sms-confirmation")
+    @Operation(summary = "Toggles transaction SMS confirmation", description = "Method for toggling transaction SMS confirmation of an account")
+    public ResponseEntity<ToggleTransactionSMSConfirmationDto> toggleTransactionSMSConfirmation(@PathVariable @NotNull Long id) {
+        Account account = accountService.getAccount(id);
+        Boolean enabled = accountService.toggleTransactionSMSConfirmation(account);
+        String message = messageSource.getMessage("account.transaction.sms-confirmation.toggle",
+                new String[]{enabled ? "enabled" : "disabled"},
+                LocaleContextHolder.getLocale());
+        return new ResponseEntity<>(new ToggleTransactionSMSConfirmationDto(enabled, message), HttpStatus.OK);
     }
 
 }
