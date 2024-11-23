@@ -1,7 +1,6 @@
 package com.michaelvol.bankingapp.transaction.controller;
 
 import com.michaelvol.bankingapp.AppConstants;
-import com.michaelvol.bankingapp.transaction.dto.InitiatedTransactionResultDto;
 import com.michaelvol.bankingapp.transaction.dto.TransactionConfirmDto;
 import com.michaelvol.bankingapp.transaction.dto.TransactionResultDto;
 import com.michaelvol.bankingapp.transaction.dto.TransactionScheduleRequestDto;
@@ -14,15 +13,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
@@ -41,14 +34,8 @@ public class TransactionController {
             description = "Transfers a specified amount provided that the source account has" +
                     " the required funds and the source and target accounts differ. Sends OTP for validating the source.")
     public ResponseEntity<TransactionResultDto> transferAmount(@Valid @RequestBody TransferRequestDto dto) {
-        Transaction transaction = transactionService.initiateTransaction(dto);
-        TransactionResultDto resultDto = new InitiatedTransactionResultDto(
-                transaction,
-                messageSource.getMessage(
-                        "transaction.transfer.awaiting-validation",
-                        new UUID[]{transaction.getId()},
-                        LocaleContextHolder.getLocale()));
-        return new ResponseEntity<>(resultDto, HttpStatus.CREATED);
+        TransactionResultDto transactionResult = transactionService.initiateTransaction(dto);
+        return new ResponseEntity<>(transactionResult, HttpStatus.CREATED);
     }
 
     @PostMapping("/confirm")
@@ -77,14 +64,8 @@ public class TransactionController {
     @PostMapping("/schedule")
     @Operation(summary = "Schedule a transaction to be processed at a later time")
     public ResponseEntity<TransactionResultDto> scheduleTransaction(@RequestBody TransactionScheduleRequestDto dto) {
-        Transaction transaction = transactionService.initiateScheduledTransaction(dto);
-        TransactionResultDto resultDto = new InitiatedTransactionResultDto(
-                transaction,
-                messageSource.getMessage(
-                        "transaction.transfer.awaiting-validation",
-                        new UUID[]{transaction.getId()},
-                        LocaleContextHolder.getLocale()));
-        return new ResponseEntity<>(resultDto, HttpStatus.OK);
+        TransactionResultDto transactionResult = transactionService.initiateScheduledTransaction(dto);
+        return new ResponseEntity<>(transactionResult, HttpStatus.OK);
     }
 
 }

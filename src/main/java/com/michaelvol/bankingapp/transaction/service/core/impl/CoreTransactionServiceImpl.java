@@ -4,14 +4,7 @@ import com.michaelvol.bankingapp.account.entity.Account;
 import com.michaelvol.bankingapp.account.service.core.AccountService;
 import com.michaelvol.bankingapp.exceptions.exception.NotFoundException;
 import com.michaelvol.bankingapp.messaging.transaction.service.TransactionConfirmationService;
-import com.michaelvol.bankingapp.transaction.dto.GetTransactionOptions;
-import com.michaelvol.bankingapp.transaction.dto.InstantTransactionResultDto;
-import com.michaelvol.bankingapp.transaction.dto.ScheduledTransactionResultDto;
-import com.michaelvol.bankingapp.transaction.dto.TransactionConfirmDto;
-import com.michaelvol.bankingapp.transaction.dto.TransactionDirection;
-import com.michaelvol.bankingapp.transaction.dto.TransactionResultDto;
-import com.michaelvol.bankingapp.transaction.dto.TransactionScheduleRequestDto;
-import com.michaelvol.bankingapp.transaction.dto.TransferRequestDto;
+import com.michaelvol.bankingapp.transaction.dto.*;
 import com.michaelvol.bankingapp.transaction.entity.Transaction;
 import com.michaelvol.bankingapp.transaction.enums.TransactionStatus;
 import com.michaelvol.bankingapp.transaction.enums.TransactionType;
@@ -56,21 +49,20 @@ public class CoreTransactionServiceImpl implements TransactionService {
     private final MessageSource messageSource;
 
     @Override
-    public Transaction initiateTransaction(TransferRequestDto dto) {
+    public TransactionResultDto initiateTransaction(TransferRequestDto dto) {
         transactionValidator.validate(dto);
         Transaction transaction = storeTransaction(dto, TransactionType.INSTANT, null);
-        securityService.sendOTP(transaction);
-        return transaction;
+        return handleTransactionWith2FACheck(transaction);
     }
 
+
     @Override
-    public Transaction initiateScheduledTransaction(TransactionScheduleRequestDto dto) {
+    public TransactionResultDto initiateScheduledTransaction(TransactionScheduleRequestDto dto) {
         transactionValidator.validate(dto.transactionDetails());
         Transaction transaction = storeTransaction(dto.transactionDetails(),
                                                    TransactionType.SCHEDULED,
                                                    dto.timestamp());
-        securityService.sendOTP(transaction);
-        return transaction;
+        return handleTransactionWith2FACheck(transaction);
     }
 
 
@@ -117,49 +109,54 @@ public class CoreTransactionServiceImpl implements TransactionService {
         return transaction;
     }
 
-    @Override
-    public @NotNull TransactionResultDto processTransaction(UUID transactionId) {
-        Transaction transaction = transactionRepository.findById(transactionId)
-                                                       .orElseThrow(getNotFoundExceptionSupplier(transactionId));
-        return processTransaction(transaction);
+
+    public @NotNull ScheduledTransactionDto scheduleTransaction(Transaction transaction) {
+        if (transaction.getTransactionType() != TransactionType.SCHEDULED) {
+            throw new IllegalArgumentException("Transaction must be of type SCHEDULED");
+        }
+        return transactionScheduler.scheduleTransaction(transaction);
     }
+
 
     public @NotNull TransactionResultDto processTransaction(Transaction transaction) {
-        if (transaction.getTransactionType() == TransactionType.SCHEDULED) {
-            ScheduledTransactionResultDto scheduleResultDto = transactionScheduler.scheduleTransaction(transaction);
-            return scheduleResultDto;
-        } else {
-            Transaction processedTransaction = processInstantTransaction(transaction);
-            return new InstantTransactionResultDto(processedTransaction,
-                                                   messageSource.getMessage(
-                                                           "transaction.transfer.processed",
-                                                           null,
-                                                           LocaleContextHolder.getLocale())
-            );
+        if (transaction.getTransactionType() != TransactionType.INSTANT) {
+            throw new IllegalArgumentException("Transaction must be of type INSTANT");
         }
+        Transaction processedTransaction = transactionProcessor.process(transaction);
+        return finalizeTransaction(transaction, processedTransaction);
     }
 
 
-    public @NotNull Transaction processInstantTransaction(Transaction transaction) {
+    @Override
+    public TransactionResultDto processScheduledTransaction(Transaction transaction) {
+        if (transaction.getTransactionType() != TransactionType.SCHEDULED) {
+            throw new IllegalArgumentException("Transaction must be of type SCHEDULED");
+        }
         Transaction processedTransaction = transactionProcessor.process(transaction);
-        String recipient = transaction.getTargetAccount().getHolder().getUser().getPreferredPhoneNumber();
-        confirmationService.sendSMS(recipient, transaction);
-        return processedTransaction;
+        return finalizeTransaction(transaction, processedTransaction);
     }
 
 
     private @NotNull Transaction storeTransaction(TransferRequestDto dto, TransactionType type, LocalDateTime scheduledAt) {
         Transaction transaction = Transaction.builder()
-                                             .amount(dto.getAmount())
-                                             .currency(dto.getCurrency())
-                                             .transactionStatus(TransactionStatus.CREATED)
-                                             .transactionType(type)
-                                             .scheduledAt(scheduledAt)
-                                             .sourceAccount(accountService.getAccount(dto.getSourceAccountId()))
-                                             .targetAccount(accountService.getAccount(dto.getTargetAccountId()))
-                                             .build();
+                .amount(dto.getAmount())
+                .currency(dto.getCurrency())
+                .transactionStatus(TransactionStatus.CREATED)
+                .transactionType(type)
+                .scheduledAt(scheduledAt)
+                .sourceAccount(accountService.getAccount(dto.getSourceAccountId()))
+                .targetAccount(accountService.getAccount(dto.getTargetAccountId()))
+                .build();
         transactionRepository.save(transaction);
         return transaction;
+    }
+
+    @NotNull
+    private TransactionResultDto finalizeTransaction(Transaction transaction, Transaction processedTransaction) {
+        String recipient = transaction.getTargetAccount().getHolder().getUser().getPreferredPhoneNumber();
+        confirmationService.sendSMS(recipient, processedTransaction);
+        return new TransactionResultDto(processedTransaction, messageSource.getMessage(
+                "transaction.transfer.processed", new UUID[]{transaction.getId()}, LocaleContextHolder.getLocale()));
     }
 
     private @NotNull Supplier<NotFoundException> getNotFoundExceptionSupplier(UUID transactionId) {
@@ -167,5 +164,17 @@ public class CoreTransactionServiceImpl implements TransactionService {
                 "transaction.notfound",
                 new UUID[]{transactionId},
                 LocaleContextHolder.getLocale()));
+    }
+
+    private TransactionResultDto handleTransactionWith2FACheck(Transaction transaction) {
+        if (transaction.getSourceAccount().getTransaction2FAEnabled()) {
+            securityService.sendOTP(transaction);
+            return new TransactionResultDto(transaction, messageSource.getMessage(
+                    "transaction.transfer.awaiting-validation",
+                    new UUID[]{transaction.getId()},
+                    LocaleContextHolder.getLocale()));
+        } else {
+            return processTransaction(transaction);
+        }
     }
 }

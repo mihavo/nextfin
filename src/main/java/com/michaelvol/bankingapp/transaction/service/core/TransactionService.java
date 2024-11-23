@@ -1,14 +1,9 @@
 package com.michaelvol.bankingapp.transaction.service.core;
 
 import com.michaelvol.bankingapp.account.entity.Account;
-import com.michaelvol.bankingapp.transaction.dto.GetTransactionOptions;
-import com.michaelvol.bankingapp.transaction.dto.TransactionConfirmDto;
-import com.michaelvol.bankingapp.transaction.dto.TransactionResultDto;
-import com.michaelvol.bankingapp.transaction.dto.TransactionScheduleRequestDto;
-import com.michaelvol.bankingapp.transaction.dto.TransferRequestDto;
+import com.michaelvol.bankingapp.transaction.dto.*;
 import com.michaelvol.bankingapp.transaction.entity.Transaction;
 import com.michaelvol.bankingapp.transaction.enums.TransactionStatus;
-import com.michaelvol.bankingapp.transaction.enums.TransactionType;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -25,14 +20,14 @@ public interface TransactionService {
      * @param dto the dto containing the transfer details
      * @return a dto containing the transfer results
      */
-    Transaction initiateTransaction(TransferRequestDto dto);
+    TransactionResultDto initiateTransaction(TransferRequestDto dto);
 
     /**
      * Initiates a scheduled transaction and follows the same rules as {@link #initiateTransaction(TransferRequestDto)}
      * @param dto the dto containing the transfer details
-     * @return the scheduled transaction
+     * @return a dto containing the scheduled transfer results
      */
-    Transaction initiateScheduledTransaction(TransactionScheduleRequestDto dto);
+    TransactionResultDto initiateScheduledTransaction(TransactionScheduleRequestDto dto);
     /**
      * Fetches a transaction
      * @param transactionId the transactionID
@@ -48,31 +43,27 @@ public interface TransactionService {
     TransactionStatus checkStatus(UUID transactionId);
 
     /**
-     * Processes a transaction and updates its status
-     * @param transactionId the transactionID
-     * @return the updated (processed) transaction
+     * Schedules a transaction and updates its status
+     *
+     * @param transaction the transaction to schedule
+     * @return the scheduled transaction
      */
-    TransactionResultDto processTransaction(UUID transactionId);
-
+    ScheduledTransactionDto scheduleTransaction(Transaction transaction);
 
     /**
-     * Depending on the {@link TransactionType}:
-     * <ul>
-     *   <li>{@link TransactionType#SCHEDULED} schedules the transaction to be processed at a later time</li>
-     *   <li>{@link TransactionType#INSTANT} processes the transaction immediately using {@link #processInstantTransaction(Transaction)}</li>
-     * </ul>
+     * Processes a transaction and updates its status
      * @param transaction the transaction to process
-     * @return the result of the transaction processing
+     * @return the updated (processed) transaction
      */
     TransactionResultDto processTransaction(Transaction transaction);
 
-
     /**
-     * Processes a transaction and updates its status
+     * Processes a scheduled transaction and updates its status
+     *
      * @param transaction the transaction to process
      * @return the updated (processed) transaction
      */
-    Transaction processInstantTransaction(Transaction transaction);
+    TransactionResultDto processScheduledTransaction(Transaction transaction);
 
 
     /**

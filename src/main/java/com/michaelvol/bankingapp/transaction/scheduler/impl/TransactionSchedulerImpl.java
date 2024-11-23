@@ -1,7 +1,7 @@
 package com.michaelvol.bankingapp.transaction.scheduler.impl;
 
 import com.michaelvol.bankingapp.exceptions.exception.BadRequestException;
-import com.michaelvol.bankingapp.transaction.dto.ScheduledTransactionResultDto;
+import com.michaelvol.bankingapp.transaction.dto.ScheduledTransactionDto;
 import com.michaelvol.bankingapp.transaction.entity.Transaction;
 import com.michaelvol.bankingapp.transaction.scheduler.TransactionScheduler;
 import com.michaelvol.bankingapp.transaction.service.core.TransactionService;
@@ -24,7 +24,7 @@ public class TransactionSchedulerImpl implements TransactionScheduler {
     private final MessageSource messageSource;
 
     @Override
-    public ScheduledTransactionResultDto scheduleTransaction(Transaction transaction) {
+    public ScheduledTransactionDto scheduleTransaction(Transaction transaction) {
         LocalDateTime scheduledAt = transaction.getScheduledAt();
         if (scheduledAt == null || scheduledAt.isBefore(LocalDateTime.now())) {
             throw new BadRequestException("Transaction must have a scheduled time");
@@ -37,7 +37,7 @@ public class TransactionSchedulerImpl implements TransactionScheduler {
                 "transaction.transfer.scheduled",
                 null,
                 LocaleContextHolder.getLocale());
-        return new ScheduledTransactionResultDto(transaction,
+        return new ScheduledTransactionDto(transaction,
                                                  jobId.asUUID(),
                                                  transaction.getScheduledAt(),
                                                  message);

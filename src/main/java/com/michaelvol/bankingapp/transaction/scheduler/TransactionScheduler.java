@@ -1,6 +1,6 @@
 package com.michaelvol.bankingapp.transaction.scheduler;
 
-import com.michaelvol.bankingapp.transaction.dto.ScheduledTransactionResultDto;
+import com.michaelvol.bankingapp.transaction.dto.ScheduledTransactionDto;
 import com.michaelvol.bankingapp.transaction.entity.Transaction;
 
 public interface TransactionScheduler {
@@ -10,5 +10,5 @@ public interface TransactionScheduler {
      * @param transaction the transaction to schedule
      * @return the result of the scheduling
      */
-    ScheduledTransactionResultDto scheduleTransaction(Transaction transaction);
+    ScheduledTransactionDto scheduleTransaction(Transaction transaction);
 }
