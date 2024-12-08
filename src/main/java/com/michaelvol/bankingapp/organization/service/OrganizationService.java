@@ -23,4 +23,6 @@ public interface OrganizationService {
     List<Account> getAccounts(AccountType type);
 
     void organizationExists(UUID organizationId) throws NoSuchElementException;
+
+    void setupBillPlan(CreateBillPlanDto billPlanDto, UUID organizationId);
 }
