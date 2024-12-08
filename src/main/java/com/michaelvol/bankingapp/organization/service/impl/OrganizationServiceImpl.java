@@ -2,7 +2,7 @@ package com.michaelvol.bankingapp.organization.service.impl;
 
 import com.michaelvol.bankingapp.account.entity.Account;
 import com.michaelvol.bankingapp.account.enums.AccountType;
-import com.michaelvol.bankingapp.account.repository.AccountRepository;
+import com.michaelvol.bankingapp.account.service.core.AccountService;
 import com.michaelvol.bankingapp.exceptions.exception.BadRequestException;
 import com.michaelvol.bankingapp.exceptions.exception.NotFoundException;
 import com.michaelvol.bankingapp.organization.dto.CreateOrganizationDto;
@@ -13,16 +13,13 @@ import com.michaelvol.bankingapp.organization.service.OrganizationService;
 import com.michaelvol.bankingapp.organization.validator.OrganizationValidator;
 import com.michaelvol.bankingapp.users.entity.User;
 import com.michaelvol.bankingapp.users.service.UserService;
-import com.michaelvol.bankingapp.users.service.impl.UserServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -32,8 +29,9 @@ public class OrganizationServiceImpl implements OrganizationService {
     private final OrganizationRepository organizationRepository;
     private final OrganizationValidator organizationValidator;
     private final OrganizationMapper organizationMapper;
-    private final AccountRepository accountRepository;
+    private final AccountService accountService;
     private final UserService userService;
+    private MessageSource messageSource;
 
     @Override
     public Organization createOrganization(CreateOrganizationDto dto, User owner) {
@@ -53,19 +51,19 @@ public class OrganizationServiceImpl implements OrganizationService {
     @Override
     public Organization getOrganizationByCurrentUser() {
         User currentUser = userService.getCurrentUser();
-//         organizationRepository.getByOwner(currentUser)
-
+        return organizationRepository.getByOwner(currentUser).orElseThrow(() -> new NotFoundException(messageSource.getMessage("organization.not.found", null, Locale.getDefault())));
     }
 
     @Override
     public List<Account> getAccounts(AccountType type) {
-        return List.of();
+        Organization organization = getOrganizationByCurrentUser();
+        return accountService.getAccountsByUser(organization.getOwner(), type);
     }
 
     @Override
     public void organizationExists(UUID organizationId) throws NoSuchElementException {
         if (!organizationRepository.existsById(organizationId)) {
-            throw new NotFoundException()
+            throw new NotFoundException(messageSource.getMessage("organization.not.found", null, Locale.getDefault()));
         }
     }
 }

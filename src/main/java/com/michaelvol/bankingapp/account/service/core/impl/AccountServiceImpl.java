@@ -3,6 +3,7 @@ package com.michaelvol.bankingapp.account.service.core.impl;
 import com.michaelvol.bankingapp.account.dto.*;
 import com.michaelvol.bankingapp.account.entity.Account;
 import com.michaelvol.bankingapp.account.enums.AccountStatus;
+import com.michaelvol.bankingapp.account.enums.AccountType;
 import com.michaelvol.bankingapp.account.repository.AccountRepository;
 import com.michaelvol.bankingapp.account.service.core.AccountService;
 import com.michaelvol.bankingapp.account.service.validator.AccountValidator;
@@ -167,6 +168,17 @@ public class AccountServiceImpl implements AccountService {
         account.setTransactionSMSConfirmationEnabled(!account.getTransactionSMSConfirmationEnabled());
         accountRepository.save(account);
         return account.getTransactionSMSConfirmationEnabled();
+    }
+
+    @Override
+    public List<Account> getAccountsByUser(User owner, AccountType type) {
+        Holder holder = owner.getHolder();
+        if (holder == null) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    messageSource.getMessage("account.holder.not.found", null,
+                            LocaleContextHolder.getLocale()));
+        }
+        return accountRepository.findAllByHolderAndAccountType(holder, type);
     }
 
 }

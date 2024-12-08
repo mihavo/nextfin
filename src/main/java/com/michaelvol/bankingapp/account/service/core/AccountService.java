@@ -2,8 +2,10 @@ package com.michaelvol.bankingapp.account.service.core;
 
 import com.michaelvol.bankingapp.account.dto.*;
 import com.michaelvol.bankingapp.account.entity.Account;
+import com.michaelvol.bankingapp.account.enums.AccountType;
 import com.michaelvol.bankingapp.account.service.validator.AccountValidator;
 import com.michaelvol.bankingapp.exceptions.exception.NotFoundException;
+import com.michaelvol.bankingapp.users.entity.User;
 import jakarta.persistence.EntityNotFoundException;
 
 import java.math.BigDecimal;
@@ -95,4 +97,6 @@ public interface AccountService {
      * @return the new state of the transaction SMS confirmation
      */
     Boolean toggleTransactionSMSConfirmation(Account account);
+
+    List<Account> getAccountsByUser(User owner, AccountType type);
 }
