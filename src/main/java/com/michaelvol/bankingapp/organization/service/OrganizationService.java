@@ -8,6 +8,7 @@ import com.michaelvol.bankingapp.users.entity.User;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface OrganizationService {
@@ -15,7 +16,7 @@ public interface OrganizationService {
 
     Organization createOrganization(CreateOrganizationDto dto, User owner);
 
-    Organization getOrganizationById(UUID organizationId) throws NoSuchElementException;
+    Optional<Organization> getOrganizationById(UUID organizationId) throws NoSuchElementException;
 
     Organization getOrganizationByCurrentUser();
 
