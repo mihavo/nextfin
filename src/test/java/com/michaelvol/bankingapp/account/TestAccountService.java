@@ -13,6 +13,7 @@ import com.michaelvol.bankingapp.employee.service.EmployeeService;
 import com.michaelvol.bankingapp.exceptions.exception.NotFoundException;
 import com.michaelvol.bankingapp.holder.entity.Holder;
 import com.michaelvol.bankingapp.holder.service.HolderService;
+import com.michaelvol.bankingapp.users.entity.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,6 +21,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.MessageSource;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
@@ -50,6 +54,9 @@ public class TestAccountService {
     @Mock
     private MessageSource messageSource;
 
+    @Mock
+    private SecurityContext securityContext;
+
     Account sampleAccount;
 
     @BeforeEach
@@ -61,6 +68,7 @@ public class TestAccountService {
     public void createAccount() {
         UUID sampleUUID = UUID.randomUUID();
         Holder sampleHolder = Holder.builder().id(sampleUUID).build();
+        User user = User.builder().holder(sampleHolder).build();
         Employee sampleEmployee = Employee.builder().id(1L).build();
         Account sampleAccount = AccountSamples.sampleAccount(1L, sampleHolder,
                                                              sampleEmployee);
@@ -68,7 +76,10 @@ public class TestAccountService {
         when(holderService.getHolderById(sampleUUID)).thenReturn(sampleHolder);
         when(employeeService.getEmployeeById(1L)).thenReturn(sampleEmployee);
         when(accountRepository.save(any(Account.class))).thenReturn(sampleAccount);
-
+        when(securityContext.getAuthentication()).thenReturn(new UsernamePasswordAuthenticationToken(user,
+                null,
+                null));
+        SecurityContextHolder.setContext(securityContext);
         CreateAccountRequestDto input = CreateAccountRequestDto.builder()
                                                                .accountType(sampleAccount.getAccountType())
                                                                .managerId(1L)
