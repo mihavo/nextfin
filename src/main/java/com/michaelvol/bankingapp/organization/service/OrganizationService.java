@@ -24,5 +24,4 @@ public interface OrganizationService {
 
     void organizationExists(UUID organizationId) throws NoSuchElementException;
 
-    void setupBillPlan(CreateBillPlanDto billPlanDto, UUID organizationId);
 }

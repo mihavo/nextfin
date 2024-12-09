@@ -5,6 +5,7 @@ import com.michaelvol.bankingapp.account.enums.AccountType;
 import com.michaelvol.bankingapp.account.service.core.AccountService;
 import com.michaelvol.bankingapp.exceptions.exception.BadRequestException;
 import com.michaelvol.bankingapp.exceptions.exception.NotFoundException;
+import com.michaelvol.bankingapp.organization.bill.plan.repository.BillPlanRepository;
 import com.michaelvol.bankingapp.organization.dto.CreateOrganizationDto;
 import com.michaelvol.bankingapp.organization.dto.OrganizationMapper;
 import com.michaelvol.bankingapp.organization.entity.Organization;
@@ -27,10 +28,14 @@ import java.util.*;
 public class OrganizationServiceImpl implements OrganizationService {
 
     private final OrganizationRepository organizationRepository;
+    private final BillPlanRepository billPlanRepository;
+
     private final OrganizationValidator organizationValidator;
     private final OrganizationMapper organizationMapper;
+
     private final AccountService accountService;
     private final UserService userService;
+
     private MessageSource messageSource;
 
     @Override
