@@ -33,8 +33,7 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class TestAccountService {
@@ -62,6 +61,11 @@ public class TestAccountService {
     @BeforeEach
     public void init() {
         sampleAccount = AccountSamples.sampleAccount(1L, new Holder(), new Employee());
+    }
+
+    //    @AfterEach
+    public void tearDown() {
+        verifyNoMoreInteractions(accountRepository, holderService, employeeService, messageSource, securityContext);
     }
 
     @Test
@@ -93,7 +97,7 @@ public class TestAccountService {
         assertEquals(1L, returnedAccount.getManager().getId());
         assertEquals(sampleUUID, returnedAccount.getHolder().getId());
         assertEquals(sampleAccount.getCurrency(), returnedAccount.getCurrency());
-        assertEquals(returnedAccount.getBalance(), BigDecimal.ZERO);
+        assertEquals(BigDecimal.ZERO, returnedAccount.getBalance());
         assertEquals(returnedAccount.getAccountType(), sampleAccount.getAccountType());
     }
 
