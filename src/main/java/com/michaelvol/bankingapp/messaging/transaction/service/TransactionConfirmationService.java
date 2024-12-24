@@ -19,13 +19,13 @@ import java.time.format.DateTimeFormatter;
 @RequiredArgsConstructor
 public class TransactionConfirmationService {
 
-    @Value("${clients.twilio.account-sid}")
+    @Value("${clients.twilio.account-sid:#{null}}")
     private String accountSid;
 
-    @Value("${clients.twilio.auth-token}")
+    @Value("${clients.twilio.auth-token:#{null}}")
     private String authToken;
 
-    @Value("${clients.twilio.phone-number}")
+    @Value("${clients.twilio.phone-number:#{null}}")
     private String TWILIO_PHONE_NUMBER;
 
     private final MessageSource messageSource;
