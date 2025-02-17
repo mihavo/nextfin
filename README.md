@@ -29,7 +29,7 @@
 
 ## 📖 Overview
 
-The **e-Banking Platform API** is a comprehensive RESTful backend platform designed to enhance digital banking
+**Nextfin** is a comprehensive RESTful backend platform designed to enhance digital banking
 experiences. <br/>
 It offers a suite of features that enable seamless financial management and transactions for users.
 
