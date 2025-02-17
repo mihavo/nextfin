@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://github.com/mihavo/nextfin">
-    <img src="resources/vectors/logo.png" alt="Bootstrap logo" width="200" height="165">
+    <img src="resources/vectors/logo.png" alt="Bootstrap logo" width="200" height="140">
   </a>
 </p>
 
