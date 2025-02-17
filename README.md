@@ -1,5 +1,10 @@
-<h3 align="center">Nextfin</h3>
+<p align="center">
+  <a href="https://github.com/mihavo/nextfin">
+    <img src="resources/vectors/logo.png" alt="Bootstrap logo" width="200" height="165">
+  </a>
+</p>
 
+<h3 align="center">Nextfin</h3>
 
 <p align="center">
   A secure and scalable backend platform for e-banking operations
