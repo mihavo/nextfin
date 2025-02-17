@@ -36,7 +36,7 @@ jobs:
 
       - name: Bump version
         id: bump
-        uses: mickem/gh-action-bump-maven-version
+        uses: mickem/gh-action-bump-maven-version@v1.0.0
 
       - name: Print Version
         run: "echo 'New Version: ${{steps.bump.outputs.version}}'"
