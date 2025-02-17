@@ -38,6 +38,8 @@ jobs:
         id: bump
         uses: nnichols/maven-version-bump-action@v3
         with:
+          type: "#minor"
+          pom-path: ./
           github-token: ${{ secrets.github_token }}
 
       - name: Print Version
