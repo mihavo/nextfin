@@ -37,18 +37,19 @@ jobs:
       - name: Bump version
         id: bump
         uses: mickem/gh-action-bump-maven-version@v1.0.0
+        with:
 
       - name: Print Version
-        run: "echo 'New Version: ${{steps.bump.outputs.version}}'"
+        run: "echo 'New Version: ${{steps.bump.outputs.tag}}'"
 
       - name: Store New Version in GITHUB_ENV
-        run: echo "VERSION=${{ steps.bump.outputs.version }}" >> $GITHUB_ENV
+        run: echo "VERSION=${{ steps.bump.outputs.tag }}" >> $GITHUB_ENV
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v${{ env.VERSION }}
-          name: Release v${{ env.VERSION }}
+          tag_name: ${{ env.tag}}
+          name: Release ${{ env.tag }}
           draft: false
           prerelease: false
           files: target/*.jar
