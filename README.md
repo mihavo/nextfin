@@ -1,14 +1,14 @@
 <h3 align="center">Nextfin</h3>
 
 
-<p style="text-align: center">
+<p align="center">
   A secure and scalable backend platform for e-banking operations
   <br>
   <a href="https://github.com/mihavo/nextfin/issues/new">Report bug</a>
   ·
   <a href="https://github.com/mihavo/nextfin/issues/new?labels=feature">Request feature</a>
 </p>
-<p style="text-align: center"> <img src="https://img.shields.io/badge/Spring%20Boot-3.3.2-green" alt="Spring Boot"> 
+<p align="center"> <img src="https://img.shields.io/badge/Spring%20Boot-3.3.2-green" alt="Spring Boot"> 
 <img src="https://img.shields.io/badge/OAuth-2.0-blue" alt="OAuth">
 <img src="https://img.shields.io/badge/Twilio-API-red" alt="Twilio">
 <img src="https://img.shields.io/badge/PostgreSQL-13-yellow" alt="PostgreSQL">
