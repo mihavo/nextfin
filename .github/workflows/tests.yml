@@ -1,4 +1,4 @@
-name: Test Spring Boot App
+name: Run NextFin Unit Tests
 
 on:
   push:
