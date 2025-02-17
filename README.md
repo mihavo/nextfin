@@ -9,9 +9,9 @@
 <p align="center">
   A secure and scalable backend platform for e-banking operations
   <br>
-  <a href="https://github.com/mihavo/nextfin/issues/new">Report bug</a>
+  <a href="https://github.com/mihavo/nextfin/issues/new?template=bug_report.md">Report bug</a>
   ·
-  <a href="https://github.com/mihavo/nextfin/issues/new?labels=feature">Request feature</a>
+  <a href="https://github.com/mihavo/nextfin/issues/new?labels=feature?template=feature_request.md">Request feature</a>
 </p>
 <p align="center"> <img src="https://img.shields.io/badge/Spring%20Boot-3.3.2-green" alt="Spring Boot"> 
 <img src="https://img.shields.io/badge/OAuth-2.0-blue" alt="OAuth">
