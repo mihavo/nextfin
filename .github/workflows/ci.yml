@@ -1,0 +1,14 @@
+name: Build & Test Nextfin
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build:
+    uses: ./.github/workflows/build.yml
+
+  test:
+    needs: build
+    uses: ./.github/workflows/tests.yml

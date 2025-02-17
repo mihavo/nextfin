@@ -1,12 +1,7 @@
 name: Run NextFin Unit Tests
 
 on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+  workflow_call:
 
 jobs:
   test:
@@ -24,4 +19,3 @@ jobs:
 
       - name: Run tests with Maven
         run: mvn test  -Dspring.profiles.active=test
-
