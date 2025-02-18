@@ -47,7 +47,7 @@ It offers a suite of features that enable seamless financial management and tran
 Bootstrap the application with one of the following options:
 
 - [Download The Latest Release](https://github.com/mihavo/nextfin/releases)
-- [Build From Source](https://github.com/mihavo/nextfin/wiki/Guide-%E2%80%90-Build-from-Source)
+- [Build From Source](https://github.com/mihavo/nextfin/wiki/Nextfin-%E2%80%90-Build-from-Source)
 
 ## 📚 Documentation
 
