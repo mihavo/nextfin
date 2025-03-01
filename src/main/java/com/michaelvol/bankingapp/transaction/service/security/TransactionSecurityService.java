@@ -11,14 +11,14 @@ import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.MessageSource;
-import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "2fa.enabled", havingValue = "true", matchIfMissing = true)
 public class TransactionSecurityService {
     private final TransactionRepository transactionRepository;
 
@@ -31,12 +31,11 @@ public class TransactionSecurityService {
     @Value("${clients.twilio.verification-sid}")
     private String verificationSid;
 
-
     private final MessageSource messageSource;
-
-    @EventListener(ApplicationReadyEvent.class)
+    
     private void initializeTwilio() {
         Twilio.init(accountSid, authToken);
+        log.info("2FA Initialized");
     }
 
     public Verification sendOTP(Transaction transaction) {

@@ -12,6 +12,7 @@ import com.michaelvol.bankingapp.transaction.service.core.TransactionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
@@ -85,7 +86,8 @@ public class AccountController {
 
     @GetMapping("/{id}/balance")
     @Operation(summary = "Gets account balance", description = "Method for fetching current account balance")
-    public ResponseEntity<AccountBalanceResponseDto> checkBalance(@PathVariable @NotNull Long id) {
+    public ResponseEntity<AccountBalanceResponseDto> checkBalance(@PathVariable @Min(value = 0L, message = "The value" +
+            " must be positive") Long id) {
         GetAccountBalanceDto dto = accountService.checkBalance(id);
         String message = messageSource.getMessage("account.balance.check",
                                                   new String[]{dto.balance().toString(), dto.currency().getSymbol()},
