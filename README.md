@@ -16,7 +16,8 @@
 <p align="center"> <img src="https://img.shields.io/badge/Spring%20Boot-3.3.2-green" alt="Spring Boot"> 
 <img src="https://img.shields.io/badge/OAuth-2.0-blue" alt="OAuth">
 <img src="https://img.shields.io/badge/Twilio-API-red" alt="Twilio">
-<img src="https://img.shields.io/badge/PostgreSQL-13-yellow" alt="PostgreSQL">
+<img src="https://img.shields.io/badge/PostgreSQL-17-yellow" alt="PostgreSQL">
+<img src="https://img.shields.io/badge/supabase-black?logo=supabase&style=for-the-badge%22" alt="Supabase">
 </p>
 
 ## Table of Contents

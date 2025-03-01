@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.michaelvol</groupId>
-    <artifactId>bankingapp</artifactId>
+    <artifactId>nextfin</artifactId>
     <version>0.0.3</version>
-    <name>bankingapp</name>
-    <description>bankingapp</description>
+    <name>nextfin</name>
+    <description>nextfin</description>
     <properties>
         <java.version>21</java.version>
     </properties>
@@ -122,7 +122,7 @@
         <dependency>
             <groupId>org.jobrunr</groupId>
             <artifactId>jobrunr-spring-boot-3-starter</artifactId>
-            <version>7.2.3</version>
+            <version>7.4.1</version>
         </dependency>
         <dependency>
             <groupId>com.twilio.sdk</groupId>
