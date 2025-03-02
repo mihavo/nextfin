@@ -1,7 +1,6 @@
 package com.nextfin.transaction.service.core;
 
 import com.nextfin.account.entity.Account;
-import com.michaelvol.nextfin.transaction.dto.*;
 import com.nextfin.transaction.dto.*;
 import com.nextfin.transaction.entity.Transaction;
 import com.nextfin.transaction.enums.TransactionStatus;

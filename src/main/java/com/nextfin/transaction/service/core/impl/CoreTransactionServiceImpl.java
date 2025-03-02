@@ -4,7 +4,6 @@ import com.nextfin.account.entity.Account;
 import com.nextfin.account.service.core.AccountService;
 import com.nextfin.exceptions.exception.NotFoundException;
 import com.nextfin.messaging.transaction.service.TransactionConfirmationService;
-import com.michaelvol.nextfin.transaction.dto.*;
 import com.nextfin.transaction.dto.*;
 import com.nextfin.transaction.entity.Transaction;
 import com.nextfin.transaction.enums.TransactionStatus;

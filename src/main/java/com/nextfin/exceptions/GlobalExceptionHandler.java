@@ -1,6 +1,5 @@
 package com.nextfin.exceptions;
 
-import com.michaelvol.nextfin.exceptions.exception.*;
 import com.nextfin.exceptions.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

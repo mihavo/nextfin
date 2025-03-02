@@ -1,7 +1,6 @@
 package com.nextfin.account.controller;
 
 import com.nextfin.AppConstants;
-import com.michaelvol.nextfin.account.dto.*;
 import com.nextfin.account.dto.*;
 import com.nextfin.account.entity.Account;
 import com.nextfin.account.enums.AccountType;
