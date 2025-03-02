@@ -3,6 +3,7 @@ package com.michaelvol.bankingapp.holder.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.michaelvol.bankingapp.account.entity.Account;
 import com.michaelvol.bankingapp.common.address.entity.Address;
+import com.michaelvol.bankingapp.generic.Auditable;
 import com.michaelvol.bankingapp.users.entity.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
@@ -21,7 +22,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @ToString
-public class Holder implements Serializable {
+public class Holder extends Auditable implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", nullable = false)

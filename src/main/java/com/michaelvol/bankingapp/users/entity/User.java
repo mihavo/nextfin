@@ -2,6 +2,7 @@ package com.michaelvol.bankingapp.users.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.michaelvol.bankingapp.AppConstants;
+import com.michaelvol.bankingapp.generic.Auditable;
 import com.michaelvol.bankingapp.holder.entity.Holder;
 import com.michaelvol.bankingapp.users.enums.Role;
 import jakarta.persistence.*;
@@ -13,7 +14,6 @@ import org.hibernate.annotations.Check;
 import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
@@ -28,7 +28,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @DynamicUpdate
-public class User implements UserDetails {
+public class User extends Auditable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
 	@Column(name = "id", updatable = false, nullable = false)

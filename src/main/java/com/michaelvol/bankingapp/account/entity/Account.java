@@ -29,7 +29,7 @@ import java.util.Currency;
 @ToString
 public class Account {
     @Id
-    @SequenceGenerator(name = "accounts_gen", sequenceName = "accounts_seq")
+    @SequenceGenerator(name = "accounts_gen", sequenceName = "accounts_seq", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "accounts_gen")
     @Column(name = "id", nullable = false)
     private Long id;
