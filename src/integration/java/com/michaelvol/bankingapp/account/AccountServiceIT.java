@@ -1,15 +1,15 @@
 package com.michaelvol.nextfin.account;
 
-import com.michaelvol.nextfin.account.dto.CreateAccountRequestDto;
-import com.michaelvol.nextfin.account.entity.Account;
-import com.michaelvol.nextfin.account.enums.AccountType;
-import com.michaelvol.nextfin.account.repository.AccountRepository;
-import com.michaelvol.nextfin.account.service.core.AccountService;
-import com.michaelvol.nextfin.employee.entity.Employee;
-import com.michaelvol.nextfin.employee.repository.EmployeeRepository;
-import com.michaelvol.nextfin.exceptions.exception.NotFoundException;
-import com.michaelvol.nextfin.holder.entity.Holder;
-import com.michaelvol.nextfin.holder.repository.HolderRepository;
+import com.nextfin.account.dto.CreateAccountRequestDto;
+import com.nextfin.account.entity.Account;
+import com.nextfin.account.enums.AccountType;
+import com.nextfin.account.repository.AccountRepository;
+import com.nextfin.account.service.core.AccountService;
+import com.nextfin.employee.entity.Employee;
+import com.nextfin.employee.repository.EmployeeRepository;
+import com.nextfin.exceptions.exception.NotFoundException;
+import com.nextfin.holder.entity.Holder;
+import com.nextfin.holder.repository.HolderRepository;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
