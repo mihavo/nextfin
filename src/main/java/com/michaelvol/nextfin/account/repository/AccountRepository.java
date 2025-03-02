@@ -1,0 +1,28 @@
+package com.michaelvol.nextfin.account.repository;
+
+import com.michaelvol.nextfin.account.entity.Account;
+import com.michaelvol.nextfin.account.enums.AccountType;
+import com.michaelvol.nextfin.holder.entity.Holder;
+import jakarta.persistence.LockModeType;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+@Repository
+public interface AccountRepository extends JpaRepository<Account, Long> {
+
+    @NotNull
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    <S extends Account> S save(@NotNull S entity);
+
+    List<Account> findAllByHolder(Holder holder);
+
+    List<Account> findAllByHolderAndAccountType(Holder holder, AccountType accountType);
+
+    @Query("SELECT us.id FROM User us JOIN Holder ho ON ho.user = us JOIN ho.accounts acc WHERE acc.id = :id")
+    Long findUserIdByAccountId(Long id);
+}

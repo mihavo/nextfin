@@ -1,15 +1,15 @@
-package com.michaelvol.bankingapp.account;
+package com.michaelvol.nextfin.account;
 
-import com.michaelvol.bankingapp.account.dto.CreateAccountRequestDto;
-import com.michaelvol.bankingapp.account.entity.Account;
-import com.michaelvol.bankingapp.account.enums.AccountType;
-import com.michaelvol.bankingapp.account.repository.AccountRepository;
-import com.michaelvol.bankingapp.account.service.core.AccountService;
-import com.michaelvol.bankingapp.employee.entity.Employee;
-import com.michaelvol.bankingapp.employee.repository.EmployeeRepository;
-import com.michaelvol.bankingapp.exceptions.exception.NotFoundException;
-import com.michaelvol.bankingapp.holder.entity.Holder;
-import com.michaelvol.bankingapp.holder.repository.HolderRepository;
+import com.michaelvol.nextfin.account.dto.CreateAccountRequestDto;
+import com.michaelvol.nextfin.account.entity.Account;
+import com.michaelvol.nextfin.account.enums.AccountType;
+import com.michaelvol.nextfin.account.repository.AccountRepository;
+import com.michaelvol.nextfin.account.service.core.AccountService;
+import com.michaelvol.nextfin.employee.entity.Employee;
+import com.michaelvol.nextfin.employee.repository.EmployeeRepository;
+import com.michaelvol.nextfin.exceptions.exception.NotFoundException;
+import com.michaelvol.nextfin.holder.entity.Holder;
+import com.michaelvol.nextfin.holder.repository.HolderRepository;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
