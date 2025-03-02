@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.UUID;
 
 @Repository
 public interface AccountRepository extends JpaRepository<Account, Long> {
@@ -24,5 +25,5 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
     List<Account> findAllByHolderAndAccountType(Holder holder, AccountType accountType);
 
     @Query("SELECT us.id FROM User us JOIN Holder ho ON ho.user = us JOIN ho.accounts acc WHERE acc.id = :id")
-    Long findUserIdByAccountId(Long id);
+    UUID findUserIdByAccountId(Long id);
 }

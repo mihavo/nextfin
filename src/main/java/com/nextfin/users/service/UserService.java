@@ -3,9 +3,9 @@ package com.nextfin.users.service;
 import com.nextfin.exceptions.exception.UserNotFoundException;
 import com.nextfin.users.dto.CreateUserDto;
 import com.nextfin.users.entity.User;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import com.nextfin.users.service.impl.NextfinUserDetailsService;
 
-public interface UserService extends UserDetailsService {
+public interface UserService extends NextfinUserDetailsService {
 
 	/**
 	 * Should create a new user with the given information

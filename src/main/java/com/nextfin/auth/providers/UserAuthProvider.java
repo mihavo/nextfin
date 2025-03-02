@@ -1,5 +1,8 @@
 package com.nextfin.auth.providers;
 
+import com.nextfin.users.entity.NextfinUserDetails;
+import com.nextfin.users.service.impl.NextfinUserDetailsService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -7,18 +10,14 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-
-import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
 public class UserAuthProvider implements AuthenticationProvider {
 
-    private final UserDetailsService userService;
+    private final NextfinUserDetailsService userService;
     private final PasswordEncoder passwordEncoder;
 
     private final MessageSource messageSource;
@@ -28,7 +27,7 @@ public class UserAuthProvider implements AuthenticationProvider {
         String username = authentication.getName();
         String password = authentication.getCredentials().toString();
 
-        UserDetails userDetails = userService.loadUserByUsername(username);
+        NextfinUserDetails userDetails = (NextfinUserDetails) userService.loadUserByUsername(username);
         if (!passwordEncoder.matches(password, userDetails.getPassword())) {
             throw new BadCredentialsException(messageSource.getMessage("auth.bad-credentials",
                                                                        null,

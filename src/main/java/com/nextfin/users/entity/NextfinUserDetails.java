@@ -1,21 +1,10 @@
 package com.nextfin.users.entity;
 
-import lombok.*;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
+import java.util.UUID;
 
-@Getter
-@Setter
-@Builder
-@EqualsAndHashCode
-@RequiredArgsConstructor
-public abstract class NextfinUserDetails implements UserDetails {
+public interface NextfinUserDetails extends UserDetails {
 
-    private Long id;
-    private String username;
-    private String password;
-
-    private Collection<? extends GrantedAuthority> authorities;
+    UUID getId();
 }
