@@ -21,6 +21,7 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -48,6 +49,7 @@ public class AccountController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Gets account data", description = "Method for fetching account information")
+    @PreAuthorize("@accountSecurityServiceImpl.isAccountOwner(#accountId)")
     public ResponseEntity<GetAccountResponseDto> getAccountData(@PathVariable(name = "id") @NotNull @Positive Long accountId) {
         Account account = accountService.getAccount(accountId);
         GetAccountResponseDto responseDto = new GetAccountResponseDto(account, "Fetched account successfully");
@@ -55,6 +57,8 @@ public class AccountController {
     }
 
     @GetMapping("")
+    @Operation(summary = "Gets accounts", description = "Method for fetching all of the currently authenticated " +
+            "user's accounts")
     public ResponseEntity<GetMyAccountsResponseDto> getMyAccounts(@RequestParam(name = "type", required = false) AccountType type) {
         List<Account> accounts = holderService.getAccounts(type);
         return new ResponseEntity<>(new GetMyAccountsResponseDto(accounts, messageSource.getMessage("account" +
@@ -63,6 +67,7 @@ public class AccountController {
 
     @PostMapping("/{id}/deposit")
     @Operation(summary = "Deposit to account", description = "Method for depositing a specified amount to an account")
+    @PreAuthorize("@accountSecurityServiceImpl.isAccountOwner(#id)")
     public ResponseEntity<DepositAmountResponseDto> depositAmount(@PathVariable @NotNull Long id, @Valid @RequestBody DepositAmountRequestDto dto) {
         BigDecimal updatedBalance = accountService.depositAmount(id, dto);
         return new ResponseEntity<>(new DepositAmountResponseDto(updatedBalance,
@@ -74,6 +79,7 @@ public class AccountController {
 
     @PostMapping("/{id}/withdraw")
     @Operation(summary = "Withdraw from account", description = "Method for withdrawing a specified amount from an account")
+    @PreAuthorize("@accountSecurityServiceImpl.isAccountOwner(#id)")
     public ResponseEntity<WithdrawAmountResponseDto> withdrawAmount(@PathVariable @NotNull Long id, @Valid @RequestBody WithdrawAmountRequestDto dto) {
         BigDecimal updatedBalance = accountService.withdrawAmount(id, dto);
         return new ResponseEntity<>(new WithdrawAmountResponseDto(updatedBalance,
@@ -98,6 +104,7 @@ public class AccountController {
 
     @GetMapping("/{id}/transactions")
     @Operation(summary = "Gets recent transactions of the account")
+    @PreAuthorize("@accountSecurityServiceImpl.isAccountOwner(#id)")
     public ResponseEntity<Page<Transaction>> getTransactions(@PathVariable @NotNull Long id, @Valid GetTransactionOptions options) {
         Account account = accountService.getAccount(id);
         Page<Transaction> filteredTransactions = transactionService.getAccountTransactions(account, options);
@@ -106,6 +113,7 @@ public class AccountController {
 
     @PatchMapping("/{id}/transactions/update-limit")
     @Operation(summary = "Updates transaction limit", description = "Method for updating transaction limit of an account")
+    @PreAuthorize("@accountSecurityServiceImpl.isAccountOwner(#id)")
     public ResponseEntity<UpdateTransactionLimitResponseDto> updateTransactionLimit(@PathVariable @NotNull Long id, @Valid @RequestBody UpdateTransactionLimitRequestDto dto) {
         Account account = accountService.getAccount(id);
         accountService.updateTransactionLimit(account, dto.transactionLimit());
@@ -114,6 +122,7 @@ public class AccountController {
 
     @PatchMapping("/{id}/transactions/toggle-limit")
     @Operation(summary = "Toggles transaction limit", description = "Method for toggling transaction limit of an account")
+    @PreAuthorize("@accountSecurityServiceImpl.isAccountOwner(#id)")
     public ResponseEntity<ToggleTransactionLimitResponseDto> toggleTransactionLimit(@PathVariable @NotNull Long id) {
         Account account = accountService.getAccount(id);
         Boolean enabled = accountService.toggleTransactionLimit(account);
@@ -137,6 +146,7 @@ public class AccountController {
 
     @PatchMapping("/{id}/transactions/toggle-sms-confirmation")
     @Operation(summary = "Toggles transaction SMS confirmation", description = "Method for toggling transaction SMS confirmation of an account")
+    @PreAuthorize("@accountSecurityServiceImpl.isAccountOwner(#id)")
     public ResponseEntity<ToggleTransactionSMSConfirmationDto> toggleTransactionSMSConfirmation(@PathVariable @NotNull Long id) {
         Account account = accountService.getAccount(id);
         Boolean enabled = accountService.toggleTransactionSMSConfirmation(account);
