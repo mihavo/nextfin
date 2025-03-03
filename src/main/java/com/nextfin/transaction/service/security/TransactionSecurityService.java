@@ -6,6 +6,7 @@ import com.nextfin.transaction.repository.TransactionRepository;
 import com.twilio.Twilio;
 import com.twilio.rest.verify.v2.service.Verification;
 import com.twilio.rest.verify.v2.service.VerificationCheck;
+import jakarta.annotation.PostConstruct;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+// system-wide 2fa enabled flag
 @ConditionalOnProperty(name = "2fa.enabled", havingValue = "true", matchIfMissing = true)
 public class TransactionSecurityService {
     private final TransactionRepository transactionRepository;
@@ -32,7 +34,8 @@ public class TransactionSecurityService {
     private String verificationSid;
 
     private final MessageSource messageSource;
-    
+
+    @PostConstruct
     private void initializeTwilio() {
         Twilio.init(accountSid, authToken);
         log.info("2FA Initialized");

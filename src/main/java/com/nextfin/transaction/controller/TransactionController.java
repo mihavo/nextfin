@@ -1,10 +1,7 @@
 package com.nextfin.transaction.controller;
 
 import com.nextfin.AppConstants;
-import com.nextfin.transaction.dto.TransactionConfirmDto;
-import com.nextfin.transaction.dto.TransactionResultDto;
-import com.nextfin.transaction.dto.TransactionScheduleRequestDto;
-import com.nextfin.transaction.dto.TransferRequestDto;
+import com.nextfin.transaction.dto.*;
 import com.nextfin.transaction.entity.Transaction;
 import com.nextfin.transaction.enums.TransactionStatus;
 import com.nextfin.transaction.service.core.TransactionService;
@@ -27,23 +24,27 @@ public class TransactionController {
 
     private final TransactionService transactionService;
 
+    private final TransactionMapper transactionMapper;
+
     private final MessageSource messageSource;
 
     @PostMapping("/initiate")
     @Operation(summary = "Initiates a transaction from a source account to a target account",
-            description = "Transfers a specified amount provided that the source account has" +
-                    " the required funds and the source and target accounts differ. Sends OTP for validating the source.")
-    public ResponseEntity<TransactionResultDto> transferAmount(@Valid @RequestBody TransferRequestDto dto) {
+            description = "Transfers a specified amount provided that the source account has the required funds and " +
+                    "the source and target accounts differ.")
+    public ResponseEntity<TransactionResponseDto> transferAmount(@Valid @RequestBody TransferRequestDto dto) {
         TransactionResultDto transactionResult = transactionService.initiateTransaction(dto);
-        return new ResponseEntity<>(transactionResult, HttpStatus.CREATED);
+        TransactionResponseDto response = transactionMapper.toTransactionResponse(transactionResult);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @PostMapping("/confirm")
     @Operation(summary = "Confirms a transaction by providing the OTP sent to the source account")
-    public ResponseEntity<TransactionResultDto> confirmTransaction(@Valid @RequestBody TransactionConfirmDto dto) {
+    public ResponseEntity<TransactionResponseDto> confirmTransaction(@Valid @RequestBody TransactionConfirmDto dto) {
         Transaction transaction = transactionService.confirmTransaction(dto);
         TransactionResultDto transactionResultDto = transactionService.processTransaction(transaction);
-        return new ResponseEntity<>(transactionResultDto, HttpStatus.CREATED);
+        TransactionResponseDto response = transactionMapper.toTransactionResponse(transactionResultDto);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
 
@@ -63,9 +64,10 @@ public class TransactionController {
 
     @PostMapping("/schedule")
     @Operation(summary = "Schedule a transaction to be processed at a later time")
-    public ResponseEntity<TransactionResultDto> scheduleTransaction(@RequestBody TransactionScheduleRequestDto dto) {
+    public ResponseEntity<TransactionResponseDto> scheduleTransaction(@RequestBody TransactionScheduleRequestDto dto) {
         TransactionResultDto transactionResult = transactionService.initiateScheduledTransaction(dto);
-        return new ResponseEntity<>(transactionResult, HttpStatus.OK);
+        TransactionResponseDto response = transactionMapper.toTransactionResponse(transactionResult);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 }

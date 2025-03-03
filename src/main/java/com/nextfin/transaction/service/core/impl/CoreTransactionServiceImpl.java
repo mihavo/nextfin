@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -41,7 +42,7 @@ public class CoreTransactionServiceImpl implements TransactionService {
 
     @Lazy private final TransactionValidator transactionValidator;
     @Lazy private final TransactionScheduler transactionScheduler;
-    private final TransactionSecurityService securityService;
+    private final Optional<TransactionSecurityService> securityService;
 
     private final AccountService accountService;
     private final TransactionConfirmationService confirmationService;
@@ -52,7 +53,7 @@ public class CoreTransactionServiceImpl implements TransactionService {
     public TransactionResultDto initiateTransaction(TransferRequestDto dto) {
         transactionValidator.validate(dto);
         Transaction transaction = storeTransaction(dto, TransactionType.INSTANT, null);
-        return handleTransactionWith2FACheck(transaction);
+        return handleTransaction(transaction);
     }
 
 
@@ -62,7 +63,7 @@ public class CoreTransactionServiceImpl implements TransactionService {
         Transaction transaction = storeTransaction(dto.transactionDetails(),
                                                    TransactionType.SCHEDULED,
                                                    dto.timestamp());
-        return handleTransactionWith2FACheck(transaction);
+        return handleTransaction(transaction);
     }
 
 
@@ -105,7 +106,7 @@ public class CoreTransactionServiceImpl implements TransactionService {
     public Transaction confirmTransaction(TransactionConfirmDto dto) {
         Transaction transaction = getTransaction(dto.transactionId());
         String sourcePhone = transaction.getSourceAccount().getHolder().getUser().getPreferredPhoneNumber();
-        securityService.validateOTP(sourcePhone, dto.otp());
+        securityService.ifPresent(service -> service.validateOTP(sourcePhone, dto.otp()));
         return transaction;
     }
 
@@ -153,14 +154,11 @@ public class CoreTransactionServiceImpl implements TransactionService {
 
     @NotNull
     private TransactionResultDto finalizeTransaction(Transaction transaction, Transaction processedTransaction) {
-        Account sourceAccount = transaction.getSourceAccount();
-        if (sourceAccount.getTransactionSMSConfirmationEnabled()) {
-            String initiator = sourceAccount.getHolder().getUser().getPreferredPhoneNumber();
-            confirmationService.sendSMS(initiator, processedTransaction);
-        }
+        handleConfirmation(transaction.getSourceAccount(), processedTransaction);
         return new TransactionResultDto(processedTransaction, messageSource.getMessage(
                 "transaction.transfer.processed", new UUID[]{transaction.getId()}, LocaleContextHolder.getLocale()));
     }
+
 
     private @NotNull Supplier<NotFoundException> getNotFoundExceptionSupplier(UUID transactionId) {
         return () -> new NotFoundException(messageSource.getMessage(
@@ -169,9 +167,10 @@ public class CoreTransactionServiceImpl implements TransactionService {
                 LocaleContextHolder.getLocale()));
     }
 
-    private TransactionResultDto handleTransactionWith2FACheck(Transaction transaction) {
-        if (transaction.getSourceAccount().getTransaction2FAEnabled()) {
-            securityService.sendOTP(transaction);
+    @SuppressWarnings("OptionalGetWithoutIsPresent")
+    private TransactionResultDto handleTransaction(Transaction transaction) {
+        if (check2fa(transaction.getSourceAccount())) {
+            securityService.get().sendOTP(transaction);
             return new TransactionResultDto(transaction, messageSource.getMessage(
                     "transaction.transfer.awaiting-validation",
                     new UUID[]{transaction.getId()},
@@ -179,5 +178,16 @@ public class CoreTransactionServiceImpl implements TransactionService {
         } else {
             return processTransaction(transaction);
         }
+    }
+
+    private void handleConfirmation(Account sourceAccount, Transaction processedTransaction) {
+        if (check2fa(sourceAccount)) {
+            String initiator = sourceAccount.getHolder().getUser().getPreferredPhoneNumber();
+            confirmationService.sendSMS(initiator, processedTransaction);
+        }
+    }
+
+    private boolean check2fa(Account sourceAccount) {
+        return securityService.isPresent() && sourceAccount.getTransaction2FAEnabled();
     }
 }
