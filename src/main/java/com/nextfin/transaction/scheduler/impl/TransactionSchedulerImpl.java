@@ -30,7 +30,7 @@ public class TransactionSchedulerImpl implements TransactionScheduler {
             throw new BadRequestException("Transaction must have a scheduled time");
         }
         JobId jobId = jobScheduler.schedule(scheduledAt, () ->
-                transactionService.processTransaction(transaction)
+                transactionService.processScheduledTransaction(transaction)
         );
 
         String message = messageSource.getMessage(

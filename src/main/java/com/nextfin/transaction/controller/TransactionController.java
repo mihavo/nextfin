@@ -33,7 +33,7 @@ public class TransactionController {
             description = "Transfers a specified amount provided that the source account has the required funds and " +
                     "the source and target accounts differ.")
     public ResponseEntity<TransactionResponseDto> transferAmount(@Valid @RequestBody TransferRequestDto dto) {
-        TransactionResultDto transactionResult = transactionService.initiateTransaction(dto);
+        TransactionResponse transactionResult = transactionService.initiateTransaction(dto);
         TransactionResponseDto response = transactionMapper.toTransactionResponse(transactionResult);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
@@ -42,7 +42,7 @@ public class TransactionController {
     @Operation(summary = "Confirms a transaction by providing the OTP sent to the source account")
     public ResponseEntity<TransactionResponseDto> confirmTransaction(@Valid @RequestBody TransactionConfirmDto dto) {
         Transaction transaction = transactionService.confirmTransaction(dto);
-        TransactionResultDto transactionResultDto = transactionService.processTransaction(transaction);
+        TransactionResponse transactionResultDto = transactionService.processTransaction(transaction);
         TransactionResponseDto response = transactionMapper.toTransactionResponse(transactionResultDto);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
@@ -65,7 +65,7 @@ public class TransactionController {
     @PostMapping("/schedule")
     @Operation(summary = "Schedule a transaction to be processed at a later time")
     public ResponseEntity<TransactionResponseDto> scheduleTransaction(@RequestBody TransactionScheduleRequestDto dto) {
-        TransactionResultDto transactionResult = transactionService.initiateScheduledTransaction(dto);
+        TransactionResponse transactionResult = transactionService.initiateScheduledTransaction(dto);
         TransactionResponseDto response = transactionMapper.toTransactionResponse(transactionResult);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

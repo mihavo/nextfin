@@ -20,14 +20,14 @@ public interface TransactionService {
      * @param dto the dto containing the transfer details
      * @return a dto containing the transfer results
      */
-    TransactionResultDto initiateTransaction(TransferRequestDto dto);
+    TransactionResponse initiateTransaction(TransferRequestDto dto);
 
     /**
      * Initiates a scheduled transaction and follows the same rules as {@link #initiateTransaction(TransferRequestDto)}
      * @param dto the dto containing the transfer details
      * @return a dto containing the scheduled transfer results
      */
-    TransactionResultDto initiateScheduledTransaction(TransactionScheduleRequestDto dto);
+    TransactionResponse initiateScheduledTransaction(TransactionScheduleRequestDto dto);
     /**
      * Fetches a transaction
      * @param transactionId the transactionID
@@ -55,7 +55,7 @@ public interface TransactionService {
      * @param transaction the transaction to process
      * @return the updated (processed) transaction
      */
-    TransactionResultDto processTransaction(Transaction transaction);
+    TransactionResponse processTransaction(Transaction transaction);
 
     /**
      * Processes a scheduled transaction and updates its status
@@ -63,7 +63,7 @@ public interface TransactionService {
      * @param transaction the transaction to process
      * @return the updated (processed) transaction
      */
-    TransactionResultDto processScheduledTransaction(Transaction transaction);
+    TransactionResponse processScheduledTransaction(Transaction transaction);
 
 
     /**

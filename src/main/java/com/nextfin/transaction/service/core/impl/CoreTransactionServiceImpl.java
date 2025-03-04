@@ -51,7 +51,7 @@ public class CoreTransactionServiceImpl implements TransactionService {
     private final MessageSource messageSource;
 
     @Override
-    public TransactionResultDto initiateTransaction(TransferRequestDto dto) {
+    public TransactionResponse initiateTransaction(TransferRequestDto dto) {
         transactionValidator.validate(dto);
         Transaction transaction = storeTransaction(dto, TransactionType.INSTANT, null);
         return handleTransaction(transaction);
@@ -59,12 +59,12 @@ public class CoreTransactionServiceImpl implements TransactionService {
 
 
     @Override
-    public TransactionResultDto initiateScheduledTransaction(TransactionScheduleRequestDto dto) {
+    public TransactionResponse initiateScheduledTransaction(TransactionScheduleRequestDto dto) {
         transactionValidator.validate(dto.transactionDetails());
         Transaction transaction = storeTransaction(dto.transactionDetails(),
                                                    TransactionType.SCHEDULED,
                                                    dto.timestamp());
-        return handleTransaction(transaction);
+        return handleScheduledTransaction(transaction);
     }
 
 
@@ -126,7 +126,7 @@ public class CoreTransactionServiceImpl implements TransactionService {
     }
 
 
-    public @NotNull TransactionResultDto processTransaction(Transaction transaction) {
+    public @NotNull TransactionResponse processTransaction(Transaction transaction) {
         if (transaction.getTransactionType() != TransactionType.INSTANT) {
             throw new IllegalArgumentException("Transaction must be of type INSTANT");
         }
@@ -136,7 +136,7 @@ public class CoreTransactionServiceImpl implements TransactionService {
 
 
     @Override
-    public TransactionResultDto processScheduledTransaction(Transaction transaction) {
+    public TransactionResponse processScheduledTransaction(Transaction transaction) {
         if (transaction.getTransactionType() != TransactionType.SCHEDULED) {
             throw new IllegalArgumentException("Transaction must be of type SCHEDULED");
         }
@@ -160,7 +160,7 @@ public class CoreTransactionServiceImpl implements TransactionService {
     }
 
     @NotNull
-    private TransactionResultDto finalizeTransaction(Transaction transaction, Transaction processedTransaction) {
+    private TransactionResponse finalizeTransaction(Transaction transaction, Transaction processedTransaction) {
         handleConfirmation(transaction.getSourceAccount(), processedTransaction);
         return new TransactionResultDto(processedTransaction, messageSource.getMessage(
                 "transaction.transfer.processed", new UUID[]{transaction.getId()}, LocaleContextHolder.getLocale()));
@@ -175,7 +175,7 @@ public class CoreTransactionServiceImpl implements TransactionService {
     }
 
     @SuppressWarnings("OptionalGetWithoutIsPresent")
-    private TransactionResultDto handleTransaction(Transaction transaction) {
+    private TransactionResponse handleTransaction(Transaction transaction) {
         if (check2fa(transaction.getSourceAccount())) {
             securityService.get().sendOTP(transaction);
             return new TransactionResultDto(transaction, messageSource.getMessage(
@@ -186,16 +186,18 @@ public class CoreTransactionServiceImpl implements TransactionService {
             return processTransaction(transaction);
         }
     }
-//
-//    private ScheduledTransactionDto handleScheduledTransaction(Transaction transaction) {
-//        if (check2fa(transaction.getSourceAccount())) {
-//            securityService.get().sendOTP(transaction);
-//            return new TransactionResultDto(transaction, messageSource.getMessage(
-//                    "transaction.transfer.awaiting-validation",
-//                    new UUID[]{transaction.getId()},
-//                    LocaleContextHolder.getLocale()));
-//        }
-//    }
+
+    @SuppressWarnings("OptionalGetWithoutIsPresent")
+    private ScheduledTransactionDto handleScheduledTransaction(Transaction transaction) {
+        if (check2fa(transaction.getSourceAccount())) {
+            securityService.get().sendOTP(transaction);
+            return ScheduledTransactionDto.builder().transaction(transaction).message(messageSource.getMessage(
+                    "transaction.transfer.awaiting-validation",
+                    new UUID[]{transaction.getId()},
+                    LocaleContextHolder.getLocale())).build();
+        }
+        return scheduleTransaction(transaction);
+    }
 
     private void handleConfirmation(Account sourceAccount, Transaction processedTransaction) {
         if (check2fa(sourceAccount)) {
