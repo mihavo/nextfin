@@ -2,6 +2,7 @@ package com.nextfin.transaction.service.core.impl;
 
 import com.nextfin.account.entity.Account;
 import com.nextfin.account.service.core.AccountService;
+import com.nextfin.exceptions.exception.Disabled2FAException;
 import com.nextfin.exceptions.exception.NotFoundException;
 import com.nextfin.messaging.transaction.service.TransactionConfirmationService;
 import com.nextfin.transaction.dto.*;
@@ -103,10 +104,16 @@ public class CoreTransactionServiceImpl implements TransactionService {
     }
 
     @Override
+    @SuppressWarnings("OptionalGetWithoutIsPresent")
     public Transaction confirmTransaction(TransactionConfirmDto dto) {
         Transaction transaction = getTransaction(dto.transactionId());
-        String sourcePhone = transaction.getSourceAccount().getHolder().getUser().getPreferredPhoneNumber();
-        securityService.ifPresent(service -> service.validateOTP(sourcePhone, dto.otp()));
+        Account sourceAccount = transaction.getSourceAccount();
+        String sourcePhone = sourceAccount.getHolder().getUser().getPreferredPhoneNumber();
+        if (!check2fa(sourceAccount)) {
+            throw new Disabled2FAException("Attempted transaction confirmation on disabled 2FA config.");
+        }
+
+        securityService.get().validateOTP(sourcePhone, dto.otp());
         return transaction;
     }
 

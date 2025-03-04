@@ -1,6 +1,7 @@
 package com.nextfin.exceptions;
 
 import com.nextfin.exceptions.exception.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -11,6 +12,7 @@ import java.io.StringWriter;
 import java.time.ZonedDateTime;
 
 @ControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(BadRequestException.class)
@@ -58,6 +60,19 @@ public class GlobalExceptionHandler {
                 .message(e.getMessage())
                 .timestamp(ZonedDateTime.now())
                 .build(), HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(Disabled2FAException.class)
+    public ResponseEntity<APIErrorResponse> handleDisabled2FAException(Disabled2FAException e) {
+        log.error("Attempted access of 2FA services");
+        return new ResponseEntity<>(
+                APIErrorResponse.builder().
+                                status(HttpStatus.BAD_REQUEST)
+                                .message(e.getMessage())
+                                .timestamp(ZonedDateTime.now())
+                                .build(),
+                HttpStatus.BAD_REQUEST
+        );
     }
 
     protected String printStackTrace(Throwable exception) {
