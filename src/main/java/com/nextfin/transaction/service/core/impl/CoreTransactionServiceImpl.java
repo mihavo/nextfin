@@ -117,7 +117,7 @@ public class CoreTransactionServiceImpl implements TransactionService {
         return transaction;
     }
 
-
+    @Override
     public @NotNull ScheduledTransactionDto scheduleTransaction(Transaction transaction) {
         if (transaction.getTransactionType() != TransactionType.SCHEDULED) {
             throw new IllegalArgumentException("Transaction must be of type SCHEDULED");
@@ -186,6 +186,16 @@ public class CoreTransactionServiceImpl implements TransactionService {
             return processTransaction(transaction);
         }
     }
+//
+//    private ScheduledTransactionDto handleScheduledTransaction(Transaction transaction) {
+//        if (check2fa(transaction.getSourceAccount())) {
+//            securityService.get().sendOTP(transaction);
+//            return new TransactionResultDto(transaction, messageSource.getMessage(
+//                    "transaction.transfer.awaiting-validation",
+//                    new UUID[]{transaction.getId()},
+//                    LocaleContextHolder.getLocale()));
+//        }
+//    }
 
     private void handleConfirmation(Account sourceAccount, Transaction processedTransaction) {
         if (check2fa(sourceAccount)) {
