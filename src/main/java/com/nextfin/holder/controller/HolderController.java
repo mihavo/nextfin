@@ -74,7 +74,7 @@ public class HolderController {
      * Fetches a holder by its ID. Requires the user role to be MANAGER, EMPLOYEE or ADMIN.
      * @return a {@link ResponseEntity} containing the Holder
      */
-    @PreAuthorize("hasAnyRole('MANAGER', 'EMPLOYEE', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('MANAGER', 'EMPLOYEE', 'ADMIN') or @holderSecurityService.isHolderOwner(#id)")
     @Operation(summary = "Gets a holder by its ID")
     @GetMapping("/{id}")
     public ResponseEntity<Holder> getHolderById(@PathVariable UUID id) {
