@@ -3,6 +3,7 @@ package com.nextfin.transaction.service.security;
 import com.nextfin.transaction.entity.Transaction;
 import com.nextfin.transaction.enums.TransactionStatus;
 import com.nextfin.transaction.repository.TransactionRepository;
+import com.nextfin.transaction.service.core.TransactionService;
 import com.twilio.Twilio;
 import com.twilio.rest.verify.v2.service.Verification;
 import com.twilio.rest.verify.v2.service.VerificationCheck;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Service;
 @ConditionalOnProperty(name = "2fa.enabled", havingValue = "true", matchIfMissing = true)
 public class TransactionSecurityService {
     private final TransactionRepository transactionRepository;
+    private final TransactionService transactionService;
 
     @Value("${clients.twilio.account-sid}")
     private String accountSid;
@@ -57,5 +59,5 @@ public class TransactionSecurityService {
                             @Digits(integer = 6, fraction = 0, message = "The OTP Code must be exactly 6 digits") String code) {
         VerificationCheck.creator(verificationSid).setTo(sourcePhone).setCode(code).create();
     }
-
 }
+

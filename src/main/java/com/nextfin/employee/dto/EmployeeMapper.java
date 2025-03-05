@@ -9,4 +9,6 @@ public interface EmployeeMapper {
 
     @Mapping(target = "address", ignore = true)
     Employee toEmployee(CreateEmployeeRequestDto requestDto);
+    
+    CreateEmployeeResponseDto toCreateEmployeeResponseDto(Employee employee);
 }

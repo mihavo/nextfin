@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -50,6 +51,7 @@ public class TransactionController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Fetches a transaction by its ID")
+    @PreAuthorize("@coreTransactionServiceImpl.isTransactionRelated(#id)")
     public ResponseEntity<Transaction> getTransaction(@PathVariable UUID id) {
         Transaction transaction = transactionService.getTransaction(id);
         return new ResponseEntity<>(transaction, HttpStatus.OK);
@@ -57,6 +59,7 @@ public class TransactionController {
 
     @GetMapping("/{id}/status")
     @Operation(summary = "Checks the status of a Transaction")
+    @PreAuthorize("@coreTransactionServiceImpl.isTransactionRelated(#id)")
     public ResponseEntity<TransactionStatus> checkStatus(@PathVariable UUID id) {
         TransactionStatus transactionStatus = transactionService.checkStatus(id);
         return new ResponseEntity<>(transactionStatus, HttpStatus.OK);

@@ -15,6 +15,7 @@ import com.nextfin.transaction.service.core.TransactionService;
 import com.nextfin.transaction.service.processor.TransactionProcessor;
 import com.nextfin.transaction.service.security.TransactionSecurityService;
 import com.nextfin.transaction.service.validator.TransactionValidator;
+import com.nextfin.users.entity.NextfinUserDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -24,6 +25,7 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -204,6 +206,22 @@ public class CoreTransactionServiceImpl implements TransactionService {
             String initiator = sourceAccount.getHolder().getUser().getPreferredPhoneNumber();
             confirmationService.sendSMS(initiator, processedTransaction);
         }
+    }
+
+    public boolean isTransactionRelated(UUID transactionId) {
+        Transaction transaction = getTransaction(transactionId);
+        UUID currentUserId = ((NextfinUserDetails) SecurityContextHolder.getContext()
+                                                                        .getAuthentication()
+                                                                        .getPrincipal()).getId();
+        return (transaction.getSourceAccount()
+                           .getHolder()
+                           .getUser()
+                           .getId()
+                           .equals(currentUserId) || transaction.getTargetAccount()
+                                                                .getHolder()
+                                                                .getUser()
+                                                                .getId()
+                                                                .equals(currentUserId));
     }
 
     private boolean check2fa(Account sourceAccount) {

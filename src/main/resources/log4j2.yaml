@@ -4,7 +4,7 @@ Configuration:
   properties:
     property:
       - name: CLR
-        value: "{FATAL=red blink, ERROR=red, WARN=yellow bold, INFO=\u001B[92m, DEBUG=green, TRACE=blue}"
+        value: "{FATAL=red blink, ERROR=red, WARN=yellow bold, INFO=normal, DEBUG=green, TRACE=blue}"
       - name: LOG_PATTERN
         value: "%highlight{%5p- %d{yy-MM-dd HH:mm:ss.SSS}}${CLR} %clr{${sys:PID}}{magenta}%clr{-}{faint}%clr{[%15.15t]}{faint} %clr{%-40.40c{1.}}{cyan}  %highlight{: %m%n%xwEx}${CLR}"
   appenders:

@@ -3,6 +3,7 @@ package com.nextfin.employee.controller;
 import com.nextfin.AppConstants;
 import com.nextfin.employee.dto.CreateEmployeeRequestDto;
 import com.nextfin.employee.dto.CreateEmployeeResponseDto;
+import com.nextfin.employee.dto.EmployeeMapper;
 import com.nextfin.employee.dto.GetEmployeeDto;
 import com.nextfin.employee.entity.Employee;
 import com.nextfin.employee.service.EmployeeService;
@@ -14,12 +15,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(AppConstants.API_BASE_URL + "/employees/")
@@ -30,6 +26,7 @@ public class EmployeeController {
     private final EmployeeService employeeService;
 
     private final MessageSource messageSource;
+    private final EmployeeMapper employeeMapper;
 
     /**
      * Creates and stores an employee given a {@link CreateEmployeeResponseDto}
@@ -40,11 +37,12 @@ public class EmployeeController {
     @Operation(summary = "Creates a bank employee")
     public ResponseEntity<CreateEmployeeResponseDto> createEmployee(@Valid @RequestBody CreateEmployeeRequestDto requestDto) {
         Employee employee = employeeService.createEmployee(requestDto);
+        CreateEmployeeResponseDto employeeResponse = employeeMapper.toCreateEmployeeResponseDto(employee);
         String successMessage = messageSource.getMessage("employee.create.success",
                                                          null,
                                                          LocaleContextHolder.getLocale());
 
-        return new ResponseEntity<>(new CreateEmployeeResponseDto(employee.getId(), successMessage),
+        return new ResponseEntity<>(employeeResponse,
                                     HttpStatus.CREATED);
     }
 

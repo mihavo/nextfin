@@ -122,7 +122,7 @@ public class AccountController {
 
     @PatchMapping("/{id}/transactions/toggle-limit")
     @Operation(summary = "Toggles transaction limit", description = "Method for toggling transaction limit of an account")
-    @PreAuthorize("@accountSecurityServiceImpl.isAccountOwner(#id)")
+    @PreAuthorize("@accountSecurityService.isAccountOwner(#id)")
     public ResponseEntity<ToggleTransactionLimitResponseDto> toggleTransactionLimit(@PathVariable @NotNull Long id) {
         Account account = accountService.getAccount(id);
         Boolean enabled = accountService.toggleTransactionLimit(account);
@@ -146,7 +146,7 @@ public class AccountController {
 
     @PatchMapping("/{id}/transactions/toggle-sms-confirmation")
     @Operation(summary = "Toggles transaction SMS confirmation", description = "Method for toggling transaction SMS confirmation of an account")
-    @PreAuthorize("@accountSecurityServiceImpl.isAccountOwner(#id)")
+    @PreAuthorize("@accountSecurityService.isAccountOwner(#id)")
     public ResponseEntity<ToggleTransactionSMSConfirmationDto> toggleTransactionSMSConfirmation(@PathVariable @NotNull Long id) {
         Account account = accountService.getAccount(id);
         Boolean enabled = accountService.toggleTransactionSMSConfirmation(account);
