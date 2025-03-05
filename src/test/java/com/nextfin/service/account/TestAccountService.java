@@ -1,4 +1,4 @@
-package com.nextfin.account;
+package com.nextfin.service.account;
 
 import com.nextfin.account.dto.CreateAccountRequestDto;
 import com.nextfin.account.dto.DepositAmountRequestDto;
@@ -6,13 +6,13 @@ import com.nextfin.account.dto.GetAccountBalanceDto;
 import com.nextfin.account.dto.WithdrawAmountRequestDto;
 import com.nextfin.account.entity.Account;
 import com.nextfin.account.repository.AccountRepository;
-import com.nextfin.account.samples.AccountSamples;
 import com.nextfin.account.service.core.impl.AccountServiceImpl;
 import com.nextfin.employee.entity.Employee;
 import com.nextfin.employee.service.EmployeeService;
 import com.nextfin.exceptions.exception.NotFoundException;
 import com.nextfin.holder.entity.Holder;
 import com.nextfin.holder.service.HolderService;
+import com.nextfin.service.account.samples.AccountSamples;
 import com.nextfin.users.entity.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

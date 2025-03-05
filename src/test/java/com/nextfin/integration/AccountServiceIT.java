@@ -1,4 +1,4 @@
-package com.michaelvol.nextfin.account;
+package com.nextfin.integration;
 
 import com.nextfin.account.dto.CreateAccountRequestDto;
 import com.nextfin.account.entity.Account;
@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.security.test.context.support.WithUserDetails;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -32,7 +31,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @Testcontainers
 @ExtendWith(SpringExtension.class)
-@ActiveProfiles("it")
 public class AccountServiceIT {
 
     @Autowired

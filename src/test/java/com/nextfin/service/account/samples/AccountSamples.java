@@ -1,4 +1,4 @@
-package com.nextfin.account.samples;
+package com.nextfin.service.account.samples;
 
 import com.nextfin.account.entity.Account;
 import com.nextfin.account.enums.AccountStatus;
