@@ -21,20 +21,20 @@ public class RedisConfig {
 
     private JedisConnectionFactory connFactory;
 
-    @Value("{nextfin.cache.host}")
+    @Value("${nextfin.cache.host:#{null}}")
     private String host;
 
-    @Value("{nextfin.cache.port}")
-    private int port;
+    @Value("${nextfin.cache.port:#{null}}")
+    private Integer port;
 
-    @Value("{nextfin.cache.password}")
+    @Value("${nextfin.cache.password:#{null}}")
     private String password;
 
-    @Value("{nextfin.cache.database}")
-    private int database;
+    @Value("${nextfin.cache.database:#{null}}")
+    private Integer database;
 
-    @Value("{nextfin.cache.allowed:true}")
-    private boolean isCachingAllowed;
+    @Value("${nextfin.cache.allowed:true}")
+    private Boolean isCachingAllowed;
 
     private static final AtomicBoolean isCachingEnabled = new AtomicBoolean(false);
 
@@ -43,7 +43,7 @@ public class RedisConfig {
         if (!isCachingAllowed || ObjectUtils.anyNull(host, port, password, database)) {
             return null;
         }
-        RedisStandaloneConfiguration redisConfig = new RedisStandaloneConfiguration(host, port);
+        RedisStandaloneConfiguration redisConfig = new RedisStandaloneConfiguration();
         redisConfig.setDatabase(database);
         redisConfig.setPassword(password);
         return new JedisConnectionFactory(redisConfig);
