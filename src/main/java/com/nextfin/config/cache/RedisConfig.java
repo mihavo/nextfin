@@ -1,17 +1,19 @@
 package com.nextfin.config.cache;
 
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ObjectUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.RedisPassword;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 
+import java.nio.charset.StandardCharsets;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Configuration
@@ -19,18 +21,16 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @RequiredArgsConstructor
 public class RedisConfig {
 
-    private JedisConnectionFactory connFactory;
-
-    @Value("${nextfin.cache.host:#{null}}")
+    @Value("${nextfin.cache.host}")
     private String host;
 
-    @Value("${nextfin.cache.port:#{null}}")
+    @Value("${nextfin.cache.port:6379}")
     private Integer port;
 
-    @Value("${nextfin.cache.password:#{null}}")
+    @Value("${nextfin.cache.password}")
     private String password;
 
-    @Value("${nextfin.cache.database:#{null}}")
+    @Value("${nextfin.cache.database:0}")
     private Integer database;
 
     @Value("${nextfin.cache.allowed:true}")
@@ -40,28 +40,51 @@ public class RedisConfig {
 
     @Bean
     public RedisConnectionFactory connectionFactory() {
-        if (!isCachingAllowed || ObjectUtils.anyNull(host, port, password, database)) {
-            return null;
-        }
         RedisStandaloneConfiguration redisConfig = new RedisStandaloneConfiguration();
+        JedisConnectionFactory connFactory = new JedisConnectionFactory(redisConfig);
+        if (!isCachingAllowed || host == null) {
+            log.warn(
+                    "Caching is explicitly disabled from environment or misconfigured;  attempted connections will " +
+                            "fail.");
+            return constructMinimalFactory();
+        }
+        redisConfig.setHostName(host);
+        redisConfig.setPort(port);
         redisConfig.setDatabase(database);
-        redisConfig.setPassword(password);
-        return new JedisConnectionFactory(redisConfig);
+        redisConfig.setPassword(RedisPassword.of(password));
+        return evaluateConnection(connFactory);
     }
 
-    @PostConstruct
-    public void evaluateConnection() {
+    private static @NotNull JedisConnectionFactory constructMinimalFactory() {
+        RedisStandaloneConfiguration redisConfig = new RedisStandaloneConfiguration();
+        redisConfig.setHostName("localhost");
+        redisConfig.setPort(6379);
+        redisConfig.setDatabase(0);
+        redisConfig.setPassword(RedisPassword.none());
+        return new JedisConnectionFactory(redisConfig) {
+            @Override
+            public @NotNull RedisConnection getConnection() {
+                throw new UnsupportedOperationException("Cannot connect to cache");
+            }
+        };
+    }
+
+    public RedisConnectionFactory evaluateConnection(JedisConnectionFactory connFactory) {
+        connFactory.start();
         try (RedisConnection connection = connFactory.getConnection()) {
             String ping = connection.ping();
             if (ping != null && ping.equals("PONG")) {
-                log.info("Connection with Cache client established: {}", connection.getClientName());
+                String connectionId = "nextfin-cache-" + UUID.randomUUID();
+                connection.serverCommands().setClientName(connectionId.getBytes(StandardCharsets.UTF_8));
+                log.info("Connection with Cache client established: {}", connection.serverCommands().getClientName());
                 isCachingEnabled.set(true);
-                return;
+                return connFactory;
             }
             throw new RuntimeException("Connection could not be established: unexpected response");
         } catch (Exception e) {
             log.error("Connection with Cache Client failed: {}", e.getMessage());
         }
+        return connFactory;
     }
 
 }
