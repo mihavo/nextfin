@@ -1,5 +1,6 @@
 package com.nextfin.cache;
 
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
@@ -10,19 +11,21 @@ public interface CacheService {
      *
      * @param key
      * @param fetchSupplier
+     * @param valueType
      * @param <T>
      * @return
      */
-    <T> T getOrFetch(String key, Supplier<T> fetchSupplier);
+    <T> Optional<T> getOrFetch(String key, Class<T> valueType, Supplier<T> fetchSupplier);
 
     /**
      * Retrieve a value from the cache
      *
      * @param key
+     * @param valueType
      * @param <T>
      * @return
      */
-    <T> T get(String key);
+    <T> Optional<T> get(String key, Class<T> valueType);
 
     /**
      * Sets a key-value pair in the cache with the default timeout & timeunit
@@ -47,10 +50,11 @@ public interface CacheService {
      *
      * @param key
      * @param field
+     * @param valueType
      * @param <T>
      * @return
      */
-    <T> T getHashField(String key, String field);
+    <T> Optional<T> getHashField(String key, String field, Class<T> valueType);
 
     /**
      * Sets a field-value pair in a hash.

@@ -110,4 +110,8 @@ public class RedisConfig {
         return connFactory;
     }
 
+    public static boolean isCachingEnabled() {
+        return isCachingEnabled.get();
+    }
+
 }
