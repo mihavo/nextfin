@@ -178,7 +178,7 @@ public class TestRedisService {
     public void set_withTimeout_cachingDisabled_throwsException() {
         configureCachingEnabled(false);
 
-        CacheDisabledException exc = assertThrows(CacheDisabledException.class, () ->
+        assertThrows(CacheDisabledException.class, () ->
                 cacheService.set("key", "value", 5, TimeUnit.HOURS)
         );
         verifyNoMoreInteractions(redisTemplate);
@@ -188,7 +188,7 @@ public class TestRedisService {
     public void set_defaultTimeout_cachingDisabled_throwsException() {
         configureCachingEnabled(false);
 
-        CacheDisabledException exc = assertThrows(CacheDisabledException.class, () ->
+        assertThrows(CacheDisabledException.class, () ->
                 cacheService.set("key", "value")
         );
 
@@ -209,7 +209,7 @@ public class TestRedisService {
     public void setHashField_withTimeout_cachingDisabled_throwsException() {
         configureCachingEnabled(false);
 
-        CacheDisabledException exc = assertThrows(CacheDisabledException.class, () ->
+        assertThrows(CacheDisabledException.class, () ->
                 cacheService.setHashField("hashKey", "field", "value", 1, TimeUnit.DAYS)
         );
 
@@ -220,7 +220,7 @@ public class TestRedisService {
     public void setHashField_defaultTimeout_cachingDisabled_throwsException() {
         configureCachingEnabled(false);
 
-        CacheDisabledException exc = assertThrows(CacheDisabledException.class, () ->
+        assertThrows(CacheDisabledException.class, () ->
                 cacheService.setHashField("hashKey", "field", "value")
         );
 
@@ -231,7 +231,7 @@ public class TestRedisService {
     public void delete_cachingDisabled_throwsException() {
         configureCachingEnabled(false);
 
-        CacheDisabledException exc = assertThrows(CacheDisabledException.class, () ->
+        assertThrows(CacheDisabledException.class, () ->
                 cacheService.deleteKey("key")
         );
 
