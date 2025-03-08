@@ -37,3 +37,4 @@ env*.properties
 .resourceCache/
 logs
 *.env
+**/.DS_Store
