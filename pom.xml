@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.michaelvol</groupId>
     <artifactId>nextfin</artifactId>
-    <version>0.0.3</version>
+    <version>0.0.4</version>
     <name>nextfin</name>
     <description>nextfin</description>
     <properties>
