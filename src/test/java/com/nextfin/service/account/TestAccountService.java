@@ -12,7 +12,7 @@ import com.nextfin.employee.service.EmployeeService;
 import com.nextfin.exceptions.exception.NotFoundException;
 import com.nextfin.holder.entity.Holder;
 import com.nextfin.holder.service.HolderService;
-import com.nextfin.service.account.samples.AccountSamples;
+import com.nextfin.service.samples.AccountSamples;
 import com.nextfin.users.entity.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
