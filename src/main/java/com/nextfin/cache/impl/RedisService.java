@@ -1,5 +1,6 @@
 package com.nextfin.cache.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nextfin.cache.CacheService;
 import com.nextfin.config.cache.RedisConfig;
 import com.nextfin.exceptions.exception.CacheDisabledException;
@@ -9,6 +10,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -23,6 +25,8 @@ public class RedisService implements CacheService {
     private final StringRedisTemplate stringRedisTemplate;
 
     private final RedisConfig redisConfig;
+
+    private final ObjectMapper objectMapper;
 
     @Value("${nextfin.cache.default-timeout:10}")
     private long defaultTimeout; //TTL in minutes
@@ -86,6 +90,14 @@ public class RedisService implements CacheService {
     }
 
     @Override
+    public <T> Optional<T> getAllFieldsFromHash(String key, Class<T> valueType) {
+        if (!redisConfig.isCachingEnabled()) return Optional.empty();
+        Map<Object, Object> entries = redisTemplate.opsForHash().entries(key);
+        if (entries.isEmpty()) return Optional.empty();
+        return Optional.of(objectMapper.convertValue(entries, valueType));
+    }
+
+    @Override
     public <T> void setHashField(String key, String field, T value, long timeout, TimeUnit timeUnit) {
         if (!redisConfig.isCachingEnabled()) throw new CacheDisabledException();
         redisTemplate.opsForHash().put(key, field, value);
@@ -104,7 +116,7 @@ public class RedisService implements CacheService {
         if (!redisConfig.isCachingEnabled()) return Set.of();
         long start = (page - 1) * pageSize;
         long end = start + pageSize - 1;
-        Set<String> range = stringRedisTemplate.opsForZSet().range(setKey, start, end);
+        Set<String> range = stringRedisTemplate.opsForZSet().reverseRange(setKey, start, end);
         if (range == null || range.isEmpty()) {
             return Set.of();
         }

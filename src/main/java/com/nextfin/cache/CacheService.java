@@ -70,6 +70,16 @@ public interface CacheService {
     <T> Optional<T> getHashField(String key, String field, Class<T> valueType);
 
     /**
+     * Retrieves all fields from a hash
+     *
+     * @param key
+     * @param valueType
+     * @param <T>
+     * @return
+     */
+    <T> Optional<T> getAllFieldsFromHash(String key, Class<T> valueType);
+
+    /**
      * Sets a field-value pair in a hash.
      *
      * @param key

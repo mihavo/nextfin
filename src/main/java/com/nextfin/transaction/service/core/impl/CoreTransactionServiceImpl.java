@@ -37,6 +37,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -48,8 +49,10 @@ public class CoreTransactionServiceImpl implements TransactionService {
     private final TransactionRepository transactionRepository;
     private final TransactionProcessor transactionProcessor;
 
-    @Lazy private final TransactionValidator transactionValidator;
-    @Lazy private final TransactionScheduler transactionScheduler;
+    @Lazy
+    private final TransactionValidator transactionValidator;
+    @Lazy
+    private final TransactionScheduler transactionScheduler;
     private final Optional<TransactionSecurityService> securityService;
 
     private final AccountService accountService;
@@ -59,6 +62,8 @@ public class CoreTransactionServiceImpl implements TransactionService {
 
     private final MessageSource messageSource;
     private final UserService userService;
+
+    private static final int TRANSACTION_CACHE_SIZE = 20;
 
     @Override
     public TransactionResponse initiateTransaction(TransferRequestDto dto) {
@@ -80,8 +85,11 @@ public class CoreTransactionServiceImpl implements TransactionService {
 
     @Override
     public Transaction getTransaction(UUID transactionId) {
-        return transactionRepository.findById(transactionId)
-                                    .orElseThrow(getNotFoundExceptionSupplier(transactionId));
+        Set<String> recentIds = fetchCacheRecents();
+        return recentIds.stream().filter(id -> id.equals(transactionId.toString())).findAny().flatMap(
+                id -> fetchFromCache(transactionId)).orElseGet(
+                () -> transactionRepository.findById(transactionId).orElseThrow(
+                        getNotFoundExceptionSupplier(transactionId)));
     }
 
     @Override
@@ -94,8 +102,7 @@ public class CoreTransactionServiceImpl implements TransactionService {
         TransactionDirection direction = options.getDirection();
         PageRequest pageRequest = PageRequest.of(options.getSkip(),
                                                  options.getPageSize(),
-                                                 Sort.by(options.getSortDirection(),
-                                                         options.getSortBy().getValue()));
+                                                 Sort.by(options.getSortDirection(), options.getSortBy().getValue()));
         switch (direction) {
             case INCOMING -> {
                 return transactionRepository.findByTargetAccount(account, pageRequest);
@@ -155,16 +162,12 @@ public class CoreTransactionServiceImpl implements TransactionService {
     }
 
 
-    private @NotNull Transaction storeTransaction(TransferRequestDto dto, TransactionType type, LocalDateTime scheduledAt) {
-        Transaction transaction = Transaction.builder()
-                .amount(dto.getAmount())
-                .currency(dto.getCurrency())
-                .transactionStatus(TransactionStatus.CREATED)
-                .transactionType(type)
-                .scheduledAt(scheduledAt)
-                .sourceAccount(accountService.getAccount(dto.getSourceAccountId()))
-                .targetAccount(accountService.getAccount(dto.getTargetAccountId()))
-                .build();
+    private @NotNull Transaction storeTransaction(TransferRequestDto dto, TransactionType type,
+                                                  LocalDateTime scheduledAt) {
+        Transaction transaction = Transaction.builder().amount(dto.getAmount()).currency(
+                dto.getCurrency()).transactionStatus(TransactionStatus.CREATED).transactionType(type).scheduledAt(
+                scheduledAt).sourceAccount(accountService.getAccount(dto.getSourceAccountId())).targetAccount(
+                accountService.getAccount(dto.getTargetAccountId())).build();
         Transaction saved = transactionRepository.save(transaction);
         try {
             cacheTransaction(userService.getCurrentUser().getId(), saved);
@@ -177,16 +180,15 @@ public class CoreTransactionServiceImpl implements TransactionService {
     @NotNull
     private TransactionResponse finalizeTransaction(Transaction transaction, Transaction processedTransaction) {
         handleConfirmation(transaction.getSourceAccount(), processedTransaction);
-        return new TransactionResultDto(processedTransaction, messageSource.getMessage(
-                "transaction.transfer.processed", new UUID[]{transaction.getId()}, LocaleContextHolder.getLocale()));
+        return new TransactionResultDto(processedTransaction, messageSource.getMessage("transaction.transfer.processed",
+                                                                                       new UUID[]{transaction.getId()},
+                                                                                       LocaleContextHolder.getLocale()));
     }
 
 
     private @NotNull Supplier<NotFoundException> getNotFoundExceptionSupplier(UUID transactionId) {
-        return () -> new NotFoundException(messageSource.getMessage(
-                "transaction.notfound",
-                new UUID[]{transactionId},
-                LocaleContextHolder.getLocale()));
+        return () -> new NotFoundException(messageSource.getMessage("transaction.notfound", new UUID[]{transactionId},
+                                                                    LocaleContextHolder.getLocale()));
     }
 
     @SuppressWarnings("OptionalGetWithoutIsPresent")
@@ -194,8 +196,7 @@ public class CoreTransactionServiceImpl implements TransactionService {
         if (check2fa(transaction.getSourceAccount())) {
             securityService.get().sendOTP(transaction);
             return new TransactionResultDto(transaction, messageSource.getMessage(
-                    "transaction.transfer.awaiting-validation",
-                    new UUID[]{transaction.getId()},
+                    "transaction.transfer" + ".awaiting" + "-validation", new UUID[]{transaction.getId()},
                     LocaleContextHolder.getLocale()));
         } else {
             return processTransaction(transaction);
@@ -223,17 +224,10 @@ public class CoreTransactionServiceImpl implements TransactionService {
 
     public boolean isTransactionRelated(UUID transactionId) {
         Transaction transaction = getTransaction(transactionId);
-        UUID currentUserId = ((NextfinUserDetails) SecurityContextHolder.getContext()
-                                                                        .getAuthentication()
+        UUID currentUserId = ((NextfinUserDetails) SecurityContextHolder.getContext().getAuthentication()
                                                                         .getPrincipal()).getId();
-        return (transaction.getSourceAccount()
-                           .getHolder()
-                           .getUser()
-                           .getId()
-                           .equals(currentUserId) || transaction.getTargetAccount()
-                                                                .getHolder()
-                                                                .getUser()
-                                                                .getId()
+        return (transaction.getSourceAccount().getHolder().getUser().getId().equals(
+                currentUserId) || transaction.getTargetAccount().getHolder().getUser().getId()
                                                                 .equals(currentUserId));
     }
 
@@ -247,5 +241,15 @@ public class CoreTransactionServiceImpl implements TransactionService {
                              transaction.getCreatedAt().toEpochMilli() / 1000.0);
         cache.setHashField(CacheUtils.buildTransactionsKey(userId),
                            CacheUtils.buildTransactionsHashKey(transaction.getId()), transaction);
+    }
+
+    private Set<String> fetchCacheRecents() {
+        String setKey = CacheUtils.buildTransactionsKey(userService.getCurrentUser().getId());
+        return cache.getFromSortedSet(setKey, 0, TRANSACTION_CACHE_SIZE);
+    }
+
+    private Optional<Transaction> fetchFromCache(UUID transactionId) {
+        String hashKey = CacheUtils.buildTransactionsHashKey(transactionId);
+        return cache.getAllFieldsFromHash(hashKey, Transaction.class);
     }
 }
