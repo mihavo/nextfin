@@ -6,9 +6,11 @@ import com.nextfin.exceptions.exception.CacheDisabledException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
@@ -17,6 +19,8 @@ import java.util.function.Supplier;
 public class RedisService implements CacheService {
 
     private final RedisTemplate<String, Object> redisTemplate;
+
+    private final StringRedisTemplate stringRedisTemplate;
 
     private final RedisConfig redisConfig;
 
@@ -28,6 +32,19 @@ public class RedisService implements CacheService {
     public <T> Optional<T> getOrFetch(String key, Class<T> valueType, Supplier<T> fetchSupplier) {
         if (!redisConfig.isCachingEnabled()) return Optional.empty();
         Optional<T> result = get(key, valueType);
+        if (result.isPresent()) {
+            return result;
+        }
+        result = Optional.of(fetchSupplier.get());
+        set(key, result.get());
+        return result;
+    }
+
+    @Override
+    public <T> Optional<T> getOrFetchHashField(String key, String field, Class<T> valueType,
+                                               Supplier<T> fetchSupplier) {
+        if (!redisConfig.isCachingEnabled()) return Optional.empty();
+        Optional<T> result = getHashField(key, field, valueType);
         if (result.isPresent()) {
             return result;
         }
@@ -80,6 +97,30 @@ public class RedisService implements CacheService {
         if (!redisConfig.isCachingEnabled()) throw new CacheDisabledException();
         redisTemplate.opsForHash().put(key, field, value);
         redisTemplate.expire(key, defaultTimeout, TimeUnit.MINUTES);
+    }
+
+    @Override
+    public Set<String> getFromSortedSet(String setKey, long page, long pageSize) {
+        if (!redisConfig.isCachingEnabled()) return Set.of();
+        long start = (page - 1) * pageSize;
+        long end = start + pageSize - 1;
+        Set<String> range = stringRedisTemplate.opsForZSet().range(setKey, start, end);
+        if (range == null || range.isEmpty()) {
+            return Set.of();
+        }
+        return range;
+    }
+
+    @Override
+    public void addToSortedSet(String setKey, String member, double score) {
+        if (!redisConfig.isCachingEnabled()) throw new CacheDisabledException();
+        stringRedisTemplate.opsForZSet().addIfAbsent(setKey, member, score);
+    }
+
+    @Override
+    public void deleteFromSortedSet(String setKey, String... members) {
+        if (!redisConfig.isCachingEnabled()) throw new CacheDisabledException();
+        stringRedisTemplate.opsForZSet().remove(setKey, (Object[]) members);
     }
 
     @Override

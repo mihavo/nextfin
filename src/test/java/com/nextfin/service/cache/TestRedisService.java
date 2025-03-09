@@ -3,6 +3,7 @@ package com.nextfin.service.cache;
 import com.nextfin.cache.impl.RedisService;
 import com.nextfin.config.cache.RedisConfig;
 import com.nextfin.exceptions.exception.CacheDisabledException;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,11 +11,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.redis.core.HashOperations;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.data.redis.core.*;
 
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
@@ -28,6 +28,9 @@ public class TestRedisService {
     private RedisTemplate<String, Object> redisTemplate;
 
     @Mock
+    private StringRedisTemplate stringRedisTemplate;
+
+    @Mock
     private RedisConfig redisConfig;
 
     @Mock
@@ -36,17 +39,27 @@ public class TestRedisService {
     @Mock
     private HashOperations<String, Object, Object> hashOperations;
 
+    @Mock
+    private ZSetOperations<String, String> zSetOperations;
+
     @InjectMocks
     private RedisService cacheService;
 
 
-    private static final long DEFAULT_TIMEOUT = 0L;
-    private static final TimeUnit DEFAULT_TIME_UNIT = TimeUnit.MINUTES;
+    private final long DEFAULT_TIMEOUT = 0L;
+    private final TimeUnit DEFAULT_TIME_UNIT = TimeUnit.MINUTES;
 
     @BeforeEach
     public void setup() {
+        cacheService = new RedisService(redisTemplate, stringRedisTemplate, redisConfig);
         lenient().when(redisTemplate.opsForValue()).thenReturn(valueOperations);
         lenient().when(redisTemplate.opsForHash()).thenReturn(hashOperations);
+        lenient().when(stringRedisTemplate.opsForZSet()).thenReturn(zSetOperations);
+    }
+
+    @AfterEach
+    public void teardown() {
+        reset(redisTemplate, stringRedisTemplate, redisConfig);
     }
 
     private void configureCachingEnabled(boolean isEnabled) {
@@ -79,6 +92,21 @@ public class TestRedisService {
         verify(valueOperations).get("key");
         verify(valueOperations).set("key", "fetched value", DEFAULT_TIMEOUT, DEFAULT_TIME_UNIT);
     }
+
+
+    @Test
+    public void getOrFetchHashField_cacheHit_returnsValue() {
+        configureCachingEnabled(true);
+        when(hashOperations.get("key", "field")).thenReturn("cachedValue");
+        Supplier<String> supplier = mock(Supplier.class);
+        Optional<String> result = cacheService.getOrFetchHashField("key", "field", String.class, supplier);
+        Assertions.assertTrue(result.isPresent());
+        Assertions.assertEquals("cachedValue", result.get());
+        verify(hashOperations).get("key", "field");
+        verify(supplier, never()).get();
+        verify(hashOperations, never()).put(anyString(), any(), any());
+    }
+
 
     @Test
     public void get_cachingEnabled_returnsValue() {
@@ -150,6 +178,40 @@ public class TestRedisService {
         cacheService.deleteKey("key");
         verify(hashOperations).delete("key");
         verifyNoMoreInteractions(hashOperations);
+    }
+
+    @Test
+    public void getFromSortedSet_cachingEnabled_returnsValues() {
+        configureCachingEnabled(true);
+        Set<String> expected = Set.of("txn1", "txn2", "txn3");
+        when(stringRedisTemplate.opsForZSet().range("transactions:account1", 0, 2)).thenReturn(expected);
+
+        Set<String> result = cacheService.getFromSortedSet("transactions:account1", 1, 3);
+
+        Assertions.assertFalse(result.isEmpty());
+        Assertions.assertEquals(expected, result);
+        verify(stringRedisTemplate.opsForZSet()).range("transactions:account1", 0, 2);
+        verifyNoMoreInteractions(zSetOperations);
+    }
+
+    @Test
+    public void addToSortedSet_cachingEnabled_addsMember() {
+        configureCachingEnabled(true);
+        when(stringRedisTemplate.opsForZSet().addIfAbsent("transactions:account1", "txn4", 10.0)).thenReturn(true);
+
+        cacheService.addToSortedSet("transactions:account1", "txn4", 10.0);
+
+        verify(stringRedisTemplate.opsForZSet()).addIfAbsent("transactions:account1", "txn4", 10.0);
+        verifyNoMoreInteractions(zSetOperations);
+    }
+
+    @Test
+    public void deleteFromSortedSet_cachingEnabled_deletesMembers() {
+        configureCachingEnabled(true);
+
+        cacheService.deleteFromSortedSet("transactions:account1", "txn1", "txn2");
+        verify(stringRedisTemplate.opsForZSet()).remove("transactions:account1", "txn1", "txn2");
+        verifyNoMoreInteractions(zSetOperations);
     }
 
     // --- Tests for Caching Disabled ---
@@ -236,5 +298,36 @@ public class TestRedisService {
         );
 
         verifyNoMoreInteractions(redisTemplate);
+    }
+
+    @Test
+    public void getFromSortedSet_cachingDisabled_returnsEmptySet() {
+        configureCachingEnabled(false);
+
+        Set<String> result = cacheService.getFromSortedSet("transactions:account1", 1, 3);
+
+        Assertions.assertTrue(result.isEmpty());
+        verifyNoMoreInteractions(stringRedisTemplate);
+    }
+
+    @Test
+    public void addToSortedSet_cachingDisabled_throwsCacheDisabledException() {
+        configureCachingEnabled(false);
+
+        Assertions.assertThrows(CacheDisabledException.class, () ->
+                cacheService.addToSortedSet("transactions:account1", "txn4", 10.0)
+        );
+        verifyNoMoreInteractions(stringRedisTemplate);
+    }
+
+    @Test
+    public void deleteFromSortedSet_cachingDisabled_throwsCacheDisabledException() {
+        configureCachingEnabled(false);
+
+        Assertions.assertThrows(CacheDisabledException.class, () ->
+                cacheService.deleteFromSortedSet("transactions:account1", "txn1", "txn2")
+        );
+
+        verifyNoMoreInteractions(stringRedisTemplate);
     }
 }

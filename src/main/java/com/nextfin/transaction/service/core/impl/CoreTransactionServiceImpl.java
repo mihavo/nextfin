@@ -2,6 +2,8 @@ package com.nextfin.transaction.service.core.impl;
 
 import com.nextfin.account.entity.Account;
 import com.nextfin.account.service.core.AccountService;
+import com.nextfin.cache.CacheService;
+import com.nextfin.cache.utils.CacheUtils;
 import com.nextfin.exceptions.exception.Disabled2FAException;
 import com.nextfin.exceptions.exception.NotFoundException;
 import com.nextfin.messaging.transaction.service.TransactionConfirmationService;
@@ -49,6 +51,8 @@ public class CoreTransactionServiceImpl implements TransactionService {
 
     private final AccountService accountService;
     private final TransactionConfirmationService confirmationService;
+
+    private final CacheService cache;
 
     private final MessageSource messageSource;
 
@@ -157,8 +161,10 @@ public class CoreTransactionServiceImpl implements TransactionService {
                 .sourceAccount(accountService.getAccount(dto.getSourceAccountId()))
                 .targetAccount(accountService.getAccount(dto.getTargetAccountId()))
                 .build();
-        transactionRepository.save(transaction);
-        return transaction;
+        Transaction saved = transactionRepository.save(transaction);
+        cache.setHashField(CacheUtils.buildTransactionsKey(dto.getSourceAccountId()),
+                           CacheUtils.buildTransactionsHashKey(saved.getId()), Transaction.class);
+        return saved;
     }
 
     @NotNull
