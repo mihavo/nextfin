@@ -4,8 +4,10 @@ import com.nextfin.account.entity.Account;
 import com.nextfin.account.service.core.AccountService;
 import com.nextfin.cache.CacheService;
 import com.nextfin.cache.utils.CacheUtils;
+import com.nextfin.exceptions.exception.CannotCacheException;
 import com.nextfin.exceptions.exception.Disabled2FAException;
 import com.nextfin.exceptions.exception.NotFoundException;
+import com.nextfin.exceptions.exception.UserNotFoundException;
 import com.nextfin.messaging.transaction.service.TransactionConfirmationService;
 import com.nextfin.transaction.dto.*;
 import com.nextfin.transaction.entity.Transaction;
@@ -18,6 +20,7 @@ import com.nextfin.transaction.service.processor.TransactionProcessor;
 import com.nextfin.transaction.service.security.TransactionSecurityService;
 import com.nextfin.transaction.service.validator.TransactionValidator;
 import com.nextfin.users.entity.NextfinUserDetails;
+import com.nextfin.users.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -55,6 +58,7 @@ public class CoreTransactionServiceImpl implements TransactionService {
     private final CacheService cache;
 
     private final MessageSource messageSource;
+    private final UserService userService;
 
     @Override
     public TransactionResponse initiateTransaction(TransferRequestDto dto) {
@@ -162,8 +166,11 @@ public class CoreTransactionServiceImpl implements TransactionService {
                 .targetAccount(accountService.getAccount(dto.getTargetAccountId()))
                 .build();
         Transaction saved = transactionRepository.save(transaction);
-        cache.setHashField(CacheUtils.buildTransactionsKey(dto.getSourceAccountId()),
-                           CacheUtils.buildTransactionsHashKey(saved.getId()), Transaction.class);
+        try {
+            cacheTransaction(userService.getCurrentUser().getId(), saved);
+        } catch (UserNotFoundException e) {
+            throw new CannotCacheException("User not found, cannot cache transaction " + transaction.getId());
+        }
         return saved;
     }
 
@@ -232,5 +239,13 @@ public class CoreTransactionServiceImpl implements TransactionService {
 
     private boolean check2fa(Account sourceAccount) {
         return securityService.isPresent() && sourceAccount.getTransaction2FAEnabled();
+    }
+
+    private void cacheTransaction(UUID userId, Transaction transaction) {
+        cache.addToSortedSet(userId.toString(),
+                             transaction.getId().toString(),
+                             transaction.getCreatedAt().toEpochMilli() / 1000.0);
+        cache.setHashField(CacheUtils.buildTransactionsKey(userId),
+                           CacheUtils.buildTransactionsHashKey(transaction.getId()), transaction);
     }
 }

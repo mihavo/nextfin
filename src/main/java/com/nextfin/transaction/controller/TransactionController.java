@@ -5,6 +5,7 @@ import com.nextfin.transaction.dto.*;
 import com.nextfin.transaction.entity.Transaction;
 import com.nextfin.transaction.enums.TransactionStatus;
 import com.nextfin.transaction.service.core.TransactionService;
+import com.nextfin.users.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -24,6 +25,7 @@ import java.util.UUID;
 public class TransactionController {
 
     private final TransactionService transactionService;
+    private final UserService userService;
 
     private final TransactionMapper transactionMapper;
 

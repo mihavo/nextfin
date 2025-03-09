@@ -28,5 +28,5 @@ public interface UserService extends NextfinUserDetailsService {
 	 * Should return the currently authenticated user
 	 * @return the current user
 	 */
-	User getCurrentUser();
+	User getCurrentUser() throws UserNotFoundException;
 }

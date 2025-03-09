@@ -56,7 +56,7 @@ public class UserServiceImpl implements UserService {
 
 
 	@Override
-	public User getCurrentUser() {
+	public User getCurrentUser() throws UserNotFoundException {
 		User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		if (currentUser == null) {
 			throw new UserNotFoundException(messageSource.getMessage("user.not-found",
