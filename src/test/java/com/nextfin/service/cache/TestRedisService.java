@@ -51,7 +51,7 @@ public class TestRedisService {
 
     @BeforeEach
     public void setup() {
-        cacheService = new RedisService(redisTemplate, stringRedisTemplate, redisConfig);
+        cacheService = new RedisService(redisTemplate, stringRedisTemplate, redisConfig, null);
         lenient().when(redisTemplate.opsForValue()).thenReturn(valueOperations);
         lenient().when(redisTemplate.opsForHash()).thenReturn(hashOperations);
         lenient().when(stringRedisTemplate.opsForZSet()).thenReturn(zSetOperations);
@@ -184,13 +184,13 @@ public class TestRedisService {
     public void getFromSortedSet_cachingEnabled_returnsValues() {
         configureCachingEnabled(true);
         Set<String> expected = Set.of("txn1", "txn2", "txn3");
-        when(stringRedisTemplate.opsForZSet().range("transactions:account1", 0, 2)).thenReturn(expected);
+        when(stringRedisTemplate.opsForZSet().reverseRange("transactions:account1", 0, 2)).thenReturn(expected);
 
         Set<String> result = cacheService.getFromSortedSet("transactions:account1", 1, 3);
 
         Assertions.assertFalse(result.isEmpty());
         Assertions.assertEquals(expected, result);
-        verify(stringRedisTemplate.opsForZSet()).range("transactions:account1", 0, 2);
+        verify(stringRedisTemplate.opsForZSet()).reverseRange("transactions:account1", 0, 2);
         verifyNoMoreInteractions(zSetOperations);
     }
 

@@ -1,5 +1,6 @@
 package com.nextfin.cache.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nextfin.cache.CacheService;
 import com.nextfin.config.cache.RedisConfig;
@@ -26,7 +27,8 @@ public class RedisService implements CacheService {
 
     private final RedisConfig redisConfig;
 
-    private final ObjectMapper objectMapper;
+    private final ObjectMapper jsonMapper;
+
 
     @Value("${nextfin.cache.default-timeout:10}")
     private long defaultTimeout; //TTL in minutes
@@ -94,21 +96,31 @@ public class RedisService implements CacheService {
         if (!redisConfig.isCachingEnabled()) return Optional.empty();
         Map<Object, Object> entries = redisTemplate.opsForHash().entries(key);
         if (entries.isEmpty()) return Optional.empty();
-        return Optional.of(objectMapper.convertValue(entries, valueType));
+        return Optional.of(jsonMapper.convertValue(entries, valueType));
     }
 
     @Override
     public <T> void setHashField(String key, String field, T value, long timeout, TimeUnit timeUnit) {
         if (!redisConfig.isCachingEnabled()) throw new CacheDisabledException();
-        redisTemplate.opsForHash().put(key, field, value);
-        redisTemplate.expire(key, timeout, timeUnit);
+        try {
+            String json = jsonMapper.writeValueAsString(value);
+            redisTemplate.opsForHash().put(key, field, json);
+            redisTemplate.expire(key, timeout, timeUnit);
+        } catch (JsonProcessingException e) {
+            throw new CacheDisabledException("Cannot cache object: " + value + e.getMessage());
+        }
     }
 
     @Override
     public <T> void setHashField(String key, String field, T value) {
         if (!redisConfig.isCachingEnabled()) throw new CacheDisabledException();
-        redisTemplate.opsForHash().put(key, field, value);
-        redisTemplate.expire(key, defaultTimeout, TimeUnit.MINUTES);
+        try {
+            String json = jsonMapper.writeValueAsString(value);
+            redisTemplate.opsForHash().put(key, field, json);
+            redisTemplate.expire(key, defaultTimeout, TimeUnit.MINUTES);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

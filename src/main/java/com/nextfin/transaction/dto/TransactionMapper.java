@@ -1,5 +1,6 @@
 package com.nextfin.transaction.dto;
 
+import com.nextfin.transaction.entity.Transaction;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -13,4 +14,10 @@ public interface TransactionMapper {
     @Mapping(source = "transaction.currency", target = "currency")
     @Mapping(source = "transaction.transactionStatus", target = "status")
     TransactionResponseDto toTransactionResponse(TransactionResponse response);
+
+    @Mapping(source = "sourceAccount.id", target = "sourceAccountId")
+    @Mapping(source = "targetAccount.id", target = "targetAccountId")
+    @Mapping(source = "transactionStatus", target = "status")
+    @Mapping(source = "transactionType", target = "type")
+    TransactionDetailsDto toTransactionDetails(Transaction transaction);
 }

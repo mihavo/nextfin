@@ -10,13 +10,16 @@ import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisPassword;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
+import org.springframework.data.redis.connection.jedis.JedisClientConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import redis.clients.jedis.JedisPoolConfig;
 
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -45,17 +48,19 @@ public class RedisConfig {
     @Bean
     public RedisConnectionFactory connectionFactory() {
         RedisStandaloneConfiguration redisConfig = new RedisStandaloneConfiguration();
-        JedisConnectionFactory connFactory = new JedisConnectionFactory(redisConfig);
         if (!isCachingAllowed || host == null) {
             log.warn(
-                    "Caching is explicitly disabled from environment or misconfigured;  attempted connections will " +
-                            "fail.");
+                    "Caching is explicitly disabled from environment or misconfigured; attempted connections will " + "fail.");
             return constructMinimalFactory();
         }
         redisConfig.setHostName(host);
         redisConfig.setPort(port);
         redisConfig.setDatabase(database);
         redisConfig.setPassword(RedisPassword.of(password));
+        JedisClientConfiguration clientConfig = JedisClientConfiguration.builder().useSsl().and().connectTimeout(
+                Duration.ofSeconds(10)).usePooling().poolConfig(new JedisPoolConfig()).build();
+        JedisConnectionFactory connFactory = new JedisConnectionFactory(redisConfig, clientConfig);
+        connFactory.afterPropertiesSet();
         return evaluateConnection(connFactory);
     }
 

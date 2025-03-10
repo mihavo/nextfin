@@ -54,6 +54,7 @@ public class Account {
     private Holder holder;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "manager_id")
     private Employee manager;
 

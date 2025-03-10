@@ -64,6 +64,7 @@ public class CoreTransactionServiceImpl implements TransactionService {
     private final UserService userService;
 
     private static final int TRANSACTION_CACHE_SIZE = 20;
+    private final TransactionMapper transactionMapper;
 
     @Override
     public TransactionResponse initiateTransaction(TransferRequestDto dto) {
@@ -108,6 +109,7 @@ public class CoreTransactionServiceImpl implements TransactionService {
                 return transactionRepository.findByTargetAccount(account, pageRequest);
             }
             case OUTGOING -> {
+                
                 return transactionRepository.findBySourceAccount(account, pageRequest);
             }
             default -> {
@@ -239,8 +241,9 @@ public class CoreTransactionServiceImpl implements TransactionService {
         cache.addToSortedSet(userId.toString(),
                              transaction.getId().toString(),
                              transaction.getCreatedAt().toEpochMilli() / 1000.0);
+        TransactionDetailsDto trnDetails = transactionMapper.toTransactionDetails(transaction);
         cache.setHashField(CacheUtils.buildTransactionsKey(userId),
-                           CacheUtils.buildTransactionsHashKey(transaction.getId()), transaction);
+                           CacheUtils.buildTransactionsHashKey(transaction.getId()), trnDetails);
     }
 
     private Set<String> fetchCacheRecents() {
