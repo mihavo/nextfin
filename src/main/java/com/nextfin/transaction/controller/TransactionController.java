@@ -52,9 +52,10 @@ public class TransactionController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Fetches a transaction by its ID")
-    public ResponseEntity<Transaction> getTransaction(@PathVariable UUID id) {
+    public ResponseEntity<TransactionDetailsDto> getTransaction(@PathVariable UUID id) {
         Transaction transaction = transactionService.getTransaction(id);
-        return new ResponseEntity<>(transaction, HttpStatus.OK);
+        TransactionDetailsDto response = transactionMapper.toTransactionDetails(transaction);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping("/{id}/status")
