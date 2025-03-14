@@ -43,6 +43,9 @@ public class RedisConfig {
     @Value("${nextfin.cache.allowed:true}")
     private Boolean isCachingAllowed;
 
+    @Value("${nextfin.cache.useSsl:true}")
+    private Boolean useSsl;
+
     private static final AtomicBoolean isCachingEnabled = new AtomicBoolean(false);
 
     @Bean
@@ -56,12 +59,18 @@ public class RedisConfig {
         redisConfig.setHostName(host);
         redisConfig.setPort(port);
         redisConfig.setDatabase(database);
-        redisConfig.setPassword(RedisPassword.of(password));
-        JedisClientConfiguration clientConfig = JedisClientConfiguration.builder().useSsl().and().connectTimeout(
-                Duration.ofSeconds(10)).usePooling().poolConfig(new JedisPoolConfig()).build();
-        JedisConnectionFactory connFactory = new JedisConnectionFactory(redisConfig, clientConfig);
+        redisConfig.setPassword(password == null ? RedisPassword.none() : RedisPassword.of(password));
+        JedisConnectionFactory connFactory = new JedisConnectionFactory(redisConfig, buildClientConfig());
         connFactory.afterPropertiesSet();
         return evaluateConnection(connFactory);
+    }
+
+    private @NotNull JedisClientConfiguration buildClientConfig() {
+        JedisClientConfiguration.JedisClientConfigurationBuilder builder = JedisClientConfiguration.builder();
+        builder.connectTimeout(Duration.ofSeconds(10));
+        builder.usePooling().poolConfig(new JedisPoolConfig());
+        if (useSsl) builder.useSsl();
+        return builder.build();
     }
 
     @Bean
