@@ -22,4 +22,8 @@ public interface TransactionMapper {
     @Mapping(source = "transactionStatus", target = "status")
     @Mapping(source = "transactionType", target = "type")
     TransactionDetailsDto toTransactionDetails(Transaction transaction);
+
+    @Mapping(source = "status", target = "transactionStatus")
+    @Mapping(source = "type", target = "transactionType")
+    Transaction toTransaction(TransactionDetailsDto transactionDetails);
 }

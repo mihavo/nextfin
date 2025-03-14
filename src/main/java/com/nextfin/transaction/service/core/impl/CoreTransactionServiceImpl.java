@@ -87,10 +87,12 @@ public class CoreTransactionServiceImpl implements TransactionService {
     @Override
     public Transaction getTransaction(UUID transactionId) {
         Set<String> recentIds = fetchCacheRecents();
-        return recentIds.stream().filter(id -> id.equals(transactionId.toString())).findAny().flatMap(
+        Transaction transaction = recentIds.stream().filter(
+                id -> id.equals(transactionId.toString())).findAny().flatMap(
                 id -> fetchFromCache(transactionId)).orElseGet(
                 () -> transactionRepository.findById(transactionId).orElseThrow(
                         getNotFoundExceptionSupplier(transactionId)));
+
     }
 
     @Override
@@ -252,6 +254,6 @@ public class CoreTransactionServiceImpl implements TransactionService {
 
     private Optional<Transaction> fetchFromCache(UUID transactionId) {
         String hashKey = CacheUtils.buildTransactionHashKey(transactionId);
-        return cache.getAllFieldsFromHash(hashKey, Transaction.class);
+        return cache.getAllFieldsFromHash(hashKey, TransactionDetailsDto.class).map(transactionMapper::toTransaction);
     }
 }
