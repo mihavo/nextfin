@@ -2,8 +2,6 @@ package com.nextfin.transaction.service.core.impl;
 
 import com.nextfin.account.entity.Account;
 import com.nextfin.account.service.core.AccountService;
-import com.nextfin.cache.CacheService;
-import com.nextfin.cache.utils.CacheUtils;
 import com.nextfin.exceptions.exception.CannotCacheException;
 import com.nextfin.exceptions.exception.Disabled2FAException;
 import com.nextfin.exceptions.exception.NotFoundException;
@@ -15,11 +13,12 @@ import com.nextfin.transaction.enums.TransactionStatus;
 import com.nextfin.transaction.enums.TransactionType;
 import com.nextfin.transaction.repository.TransactionRepository;
 import com.nextfin.transaction.scheduler.TransactionScheduler;
+import com.nextfin.transaction.service.cache.TransactionCacheService;
 import com.nextfin.transaction.service.core.TransactionService;
 import com.nextfin.transaction.service.processor.TransactionProcessor;
+import com.nextfin.transaction.service.security.MFATransactionService;
 import com.nextfin.transaction.service.security.TransactionSecurityService;
 import com.nextfin.transaction.service.validator.TransactionValidator;
-import com.nextfin.users.entity.NextfinUserDetails;
 import com.nextfin.users.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +29,6 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -47,24 +45,28 @@ import java.util.function.Supplier;
 public class CoreTransactionServiceImpl implements TransactionService {
 
     private final TransactionRepository transactionRepository;
+
     private final TransactionProcessor transactionProcessor;
+
+    private final TransactionCacheService cache;
+
+    private final TransactionSecurityService security;
 
     @Lazy
     private final TransactionValidator transactionValidator;
     @Lazy
     private final TransactionScheduler transactionScheduler;
-    private final Optional<TransactionSecurityService> securityService;
+
+    private final Optional<MFATransactionService> mfaTransactionService;
 
     private final AccountService accountService;
+
     private final TransactionConfirmationService confirmationService;
 
-    private final CacheService cache;
-
     private final MessageSource messageSource;
+
     private final UserService userService;
 
-    private static final int TRANSACTION_CACHE_SIZE = 20;
-    private final TransactionMapper transactionMapper;
 
     @Override
     public TransactionResponse initiateTransaction(TransferRequestDto dto) {
@@ -86,13 +88,14 @@ public class CoreTransactionServiceImpl implements TransactionService {
 
     @Override
     public Transaction getTransaction(UUID transactionId) {
-        Set<String> recentIds = fetchCacheRecents();
+        Set<String> recentIds = cache.fetchCacheRecents();
         Transaction transaction = recentIds.stream().filter(
                 id -> id.equals(transactionId.toString())).findAny().flatMap(
-                id -> fetchFromCache(transactionId)).orElseGet(
+                id -> cache.fetchFromCache(transactionId)).orElseGet(
                 () -> transactionRepository.findById(transactionId).orElseThrow(
                         getNotFoundExceptionSupplier(transactionId)));
-
+        security.evaluatePermissions(transaction);
+        return transaction;
     }
 
     @Override
@@ -132,8 +135,7 @@ public class CoreTransactionServiceImpl implements TransactionService {
         if (!check2fa(sourceAccount)) {
             throw new Disabled2FAException("Attempted transaction confirmation on disabled 2FA config.");
         }
-
-        securityService.get().validateOTP(sourcePhone, dto.otp());
+        mfaTransactionService.get().validateOTP(sourcePhone, dto.otp());
         return transaction;
     }
 
@@ -173,7 +175,7 @@ public class CoreTransactionServiceImpl implements TransactionService {
                 accountService.getAccount(dto.getTargetAccountId())).build();
         Transaction saved = transactionRepository.save(transaction);
         try {
-            cacheTransaction(userService.getCurrentUser().getId(), saved);
+            cache.cacheTransaction(userService.getCurrentUser().getId(), saved);
         } catch (UserNotFoundException e) {
             throw new CannotCacheException("User not found, cannot cache transaction " + transaction.getId());
         }
@@ -197,7 +199,7 @@ public class CoreTransactionServiceImpl implements TransactionService {
     @SuppressWarnings("OptionalGetWithoutIsPresent")
     private TransactionResponse handleTransaction(Transaction transaction) {
         if (check2fa(transaction.getSourceAccount())) {
-            securityService.get().sendOTP(transaction);
+            mfaTransactionService.get().sendOTP(transaction);
             return new TransactionResultDto(transaction, messageSource.getMessage(
                     "transaction.transfer" + ".awaiting" + "-validation", new UUID[]{transaction.getId()},
                     LocaleContextHolder.getLocale()));
@@ -209,7 +211,7 @@ public class CoreTransactionServiceImpl implements TransactionService {
     @SuppressWarnings("OptionalGetWithoutIsPresent")
     private ScheduledTransactionDto handleScheduledTransaction(Transaction transaction) {
         if (check2fa(transaction.getSourceAccount())) {
-            securityService.get().sendOTP(transaction);
+            mfaTransactionService.get().sendOTP(transaction);
             return ScheduledTransactionDto.builder().transaction(transaction).message(messageSource.getMessage(
                     "transaction.transfer.awaiting-validation",
                     new UUID[]{transaction.getId()},
@@ -225,35 +227,8 @@ public class CoreTransactionServiceImpl implements TransactionService {
         }
     }
 
-    public boolean isTransactionRelated(UUID transactionId) {
-        Transaction transaction = getTransaction(transactionId);
-        UUID currentUserId = ((NextfinUserDetails) SecurityContextHolder.getContext().getAuthentication()
-                                                                        .getPrincipal()).getId();
-        return (transaction.getSourceAccount().getHolder().getUser().getId().equals(
-                currentUserId) || transaction.getTargetAccount().getHolder().getUser().getId()
-                                                                .equals(currentUserId));
-    }
-
     private boolean check2fa(Account sourceAccount) {
-        return securityService.isPresent() && sourceAccount.getTransaction2FAEnabled();
+        return mfaTransactionService.isPresent() && sourceAccount.getTransaction2FAEnabled();
     }
 
-    private void cacheTransaction(UUID userId, Transaction transaction) {
-        String setKey = CacheUtils.buildTransactionsSetKey(userId);
-        cache.addToSortedSet(setKey,
-                             transaction.getId().toString(),
-                             transaction.getCreatedAt().toEpochMilli() / 1000.0);
-        TransactionDetailsDto trnDetails = transactionMapper.toTransactionDetails(transaction);
-        cache.setHashObject(CacheUtils.buildTransactionHashKey(transaction.getId()), trnDetails);
-    }
-
-    private Set<String> fetchCacheRecents() {
-        String setKey = CacheUtils.buildTransactionsSetKey(userService.getCurrentUser().getId());
-        return cache.getFromSortedSet(setKey, 1, TRANSACTION_CACHE_SIZE);
-    }
-
-    private Optional<Transaction> fetchFromCache(UUID transactionId) {
-        String hashKey = CacheUtils.buildTransactionHashKey(transactionId);
-        return cache.getAllFieldsFromHash(hashKey, TransactionDetailsDto.class).map(transactionMapper::toTransaction);
-    }
 }

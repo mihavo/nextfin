@@ -1,63 +1,37 @@
 package com.nextfin.transaction.service.security;
 
+import com.nextfin.exceptions.exception.ForbiddenException;
+import com.nextfin.transaction.dto.TransactionMapper;
 import com.nextfin.transaction.entity.Transaction;
-import com.nextfin.transaction.enums.TransactionStatus;
 import com.nextfin.transaction.repository.TransactionRepository;
 import com.nextfin.transaction.service.core.TransactionService;
-import com.twilio.Twilio;
-import com.twilio.rest.verify.v2.service.Verification;
-import com.twilio.rest.verify.v2.service.VerificationCheck;
-import jakarta.annotation.PostConstruct;
-import jakarta.validation.constraints.Digits;
-import jakarta.validation.constraints.Size;
+import com.nextfin.users.entity.NextfinUserDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.MessageSource;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
+import java.util.UUID;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-// system-wide 2fa enabled flag
-@ConditionalOnProperty(name = "2fa.enabled", havingValue = "true", matchIfMissing = true)
 public class TransactionSecurityService {
     private final TransactionRepository transactionRepository;
     private final TransactionService transactionService;
+    private final TransactionMapper transactionMapper;
 
-    @Value("${clients.twilio.account-sid}")
-    private String accountSid;
 
-    @Value("${clients.twilio.auth-token}")
-    private String authToken;
-
-    @Value("${clients.twilio.verification-sid}")
-    private String verificationSid;
-
-    private final MessageSource messageSource;
-
-    @PostConstruct
-    private void initializeTwilio() {
-        Twilio.init(accountSid, authToken);
-        log.info("2FA Initialized");
+    public boolean isTransactionRelated(UUID transactionId) {
+        Transaction transaction = transactionService.getTransaction(transactionId);
+        UUID currentUserId =
+                ((NextfinUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
+        return (transaction.getSourceAccount().getHolder().getUser().getId().equals(
+                currentUserId) || transaction.getTargetAccount().getHolder().getUser().getId().equals(currentUserId));
     }
 
-    public Verification sendOTP(Transaction transaction) {
-        String sourcePhone = transaction.getSourceAccount().getHolder().getUser().getPreferredPhoneNumber();
-        Verification verification = Verification.creator(verificationSid, sourcePhone, "sms").create();
-        log.info("OTP sent to {} for transaction {}, status: {}",
-                 sourcePhone,
-                 transaction.getId(),
-                 verification.getStatus());
-        transaction.setTransactionStatus(TransactionStatus.OTP_SENT);
-        transactionRepository.save(transaction);
-        return verification;
-    }
-
-    public void validateOTP(@Size(min = 10, max = 15, message = "Phone number should be between 10 and 15 digits") String sourcePhone,
-                            @Digits(integer = 6, fraction = 0, message = "The OTP Code must be exactly 6 digits") String code) {
-        VerificationCheck.creator(verificationSid).setTo(sourcePhone).setCode(code).create();
+    public void evaluatePermissions(Transaction transaction) throws ForbiddenException {
+        }
     }
 }
 

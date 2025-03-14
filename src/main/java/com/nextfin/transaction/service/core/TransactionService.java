@@ -89,12 +89,4 @@ public interface TransactionService {
      */
     Transaction confirmTransaction(@Valid TransactionConfirmDto dto);
 
-    /**
-     * Checks if a transaction's source or target user is the same as the currently authenticated user
-     *
-     * @param transactionId the transaction id
-     * @return true if transaction relates to the current user
-     */
-    boolean isTransactionRelated(UUID transactionId);
-
 }
