@@ -109,7 +109,6 @@ public class CoreTransactionServiceImpl implements TransactionService {
                 return transactionRepository.findByTargetAccount(account, pageRequest);
             }
             case OUTGOING -> {
-                
                 return transactionRepository.findBySourceAccount(account, pageRequest);
             }
             default -> {
@@ -238,21 +237,21 @@ public class CoreTransactionServiceImpl implements TransactionService {
     }
 
     private void cacheTransaction(UUID userId, Transaction transaction) {
-        cache.addToSortedSet(userId.toString(),
+        String setKey = CacheUtils.buildTransactionsSetKey(userId);
+        cache.addToSortedSet(setKey,
                              transaction.getId().toString(),
                              transaction.getCreatedAt().toEpochMilli() / 1000.0);
         TransactionDetailsDto trnDetails = transactionMapper.toTransactionDetails(transaction);
-        cache.setHashField(CacheUtils.buildTransactionsKey(userId),
-                           CacheUtils.buildTransactionsHashKey(transaction.getId()), trnDetails);
+        cache.setHashObject(CacheUtils.buildTransactionHashKey(transaction.getId()), trnDetails);
     }
 
     private Set<String> fetchCacheRecents() {
-        String setKey = CacheUtils.buildTransactionsKey(userService.getCurrentUser().getId());
-        return cache.getFromSortedSet(setKey, 0, TRANSACTION_CACHE_SIZE);
+        String setKey = CacheUtils.buildTransactionsSetKey(userService.getCurrentUser().getId());
+        return cache.getFromSortedSet(setKey, 1, TRANSACTION_CACHE_SIZE);
     }
 
     private Optional<Transaction> fetchFromCache(UUID transactionId) {
-        String hashKey = CacheUtils.buildTransactionsHashKey(transactionId);
+        String hashKey = CacheUtils.buildTransactionHashKey(transactionId);
         return cache.getAllFieldsFromHash(hashKey, Transaction.class);
     }
 }

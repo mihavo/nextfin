@@ -7,11 +7,11 @@ import java.util.UUID;
 @UtilityClass
 public class CacheUtils {
 
-    public String buildTransactionsKey(UUID userId) {
+    public String buildTransactionsSetKey(UUID userId) {
         return "transactions:user:" + userId;
     }
 
-    public String buildTransactionsHashKey(UUID transactionId) {
+    public String buildTransactionHashKey(UUID transactionId) {
         return "tnx:" + transactionId;
     }
 }

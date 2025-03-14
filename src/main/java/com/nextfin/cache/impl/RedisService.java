@@ -1,6 +1,6 @@
 package com.nextfin.cache.impl;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nextfin.cache.CacheService;
 import com.nextfin.config.cache.RedisConfig;
@@ -102,25 +102,35 @@ public class RedisService implements CacheService {
     @Override
     public <T> void setHashField(String key, String field, T value, long timeout, TimeUnit timeUnit) {
         if (!redisConfig.isCachingEnabled()) throw new CacheDisabledException();
-        try {
-            String json = jsonMapper.writeValueAsString(value);
-            redisTemplate.opsForHash().put(key, field, json);
+        redisTemplate.opsForHash().put(key, field, value);
             redisTemplate.expire(key, timeout, timeUnit);
-        } catch (JsonProcessingException e) {
-            throw new CacheDisabledException("Cannot cache object: " + value + e.getMessage());
-        }
     }
 
     @Override
     public <T> void setHashField(String key, String field, T value) {
         if (!redisConfig.isCachingEnabled()) throw new CacheDisabledException();
-        try {
-            String json = jsonMapper.writeValueAsString(value);
-            redisTemplate.opsForHash().put(key, field, json);
-            redisTemplate.expire(key, defaultTimeout, TimeUnit.MINUTES);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+        redisTemplate.opsForHash().put(key, field, value);
+
+        redisTemplate.expire(key, defaultTimeout, TimeUnit.MINUTES);
+    }
+
+    @Override
+    public <T> void setHashObject(String key, T object, long timeout, TimeUnit timeUnit) {
+        if (!redisConfig.isCachingEnabled()) throw new CacheDisabledException();
+        Map<String, Object> fields = jsonMapper.convertValue(object, new TypeReference<>() {
+        });
+        redisTemplate.opsForHash().putAll(key, fields);
+        redisTemplate.expire(key, timeout, timeUnit);
+    }
+
+    @Override
+    public <T> void setHashObject(String key, T object) {
+        if (!redisConfig.isCachingEnabled()) throw new CacheDisabledException();
+        Map<String, Object> fields = jsonMapper.convertValue(object, new TypeReference<>() {
+        });
+        redisTemplate.opsForHash().putAll(key, fields);
+        redisTemplate.expire(key, defaultTimeout, TimeUnit.MINUTES);
+
     }
 
     @Override

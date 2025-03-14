@@ -9,6 +9,7 @@ import java.util.Currency;
 import java.util.UUID;
 
 public record TransactionDetailsDto(UUID id, BigDecimal amount, Currency currency, Long sourceAccountId,
-                                    Long targetAccountId, TransactionStatus status, TransactionType type,
+                                    Long targetAccountId, UUID sourceUserId, UUID targetUserId,
+                                    TransactionStatus status, TransactionType type,
                                     Instant createdAt, Instant updatedAt) {
 }

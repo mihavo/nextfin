@@ -17,6 +17,8 @@ public interface TransactionMapper {
 
     @Mapping(source = "sourceAccount.id", target = "sourceAccountId")
     @Mapping(source = "targetAccount.id", target = "targetAccountId")
+    @Mapping(source = "sourceAccount.holder.user.id", target = "sourceUserId")
+    @Mapping(source = "targetAccount.holder.user.id", target = "targetUserId")
     @Mapping(source = "transactionStatus", target = "status")
     @Mapping(source = "transactionType", target = "type")
     TransactionDetailsDto toTransactionDetails(Transaction transaction);

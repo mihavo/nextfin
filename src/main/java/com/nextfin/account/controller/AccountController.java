@@ -7,6 +7,8 @@ import com.nextfin.account.enums.AccountType;
 import com.nextfin.account.service.core.AccountService;
 import com.nextfin.holder.service.HolderService;
 import com.nextfin.transaction.dto.GetTransactionOptions;
+import com.nextfin.transaction.dto.TransactionDetailsDto;
+import com.nextfin.transaction.dto.TransactionMapper;
 import com.nextfin.transaction.entity.Transaction;
 import com.nextfin.transaction.service.core.TransactionService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -37,6 +39,7 @@ public class AccountController {
     private final TransactionService transactionService;
     private final MessageSource messageSource;
     private final HolderService holderService;
+    private final TransactionMapper transactionMapper;
 
     @PostMapping
     @Operation(summary = "Account initialization", description = "Method for creating accounts for non-employees i.e. holders")
@@ -105,10 +108,13 @@ public class AccountController {
     @GetMapping("/{id}/transactions")
     @Operation(summary = "Gets recent transactions of the account")
     @PreAuthorize("@accountSecurityServiceImpl.isAccountOwner(#id)")
-    public ResponseEntity<Page<Transaction>> getTransactions(@PathVariable @NotNull Long id, @Valid GetTransactionOptions options) {
+    public ResponseEntity<Page<TransactionDetailsDto>> getTransactions(@PathVariable @NotNull Long id,
+                                                                       @Valid GetTransactionOptions options) {
         Account account = accountService.getAccount(id);
         Page<Transaction> filteredTransactions = transactionService.getAccountTransactions(account, options);
-        return new ResponseEntity<>(filteredTransactions, HttpStatus.OK);
+        Page<TransactionDetailsDto> filteredTrnDetails = filteredTransactions.map(
+                transactionMapper::toTransactionDetails);
+        return new ResponseEntity<>(filteredTrnDetails, HttpStatus.OK);
     }
 
     @PatchMapping("/{id}/transactions/update-limit")

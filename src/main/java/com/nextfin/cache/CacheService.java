@@ -103,6 +103,29 @@ public interface CacheService {
 
 
     /**
+     * Saves an object to the cache where each field-value pair corresponds to the key and value of each field
+     * * of the object respectively, expiration with custom timeout & timeunit
+     *
+     * @param key
+     * @param object
+     * @param timeout
+     * @param timeUnit
+     * @param <T>
+     */
+    <T> void setHashObject(String key, T object, long timeout, TimeUnit timeUnit);
+
+    /**
+     * Saves an object to the cache where each field-value pair corresponds to the key and value of each field
+     * of the object respectively.
+     *
+     * @param key
+     * @param object
+     * @param <T>
+     */
+    <T> void setHashObject(String key, T object);
+
+
+    /**
      * Gets a range of members of a specified sorted set based on the set key
      *
      * @param setKey
