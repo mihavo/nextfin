@@ -29,6 +29,7 @@ import java.util.UUID;
 @Setter
 @DynamicUpdate
 public class User extends Auditable implements NextfinUserDetails {
+	
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
 	@Column(name = "id", updatable = false, nullable = false)

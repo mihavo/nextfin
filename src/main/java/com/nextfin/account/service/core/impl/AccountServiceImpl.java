@@ -65,8 +65,6 @@ public class AccountServiceImpl implements AccountService {
                                               messageSource.getMessage("account.holder.forbidden", null,
                                                                        LocaleContextHolder.getLocale()));
         }
-        messageSource.getMessage("account.holder.forbidden", null,
-                LocaleContextHolder.getLocale());
         Employee manager = employeeService.getEmployeeById(dto.managerId);
         Account account = Account.builder()
                                  .balance(BigDecimal.ZERO)

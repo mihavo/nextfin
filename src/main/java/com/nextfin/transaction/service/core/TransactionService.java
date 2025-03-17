@@ -28,6 +28,7 @@ public interface TransactionService {
      * @return a dto containing the scheduled transfer results
      */
     TransactionResponse initiateScheduledTransaction(TransactionScheduleRequestDto dto);
+    
     /**
      * Fetches a transaction
      * @param transactionId the transactionID

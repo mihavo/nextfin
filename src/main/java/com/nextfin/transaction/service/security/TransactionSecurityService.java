@@ -1,9 +1,7 @@
 package com.nextfin.transaction.service.security;
 
 import com.nextfin.exceptions.exception.ForbiddenException;
-import com.nextfin.transaction.dto.TransactionMapper;
 import com.nextfin.transaction.entity.Transaction;
-import com.nextfin.transaction.repository.TransactionRepository;
 import com.nextfin.transaction.service.core.TransactionService;
 import com.nextfin.users.entity.NextfinUserDetails;
 import com.nextfin.users.enums.Role;
@@ -22,9 +20,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class TransactionSecurityService {
-    private final TransactionRepository transactionRepository;
     private final TransactionService transactionService;
-    private final TransactionMapper transactionMapper;
     private final MessageSource messageSource;
 
     private static final Role[] TRANSACTION_VISIBILITY_ROLES = {Role.ADMIN};
