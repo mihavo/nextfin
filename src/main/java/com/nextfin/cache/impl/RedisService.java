@@ -36,7 +36,7 @@ public class RedisService implements CacheService {
 
     @Override
     public <T> Optional<T> getOrFetch(String key, Class<T> valueType, Supplier<T> fetchSupplier) {
-        if (!redisConfig.isCachingEnabled()) return Optional.empty();
+        if (!RedisConfig.isCachingEnabled()) return Optional.empty();
         Optional<T> result = get(key, valueType);
         if (result.isPresent()) {
             return result;
@@ -49,7 +49,7 @@ public class RedisService implements CacheService {
     @Override
     public <T> Optional<T> getOrFetchHashField(String key, String field, Class<T> valueType,
                                                Supplier<T> fetchSupplier) {
-        if (!redisConfig.isCachingEnabled()) return Optional.empty();
+        if (!RedisConfig.isCachingEnabled()) return Optional.empty();
         Optional<T> result = getHashField(key, field, valueType);
         if (result.isPresent()) {
             return result;
@@ -61,7 +61,7 @@ public class RedisService implements CacheService {
 
     @Override
     public <T> Optional<T> get(String key, Class<T> valueType) {
-        if (!redisConfig.isCachingEnabled()) return Optional.empty();
+        if (!RedisConfig.isCachingEnabled()) return Optional.empty();
         Object result = redisTemplate.opsForValue().get(key);
         if (valueType.isInstance(result)) {
             return Optional.of((valueType.cast(result)));
@@ -71,19 +71,19 @@ public class RedisService implements CacheService {
 
     @Override
     public void set(String key, Object value) {
-        if (!redisConfig.isCachingEnabled()) throw new CacheDisabledException();
+        if (!RedisConfig.isCachingEnabled()) throw new CacheDisabledException();
         redisTemplate.opsForValue().set(key, value, defaultTimeout, TimeUnit.MINUTES);
     }
 
     @Override
     public void set(String key, Object value, long timeout, TimeUnit timeUnit) {
-        if (!redisConfig.isCachingEnabled()) throw new CacheDisabledException();
+        if (!RedisConfig.isCachingEnabled()) throw new CacheDisabledException();
         redisTemplate.opsForValue().set(key, value, timeout, timeUnit);
     }
 
     @Override
     public <T> Optional<T> getHashField(String key, String field, Class<T> valueType) {
-        if (!redisConfig.isCachingEnabled()) return Optional.empty();
+        if (!RedisConfig.isCachingEnabled()) return Optional.empty();
         Object result = redisTemplate.opsForHash().get(key, field);
         if (valueType.isInstance(result)) {
             return Optional.of((valueType.cast(result)));
@@ -93,7 +93,7 @@ public class RedisService implements CacheService {
 
     @Override
     public <T> Optional<T> getAllFieldsFromHash(String key, Class<T> valueType) {
-        if (!redisConfig.isCachingEnabled()) return Optional.empty();
+        if (!RedisConfig.isCachingEnabled()) return Optional.empty();
         Map<Object, Object> entries = redisTemplate.opsForHash().entries(key);
         if (entries.isEmpty()) return Optional.empty();
         return Optional.of(jsonMapper.convertValue(entries, valueType));
@@ -101,14 +101,14 @@ public class RedisService implements CacheService {
 
     @Override
     public <T> void setHashField(String key, String field, T value, long timeout, TimeUnit timeUnit) {
-        if (!redisConfig.isCachingEnabled()) throw new CacheDisabledException();
+        if (!RedisConfig.isCachingEnabled()) throw new CacheDisabledException();
         redisTemplate.opsForHash().put(key, field, value);
             redisTemplate.expire(key, timeout, timeUnit);
     }
 
     @Override
     public <T> void setHashField(String key, String field, T value) {
-        if (!redisConfig.isCachingEnabled()) throw new CacheDisabledException();
+        if (!RedisConfig.isCachingEnabled()) throw new CacheDisabledException();
         redisTemplate.opsForHash().put(key, field, value);
 
         redisTemplate.expire(key, defaultTimeout, TimeUnit.MINUTES);
@@ -116,7 +116,7 @@ public class RedisService implements CacheService {
 
     @Override
     public <T> void setHashObject(String key, T object, long timeout, TimeUnit timeUnit) {
-        if (!redisConfig.isCachingEnabled()) throw new CacheDisabledException();
+        if (!RedisConfig.isCachingEnabled()) throw new CacheDisabledException();
         Map<String, Object> fields = jsonMapper.convertValue(object, new TypeReference<>() {
         });
         redisTemplate.opsForHash().putAll(key, fields);
@@ -125,7 +125,7 @@ public class RedisService implements CacheService {
 
     @Override
     public <T> void setHashObject(String key, T object) {
-        if (!redisConfig.isCachingEnabled()) throw new CacheDisabledException();
+        if (!RedisConfig.isCachingEnabled()) throw new CacheDisabledException();
         Map<String, Object> fields = jsonMapper.convertValue(object, new TypeReference<>() {
         });
         redisTemplate.opsForHash().putAll(key, fields);
@@ -135,7 +135,7 @@ public class RedisService implements CacheService {
 
     @Override
     public Set<String> getFromSortedSet(String setKey, long page, long pageSize) {
-        if (!redisConfig.isCachingEnabled()) return Set.of();
+        if (!RedisConfig.isCachingEnabled()) return Set.of();
         long start = (page - 1) * pageSize;
         long end = start + pageSize - 1;
         Set<String> range = stringRedisTemplate.opsForZSet().reverseRange(setKey, start, end);
@@ -147,19 +147,19 @@ public class RedisService implements CacheService {
 
     @Override
     public void addToSortedSet(String setKey, String member, double score) {
-        if (!redisConfig.isCachingEnabled()) throw new CacheDisabledException();
+        if (!RedisConfig.isCachingEnabled()) throw new CacheDisabledException();
         stringRedisTemplate.opsForZSet().addIfAbsent(setKey, member, score);
     }
 
     @Override
     public void deleteFromSortedSet(String setKey, String... members) {
-        if (!redisConfig.isCachingEnabled()) throw new CacheDisabledException();
+        if (!RedisConfig.isCachingEnabled()) throw new CacheDisabledException();
         stringRedisTemplate.opsForZSet().remove(setKey, (Object[]) members);
     }
 
     @Override
     public void deleteKey(String key) {
-        if (!redisConfig.isCachingEnabled()) throw new CacheDisabledException();
+        if (!RedisConfig.isCachingEnabled()) throw new CacheDisabledException();
         redisTemplate.opsForHash().delete(key);
     }
 

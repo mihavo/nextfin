@@ -1,11 +1,13 @@
 package com.nextfin.config.security;
 
 import com.nextfin.AppConstants;
+import com.nextfin.account.service.security.session.MultiSessionRepository;
 import com.nextfin.auth.oauth2.service.OidcService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.Customizer;
@@ -21,15 +23,21 @@ import org.springframework.security.web.context.HttpSessionSecurityContextReposi
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.web.header.writers.ClearSiteDataHeaderWriter;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
+import org.springframework.session.MapSessionRepository;
+import org.springframework.session.SessionRepository;
+import org.springframework.session.config.annotation.web.http.EnableSpringHttpSession;
+import org.springframework.session.data.redis.RedisIndexedSessionRepository;
 
 @Slf4j
 @Configuration
 @EnableWebSecurity
+@EnableSpringHttpSession
 @RequiredArgsConstructor
 public class SecurityConfig {
 
     private final AuthenticationProvider authenticationProvider;
     private final OidcService oidcUserService;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -85,4 +93,11 @@ public class SecurityConfig {
     public SecurityContextRepository securityContextRepository() {
         return new HttpSessionSecurityContextRepository();
     }
+
+    @Bean
+    public SessionRepository sessionRepository(RedisIndexedSessionRepository redisRepository,
+                                               MapSessionRepository inMemoryRepository) {
+        return new MultiSessionRepository(redisRepository, inMemoryRepository);
+    }
+
 }

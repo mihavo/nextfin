@@ -63,7 +63,7 @@ public class TestRedisService {
     }
 
     private void configureCachingEnabled(boolean isEnabled) {
-        when(redisConfig.isCachingEnabled()).thenReturn(isEnabled);
+        when(RedisConfig.isCachingEnabled()).thenReturn(isEnabled);
     }
 
     @Test

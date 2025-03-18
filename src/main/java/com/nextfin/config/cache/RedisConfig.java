@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisPassword;
@@ -14,8 +15,8 @@ import org.springframework.data.redis.connection.jedis.JedisClientConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.scheduling.annotation.Scheduled;
 import redis.clients.jedis.JedisPoolConfig;
 
 import java.nio.charset.StandardCharsets;
@@ -48,6 +49,8 @@ public class RedisConfig {
 
     private static final AtomicBoolean isCachingEnabled = new AtomicBoolean(false);
 
+    private static RedisConnectionFactory factory;
+
     @Bean
     public RedisConnectionFactory connectionFactory() {
         RedisStandaloneConfiguration redisConfig = new RedisStandaloneConfiguration();
@@ -62,7 +65,8 @@ public class RedisConfig {
         redisConfig.setPassword(password == null ? RedisPassword.none() : RedisPassword.of(password));
         JedisConnectionFactory connFactory = new JedisConnectionFactory(redisConfig, buildClientConfig());
         connFactory.afterPropertiesSet();
-        return evaluateConnection(connFactory);
+        factory = evaluateConnection(connFactory);
+        return factory;
     }
 
     private @NotNull JedisClientConfiguration buildClientConfig() {
@@ -76,11 +80,10 @@ public class RedisConfig {
     @Bean
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
+
         template.setConnectionFactory(connectionFactory);
         template.setKeySerializer(new StringRedisSerializer());
-        template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
         template.setHashKeySerializer(new StringRedisSerializer());
-        template.setHashValueSerializer(new GenericJackson2JsonRedisSerializer());
         template.afterPropertiesSet();
         return template;
     }
@@ -109,22 +112,45 @@ public class RedisConfig {
     public RedisConnectionFactory evaluateConnection(JedisConnectionFactory connFactory) {
         connFactory.start();
         try (RedisConnection connection = connFactory.getConnection()) {
-            String ping = connection.ping();
-            if (ping != null && ping.equals("PONG")) {
+            if (pingCache(connection)) {
                 String connectionId = "nextfin-cache-" + UUID.randomUUID();
                 connection.serverCommands().setClientName(connectionId.getBytes(StandardCharsets.UTF_8));
-                log.info("Connection with Cache client established: {}", connection.serverCommands().getClientName());
+                log.debug("Connection with Cache client established: {}", connection.serverCommands().getClientName());
                 isCachingEnabled.set(true);
                 return connFactory;
             }
-            throw new RuntimeException("Connection could not be established: unexpected response");
+            log.error("Connection could not be established: unexpected response");
         } catch (Exception e) {
             log.error("Connection with Cache Client failed: {}", e.getMessage());
         }
         return connFactory;
     }
 
-    public boolean isCachingEnabled() {
+    private boolean pingCache(RedisConnection connection) {
+        String ping = connection.ping();
+        return ping != null && ping.equals("PONG");
+    }
+
+    @Scheduled(fixedRate = 3000)  // Re-check connection every 30 seconds
+    public void reEvaluateConnection() {
+        try {
+            if (!pingCache(factory.getConnection())) {
+                isCachingEnabled.set(false);
+            }
+            if (!isCachingEnabled()) {
+                isCachingEnabled.set(true);
+                log.debug("Cache connection re-established");
+            }
+        } catch (RedisConnectionFailureException e) {
+            log.error(e.getMessage());
+            isCachingEnabled.set(false);
+        } catch (Exception e) {  // only catches unhandled exceptions
+            log.error("Failed to recheck Redis connection: {}", e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static boolean isCachingEnabled() {
         return isCachingEnabled.get();
     }
 
