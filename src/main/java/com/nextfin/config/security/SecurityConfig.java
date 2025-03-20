@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.Customizer;
@@ -35,9 +34,9 @@ import org.springframework.session.data.redis.RedisIndexedSessionRepository;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final AuthenticationProvider authenticationProvider;
+    private final AuthenticationProvider userAuthProvider;
+    private final AuthenticationProvider daoAuthenticationProvider;
     private final OidcService oidcUserService;
-    private final RedisTemplate<String, Object> redisTemplate;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -66,8 +65,6 @@ public class SecurityConfig {
             logout.deleteCookies("JSESSIONID");
         });
 
-        http.authenticationProvider(authenticationProvider);
-
         http.oauth2Login(oauth2 -> {
             String baseUrl = AppConstants.API_BASE_URL + "/oauth2";
             oauth2.authorizationEndpoint(auth -> auth.baseUri(baseUrl + "/authorization"));
@@ -81,8 +78,12 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
-        return http.getSharedObject(AuthenticationManagerBuilder.class).build();
+        AuthenticationManagerBuilder managerBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
+        return managerBuilder.authenticationProvider(userAuthProvider)
+                             .authenticationProvider(daoAuthenticationProvider)
+                             .build();
     }
+
 
     @Bean
     public HttpSessionEventPublisher httpSessionEventPublisher() {

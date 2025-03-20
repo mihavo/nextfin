@@ -49,7 +49,7 @@ public class RedisConfig {
 
     private static final AtomicBoolean isCachingEnabled = new AtomicBoolean(false);
 
-    private static RedisConnectionFactory factory;
+    private static RedisConnection connection;
 
     @Bean
     public RedisConnectionFactory connectionFactory() {
@@ -65,7 +65,8 @@ public class RedisConfig {
         redisConfig.setPassword(password == null ? RedisPassword.none() : RedisPassword.of(password));
         JedisConnectionFactory connFactory = new JedisConnectionFactory(redisConfig, buildClientConfig());
         connFactory.afterPropertiesSet();
-        factory = evaluateConnection(connFactory);
+        RedisConnectionFactory factory = evaluateConnection(connFactory);
+        connection = factory.getConnection();
         return factory;
     }
 
@@ -84,6 +85,7 @@ public class RedisConfig {
         template.setConnectionFactory(connectionFactory);
         template.setKeySerializer(new StringRedisSerializer());
         template.setHashKeySerializer(new StringRedisSerializer());
+        template.setBeanClassLoader(Thread.currentThread().getContextClassLoader());
         template.afterPropertiesSet();
         return template;
     }
@@ -92,6 +94,7 @@ public class RedisConfig {
     public StringRedisTemplate stringRedisTemplate(RedisConnectionFactory connectionFactory) {
         StringRedisTemplate template = new StringRedisTemplate();
         template.setConnectionFactory(connectionFactory);
+        template.setBeanClassLoader(Thread.currentThread().getContextClassLoader());
         return template;
     }
 
@@ -131,10 +134,10 @@ public class RedisConfig {
         return ping != null && ping.equals("PONG");
     }
 
-    @Scheduled(fixedRate = 3000)  // Re-check connection every 30 seconds
+    @Scheduled(fixedRate = 30000)  // Re-check connection every 30 seconds
     public void reEvaluateConnection() {
         try {
-            if (!pingCache(factory.getConnection())) {
+            if (!pingCache(connection)) {
                 isCachingEnabled.set(false);
             }
             if (!isCachingEnabled()) {

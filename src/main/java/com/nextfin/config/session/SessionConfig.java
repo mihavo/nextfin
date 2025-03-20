@@ -11,7 +11,6 @@ import org.springframework.security.jackson2.SecurityJackson2Modules;
 
 @Configuration
 public class SessionConfig implements BeanClassLoaderAware {
-
     private ClassLoader loader;
 
     @Bean
