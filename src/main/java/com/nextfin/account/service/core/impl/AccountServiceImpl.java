@@ -75,7 +75,7 @@ public class AccountServiceImpl implements AccountService {
                                  .currency(Currency.getInstance(dto.currencyCode))
                                  .build();
         Account savedAccount = accountRepository.save(account);
-        log.debug("Account created: {}", savedAccount);
+        log.trace("Account created: {}", savedAccount);
         return savedAccount;
     }
 

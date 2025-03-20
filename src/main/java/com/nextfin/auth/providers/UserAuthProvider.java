@@ -11,16 +11,15 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Component;
 
-@Component
+
 @RequiredArgsConstructor
 public class UserAuthProvider implements AuthenticationProvider {
 
     private final NextfinUserDetailsService userService;
     private final PasswordEncoder passwordEncoder;
-
     private final MessageSource messageSource;
+
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {

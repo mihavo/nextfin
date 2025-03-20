@@ -3,12 +3,15 @@ package com.nextfin.config.security;
 import com.nextfin.AppConstants;
 import com.nextfin.account.service.security.session.MultiSessionRepository;
 import com.nextfin.auth.oauth2.service.OidcService;
+import com.nextfin.auth.providers.UserAuthProvider;
+import com.nextfin.users.service.impl.NextfinUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -16,6 +19,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.SessionManagementConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.HeaderWriterLogoutHandler;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
@@ -34,9 +38,10 @@ import org.springframework.session.data.redis.RedisIndexedSessionRepository;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final AuthenticationProvider userAuthProvider;
-    private final AuthenticationProvider daoAuthenticationProvider;
     private final OidcService oidcUserService;
+    private final NextfinUserDetailsService nextfinUserDetailsService;
+    private final PasswordEncoder passwordEncoder;
+    private final MessageSource messageSource;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -79,11 +84,19 @@ public class SecurityConfig {
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
         AuthenticationManagerBuilder managerBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
-        return managerBuilder.authenticationProvider(userAuthProvider)
-                             .authenticationProvider(daoAuthenticationProvider)
+        return managerBuilder.authenticationProvider(new UserAuthProvider(nextfinUserDetailsService,
+                                                                          passwordEncoder,
+                                                                          messageSource)).authenticationProvider(
+                                     daoAuthenticationProvider())
                              .build();
     }
 
+    public DaoAuthenticationProvider daoAuthenticationProvider() {
+        DaoAuthenticationProvider daoProvider = new DaoAuthenticationProvider();
+        daoProvider.setUserDetailsService(nextfinUserDetailsService);
+        daoProvider.setPasswordEncoder(passwordEncoder);
+        return daoProvider;
+    }
 
     @Bean
     public HttpSessionEventPublisher httpSessionEventPublisher() {

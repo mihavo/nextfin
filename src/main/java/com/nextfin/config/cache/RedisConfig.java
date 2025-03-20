@@ -49,25 +49,23 @@ public class RedisConfig {
 
     private static final AtomicBoolean isCachingEnabled = new AtomicBoolean(false);
 
-    private static RedisConnection connection;
+    private static RedisConnectionFactory connFactory;
 
     @Bean
     public RedisConnectionFactory connectionFactory() {
         RedisStandaloneConfiguration redisConfig = new RedisStandaloneConfiguration();
         if (!isCachingAllowed || host == null) {
-            log.warn(
-                    "Caching is explicitly disabled from environment or misconfigured; attempted connections will " + "fail.");
+            log.warn("Caching is explicitly disabled from environment or misconfigured; attempted connections will " + "fail.");
             return constructMinimalFactory();
         }
         redisConfig.setHostName(host);
         redisConfig.setPort(port);
         redisConfig.setDatabase(database);
         redisConfig.setPassword(password == null ? RedisPassword.none() : RedisPassword.of(password));
-        JedisConnectionFactory connFactory = new JedisConnectionFactory(redisConfig, buildClientConfig());
-        connFactory.afterPropertiesSet();
-        RedisConnectionFactory factory = evaluateConnection(connFactory);
-        connection = factory.getConnection();
-        return factory;
+        connFactory = new JedisConnectionFactory(redisConfig, buildClientConfig());
+        ((JedisConnectionFactory) connFactory).afterPropertiesSet();
+        evaluateConnection(connFactory);
+        return connFactory;
     }
 
     private @NotNull JedisClientConfiguration buildClientConfig() {
@@ -112,17 +110,19 @@ public class RedisConfig {
         };
     }
 
-    public RedisConnectionFactory evaluateConnection(JedisConnectionFactory connFactory) {
-        connFactory.start();
-        try (RedisConnection connection = connFactory.getConnection()) {
-            if (pingCache(connection)) {
-                String connectionId = "nextfin-cache-" + UUID.randomUUID();
-                connection.serverCommands().setClientName(connectionId.getBytes(StandardCharsets.UTF_8));
-                log.debug("Connection with Cache client established: {}", connection.serverCommands().getClientName());
+    public RedisConnectionFactory evaluateConnection(RedisConnectionFactory connFactory) {
+        ((JedisConnectionFactory) connFactory).start();
+        try (RedisConnection conn = connFactory.getConnection()) {
+            if (pingCache(conn)) {
+                String connId = "nextfin-cache-" + UUID.randomUUID();
+                conn.serverCommands().setClientName(connId.getBytes(StandardCharsets.UTF_8));
+                log.debug("Connection with Cache client established: {}", conn.serverCommands().getClientName());
                 isCachingEnabled.set(true);
-                return connFactory;
             }
             log.error("Connection could not be established: unexpected response");
+        } catch (RedisConnectionFailureException e) { // only catches connection failures
+            log.error(e.getMessage());
+            isCachingEnabled.set(false);
         } catch (Exception e) {
             log.error("Connection with Cache Client failed: {}", e.getMessage());
         }
@@ -137,14 +137,17 @@ public class RedisConfig {
     @Scheduled(fixedRate = 30000)  // Re-check connection every 30 seconds
     public void reEvaluateConnection() {
         try {
-            if (!pingCache(connection)) {
-                isCachingEnabled.set(false);
+            // no connection established in the first place, re-get the connection and try again 
+            if (!pingCache(connFactory.getConnection())) {
+                isCachingEnabled.set(false); // failed to get connection
+                return;
             }
+            // connection successful, check for previous unsuccessful attempts and re-enable the flag
             if (!isCachingEnabled()) {
                 isCachingEnabled.set(true);
                 log.debug("Cache connection re-established");
             }
-        } catch (RedisConnectionFailureException e) {
+        } catch (RedisConnectionFailureException e) { // only catches connection failures
             log.error(e.getMessage());
             isCachingEnabled.set(false);
         } catch (Exception e) {  // only catches unhandled exceptions
