@@ -28,6 +28,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @DynamicUpdate
+@ToString(exclude = "holder")
 public class User extends Auditable implements NextfinUserDetails {
 	
 	@Id

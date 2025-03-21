@@ -27,17 +27,16 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -114,12 +113,24 @@ public class CoreTransactionServiceImpl implements TransactionService {
                 return transactionRepository.findByTargetAccount(account, pageRequest);
             }
             case OUTGOING -> {
-                return transactionRepository.findBySourceAccount(account, pageRequest);
+                //Attempt to fetch recents from cache,
+                // with repository fallback if page size is bigger than cache size / page skip is provided.
+                List<Transaction> recents = fetchRecentsFromCache(options);
+                return recents.isEmpty() ? transactionRepository.findBySourceAccount(account, pageRequest) : new PageImpl<>(
+                        
+                        recents);
             }
             default -> {
                 return transactionRepository.findBySourceAccountOrTargetAccount(account, account, pageRequest);
             }
         }
+    }
+
+    private List<Transaction> fetchRecentsFromCache(GetTransactionOptions options) {
+        Set<String> recents = cache.fetchCacheRecents();
+        if (options.getPageSize() > recents.size() || options.getSkip() > 0) return List.of();
+        return recents.stream().map(recent -> cache.fetchFromCache(UUID.fromString(recent))).flatMap(Optional::stream).sorted(
+                Comparator.comparing(Transaction::getCreatedAt)).limit(options.getPageSize()).collect(Collectors.toList());
     }
 
     public List<Transaction> getLatestSourceAccountTransactionsByDate(Account sourceAccount, Instant instant) {
