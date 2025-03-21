@@ -9,7 +9,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,8 +24,6 @@ public class TransactionController {
     private final TransactionService transactionService;
 
     private final TransactionMapper transactionMapper;
-
-    private final MessageSource messageSource;
 
     @PostMapping("/initiate")
     @Operation(summary = "Initiates a transaction from a source account to a target account",

@@ -60,12 +60,14 @@ public class AccountController {
     }
 
     @GetMapping("")
-    @Operation(summary = "Gets accounts", description = "Method for fetching all of the currently authenticated " +
-            "user's accounts")
+    @Operation(summary = "Gets accounts", description = "Method for fetching all of the currently authenticated " + "user's accounts")
     public ResponseEntity<GetMyAccountsResponseDto> getMyAccounts(@RequestParam(name = "type", required = false) AccountType type) {
         List<Account> accounts = holderService.getAccounts(type);
-        return new ResponseEntity<>(new GetMyAccountsResponseDto(accounts, messageSource.getMessage("account" +
-                ".get-accounts-success", new Integer[]{accounts.size()}, LocaleContextHolder.getLocale())), HttpStatus.OK);
+        return new ResponseEntity<>(new GetMyAccountsResponseDto(accounts,
+                                                                 messageSource.getMessage("account" + ".get-accounts-success",
+                                                                                          new Integer[]{accounts.size()},
+                                                                                          LocaleContextHolder.getLocale())),
+                                    HttpStatus.OK);
     }
 
     @PostMapping("/{id}/deposit")
@@ -86,17 +88,15 @@ public class AccountController {
     public ResponseEntity<WithdrawAmountResponseDto> withdrawAmount(@PathVariable @NotNull Long id, @Valid @RequestBody WithdrawAmountRequestDto dto) {
         BigDecimal updatedBalance = accountService.withdrawAmount(id, dto);
         return new ResponseEntity<>(new WithdrawAmountResponseDto(updatedBalance,
-                                                                  messageSource.getMessage(
-                                                                          "account.withdraw.success",
-                                                                          null,
-                                                                          LocaleContextHolder.getLocale())),
+                                                                  messageSource.getMessage("account.withdraw.success",
+                                                                                           null,
+                                                                                           LocaleContextHolder.getLocale())),
                                     HttpStatus.OK);
     }
 
     @GetMapping("/{id}/balance")
     @Operation(summary = "Gets account balance", description = "Method for fetching current account balance")
-    public ResponseEntity<AccountBalanceResponseDto> checkBalance(@PathVariable @Min(value = 0L, message = "The value" +
-            " must be positive") Long id) {
+    public ResponseEntity<AccountBalanceResponseDto> checkBalance(@PathVariable @Min(value = 0L, message = "The value" + " must be positive") Long id) {
         GetAccountBalanceDto dto = accountService.checkBalance(id);
         String message = messageSource.getMessage("account.balance.check",
                                                   new String[]{dto.balance().toString(), dto.currency().getSymbol()},
@@ -108,12 +108,10 @@ public class AccountController {
     @GetMapping("/{id}/transactions")
     @Operation(summary = "Gets recent transactions of the account")
     @PreAuthorize("@accountSecurityServiceImpl.isAccountOwner(#id)")
-    public ResponseEntity<Page<TransactionDetailsDto>> getTransactions(@PathVariable @NotNull Long id,
-                                                                       @Valid GetTransactionOptions options) {
+    public ResponseEntity<Page<TransactionDetailsDto>> getTransactions(@PathVariable @NotNull Long id, @Valid GetTransactionOptions options) {
         Account account = accountService.getAccount(id);
         Page<Transaction> filteredTransactions = transactionService.getAccountTransactions(account, options);
-        Page<TransactionDetailsDto> filteredTrnDetails = filteredTransactions.map(
-                transactionMapper::toTransactionDetails);
+        Page<TransactionDetailsDto> filteredTrnDetails = filteredTransactions.map(transactionMapper::toTransactionDetails);
         return new ResponseEntity<>(filteredTrnDetails, HttpStatus.OK);
     }
 
@@ -157,8 +155,8 @@ public class AccountController {
         Account account = accountService.getAccount(id);
         Boolean enabled = accountService.toggleTransactionSMSConfirmation(account);
         String message = messageSource.getMessage("account.transaction.sms-confirmation.toggle",
-                new String[]{enabled ? "enabled" : "disabled"},
-                LocaleContextHolder.getLocale());
+                                                  new String[]{enabled ? "enabled" : "disabled"},
+                                                  LocaleContextHolder.getLocale());
         return new ResponseEntity<>(new ToggleTransactionSMSConfirmationDto(enabled, message), HttpStatus.OK);
     }
 

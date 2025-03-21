@@ -118,8 +118,7 @@ public class RedisConfig {
                 conn.serverCommands().setClientName(connId.getBytes(StandardCharsets.UTF_8));
                 log.debug("Connection with Cache client established: {}", conn.serverCommands().getClientName());
                 isCachingEnabled.set(true);
-            }
-            log.error("Connection could not be established: unexpected response");
+            } else log.error("Connection could not be established: unexpected response");
         } catch (RedisConnectionFailureException e) { // only catches connection failures
             log.error(e.getMessage());
             isCachingEnabled.set(false);
