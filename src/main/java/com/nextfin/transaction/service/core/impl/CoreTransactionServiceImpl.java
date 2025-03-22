@@ -121,7 +121,12 @@ public class CoreTransactionServiceImpl implements TransactionService {
                         recents);
             }
             default -> {
-                return transactionRepository.findBySourceAccountOrTargetAccount(account, account, pageRequest);
+                List<Transaction> targets = transactionRepository.findByTargetAccount(account, pageRequest).getContent();
+                List<Transaction> recents = fetchRecentsFromCache(options);
+                if (recents.isEmpty()) return transactionRepository.findBySourceAccountOrTargetAccount(account, account,
+                                                                                                       pageRequest);
+                recents.addAll(targets);
+                return new PageImpl<>(recents);
             }
         }
     }
