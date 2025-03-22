@@ -13,6 +13,7 @@ import com.nextfin.holder.entity.Holder;
 import com.nextfin.holder.repository.HolderRepository;
 import com.nextfin.holder.service.HolderService;
 import com.nextfin.users.entity.User;
+import com.nextfin.users.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -34,6 +35,7 @@ public class HolderServiceImpl implements HolderService {
     private final HolderMapper mapper;
 
     private final MessageSource messageSource;
+    private final UserRepository userRepository;
 
     @Override
     public Holder createHolder(CreateHolderDto dto, User user) {
@@ -52,7 +54,10 @@ public class HolderServiceImpl implements HolderService {
         Holder holder = mapper.createHolderDtoToHolder(dto);
         holder.setAddress(address);
         holder.setUser(user);
-        return holderRepository.save(holder);
+        user.setHolder(holder);
+        holder = holderRepository.save(holder);
+        userRepository.save(user);
+        return holder;
     }
 
     @Override

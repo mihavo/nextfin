@@ -36,6 +36,7 @@ import java.util.List;
 public class AccountController {
 
     private final AccountService accountService;
+    private final AccountMapper accountMapper;
     private final TransactionService transactionService;
     private final MessageSource messageSource;
     private final HolderService holderService;
@@ -45,9 +46,8 @@ public class AccountController {
     @Operation(summary = "Account initialization", description = "Method for creating accounts for non-employees i.e. holders")
     public ResponseEntity<CreateAccountResponseDto> createAccount(@Valid @RequestBody CreateAccountRequestDto dto) {
         Account account = accountService.createAccount(dto);
-        CreateAccountResponseDto responseDto = new CreateAccountResponseDto(account.getId(),
-                                                                            "Your account has been created successfully");
-        return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
+        CreateAccountResponseDto response = accountMapper.toCreateAccountResponseDto(account);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")

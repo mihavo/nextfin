@@ -60,8 +60,7 @@ public class AccountServiceImpl implements AccountService {
     public Account createAccount(CreateAccountRequestDto dto) {
         User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (currentUser.getHolder() == null) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
-                                              messageSource.getMessage("account.holder.forbidden", null,
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, messageSource.getMessage("account.holder.not-found", null,
                                                                        LocaleContextHolder.getLocale()));
         }
         Employee manager = employeeService.getEmployeeById(dto.managerId);

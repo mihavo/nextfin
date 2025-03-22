@@ -53,6 +53,7 @@ public class Holder extends Auditable implements Serializable {
 
     @OneToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @JsonIgnore
     private User user;
 
     public String getFullName() {
