@@ -9,10 +9,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -26,8 +24,6 @@ public class TransactionController {
     private final TransactionService transactionService;
 
     private final TransactionMapper transactionMapper;
-
-    private final MessageSource messageSource;
 
     @PostMapping("/initiate")
     @Operation(summary = "Initiates a transaction from a source account to a target account",
@@ -51,15 +47,14 @@ public class TransactionController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Fetches a transaction by its ID")
-    @PreAuthorize("@coreTransactionServiceImpl.isTransactionRelated(#id)")
-    public ResponseEntity<Transaction> getTransaction(@PathVariable UUID id) {
+    public ResponseEntity<TransactionDetailsDto> getTransaction(@PathVariable UUID id) {
         Transaction transaction = transactionService.getTransaction(id);
-        return new ResponseEntity<>(transaction, HttpStatus.OK);
+        TransactionDetailsDto response = transactionMapper.toTransactionDetails(transaction);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping("/{id}/status")
     @Operation(summary = "Checks the status of a Transaction")
-    @PreAuthorize("@coreTransactionServiceImpl.isTransactionRelated(#id)")
     public ResponseEntity<TransactionStatus> checkStatus(@PathVariable UUID id) {
         TransactionStatus transactionStatus = transactionService.checkStatus(id);
         return new ResponseEntity<>(transactionStatus, HttpStatus.OK);

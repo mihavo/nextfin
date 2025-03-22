@@ -37,13 +37,9 @@ public class EmployeeController {
     @Operation(summary = "Creates a bank employee")
     public ResponseEntity<CreateEmployeeResponseDto> createEmployee(@Valid @RequestBody CreateEmployeeRequestDto requestDto) {
         Employee employee = employeeService.createEmployee(requestDto);
-        CreateEmployeeResponseDto employeeResponse = employeeMapper.toCreateEmployeeResponseDto(employee);
-        String successMessage = messageSource.getMessage("employee.create.success",
-                                                         null,
-                                                         LocaleContextHolder.getLocale());
-
-        return new ResponseEntity<>(employeeResponse,
-                                    HttpStatus.CREATED);
+        String message = messageSource.getMessage("employee.create.success", null, LocaleContextHolder.getLocale());
+        CreateEmployeeResponseDto employeeResponse = employeeMapper.toCreateEmployeeResponseDto(employee, message);
+        return new ResponseEntity<>(employeeResponse, HttpStatus.CREATED);
     }
 
     /**
