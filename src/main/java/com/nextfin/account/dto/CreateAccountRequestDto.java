@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
 import com.nextfin.AppConstants;
 import com.nextfin.account.enums.AccountType;
-import com.nextfin.holder.entity.Holder;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
@@ -13,19 +12,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.extern.jackson.Jacksonized;
 
-import java.util.UUID;
-
 @Data
 @Builder
 @Jacksonized
 public class CreateAccountRequestDto {
-
-    /**
-     * Represents the id of the {@link Holder Account Holder}
-     */
-    @NotNull
-    public UUID holderId;
-
     /**
      * Represents the id of the Manager
      */

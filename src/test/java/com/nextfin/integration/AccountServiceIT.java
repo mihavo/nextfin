@@ -8,14 +8,16 @@ import com.nextfin.account.service.core.AccountService;
 import com.nextfin.employee.entity.Employee;
 import com.nextfin.employee.repository.EmployeeRepository;
 import com.nextfin.exceptions.exception.NotFoundException;
-import com.nextfin.holder.entity.Holder;
 import com.nextfin.holder.repository.HolderRepository;
+import com.nextfin.integration.utils.WithMockNextfinUser;
+import com.nextfin.users.entity.User;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
-import org.springframework.security.test.context.support.WithUserDetails;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -46,6 +48,8 @@ public class AccountServiceIT {
     @Container
     @ServiceConnection
     static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16-alpine");
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     @BeforeAll
     static void beforeAll() {
@@ -70,6 +74,7 @@ public class AccountServiceIT {
     @AfterEach
     public void tearDown() {
         accountRepository.deleteById(1L);
+        jdbcTemplate.execute("ALTER SEQUENCE accounts_seq RESTART WITH 1");
     }
 
     @Test
@@ -87,34 +92,17 @@ public class AccountServiceIT {
     }
 
     @Test
-    @WithUserDetails(userDetailsServiceBeanName = "userServiceImpl")
+    @WithMockNextfinUser
     public void shouldCreateAccount() {
-        LocalDate localDate = Instant.now()
-                                     .atZone(ZoneId.systemDefault())
-                                     .toLocalDate();
-        Holder holder = Holder.builder()
-                              .firstName("John")
-                              .lastName("Doe")
-                              .dateOfBirth(localDate)
-                              .phoneNumber("1234567890")
-                              .build();
-        Employee manager = Employee.builder()
-                                   .firstName("Jane")
-                                   .lastName("Smith")
-                                   .dateOfBirth(localDate)
-                                   .phoneNumber("0987654321")
+        LocalDate localDate = Instant.now().atZone(ZoneId.systemDefault()).toLocalDate();
+        Employee manager = Employee.builder().firstName("Jane").lastName("Smith").dateOfBirth(localDate).phoneNumber("0987654321")
                                    .build();
-        holder = holderRepository.save(holder);
         manager = employeeRepository.save(manager);
-        CreateAccountRequestDto dto =
-                CreateAccountRequestDto.builder()
-                                       .holderId(holder.getId())
-                                       .managerId(manager.getId())
-                                       .build();
+        CreateAccountRequestDto dto = CreateAccountRequestDto.builder().managerId(manager.getId()).build();
+        holderRepository.save(((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getHolder());
         Account account = sut.createAccount(dto);
         assertNotNull(account);
         assertEquals(AccountType.SAVINGS, account.getAccountType());
-        assertEquals(holder.getId(), account.getHolder().getId());
         assertEquals(manager.getId(), account.getManager().getId());
         assertEquals(Currency.getInstance("EUR"), account.getCurrency());
     }

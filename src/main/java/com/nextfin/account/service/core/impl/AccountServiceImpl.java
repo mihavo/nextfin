@@ -58,9 +58,8 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Account createAccount(CreateAccountRequestDto dto) {
-        Holder holder = holderService.getHolderById(dto.holderId);
         User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (currentUser.getHolder() == null || !currentUser.getHolder().getId().equals(dto.getHolderId())) {
+        if (currentUser.getHolder() == null) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN,
                                               messageSource.getMessage("account.holder.forbidden", null,
                                                                        LocaleContextHolder.getLocale()));
@@ -68,8 +67,7 @@ public class AccountServiceImpl implements AccountService {
         Employee manager = employeeService.getEmployeeById(dto.managerId);
         Account account = Account.builder()
                                  .balance(BigDecimal.ZERO)
-                                 .status(AccountStatus.ACTIVE)
-                                 .holder(holder)
+                                 .status(AccountStatus.ACTIVE).holder(currentUser.getHolder())
                                  .manager(manager)
                                  .accountType(dto.accountType)
                                  .currency(Currency.getInstance(dto.currencyCode))

@@ -1,6 +1,7 @@
 package com.nextfin.users.service.impl;
 
 import com.nextfin.exceptions.exception.BadRequestException;
+import com.nextfin.exceptions.exception.ForbiddenException;
 import com.nextfin.exceptions.exception.UserNotFoundException;
 import com.nextfin.users.dto.CreateUserDto;
 import com.nextfin.users.dto.UserMapper;
@@ -59,9 +60,7 @@ public class UserServiceImpl implements UserService {
 	public User getCurrentUser() throws UserNotFoundException {
 		User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		if (currentUser == null) {
-			throw new UserNotFoundException(messageSource.getMessage("user.not-found",
-																	 new String[]{"current user"},
-																	 LocaleContextHolder.getLocale()));
+			throw new ForbiddenException();
 		}
 		return currentUser;
 	}
@@ -69,9 +68,8 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public UserDetails loadUserById(UUID id) throws UserNotFoundException {
 		return userRepository.findById(id)
-							 .orElseThrow(() -> new UserNotFoundException(messageSource.getMessage(
-									 "user.not-found",
-									 new String[]{"current user"},
+							 .orElseThrow(() -> new UserNotFoundException(messageSource.getMessage("user.not-found-by-id",
+																								   new String[]{id.toString()},
 									 LocaleContextHolder.getLocale())));
 	}
 
@@ -79,8 +77,7 @@ public class UserServiceImpl implements UserService {
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		return userRepository.findByUsername(username)
 							 .orElseThrow(() -> new UserNotFoundException(messageSource.getMessage(
-									 "user.not-found",
-									 new String[]{"current user"},
+									 "user.not-found", new String[]{username},
 									 LocaleContextHolder.getLocale())));
 	}
 }
