@@ -4,9 +4,7 @@ import com.nextfin.account.entity.Account;
 import com.nextfin.account.service.core.AccountService;
 import com.nextfin.exceptions.exception.CannotCacheException;
 import com.nextfin.exceptions.exception.Disabled2FAException;
-import com.nextfin.exceptions.exception.NotFoundException;
 import com.nextfin.exceptions.exception.UserNotFoundException;
-import com.nextfin.messaging.transaction.service.TransactionConfirmationService;
 import com.nextfin.transaction.dto.*;
 import com.nextfin.transaction.entity.Transaction;
 import com.nextfin.transaction.enums.TransactionStatus;
@@ -14,10 +12,12 @@ import com.nextfin.transaction.enums.TransactionType;
 import com.nextfin.transaction.repository.TransactionRepository;
 import com.nextfin.transaction.scheduler.TransactionScheduler;
 import com.nextfin.transaction.service.cache.TransactionCacheService;
+import com.nextfin.transaction.service.confirmation.ConfirmationService;
 import com.nextfin.transaction.service.core.TransactionService;
 import com.nextfin.transaction.service.processor.TransactionProcessor;
 import com.nextfin.transaction.service.security.MFATransactionService;
 import com.nextfin.transaction.service.security.TransactionSecurityService;
+import com.nextfin.transaction.service.utils.TransactionUtils;
 import com.nextfin.transaction.service.validator.TransactionValidator;
 import com.nextfin.users.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +35,6 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -46,6 +45,8 @@ public class CoreTransactionServiceImpl implements TransactionService {
     private final TransactionRepository transactionRepository;
 
     private final TransactionProcessor transactionProcessor;
+
+    private final TransactionUtils transactionUtils;
 
     private final TransactionCacheService cache;
 
@@ -60,7 +61,7 @@ public class CoreTransactionServiceImpl implements TransactionService {
 
     private final AccountService accountService;
 
-    private final TransactionConfirmationService confirmationService;
+    private final ConfirmationService confirmationService;
 
     private final MessageSource messageSource;
 
@@ -92,7 +93,7 @@ public class CoreTransactionServiceImpl implements TransactionService {
                 id -> id.equals(transactionId.toString())).findAny().flatMap(
                 id -> cache.fetchFromCache(transactionId)).orElseGet(
                 () -> transactionRepository.findById(transactionId).orElseThrow(
-                        getNotFoundExceptionSupplier(transactionId)));
+                        transactionUtils.getNotFoundExceptionSupplier(transactionId)));
         security.evaluatePermissions(transaction);
         return transaction;
     }
@@ -117,7 +118,6 @@ public class CoreTransactionServiceImpl implements TransactionService {
                 // with repository fallback if page size is bigger than cache size / page skip is provided.
                 List<Transaction> recents = fetchRecentsFromCache(options);
                 return recents.isEmpty() ? transactionRepository.findBySourceAccount(account, pageRequest) : new PageImpl<>(
-                        
                         recents);
             }
             default -> {
@@ -143,7 +143,7 @@ public class CoreTransactionServiceImpl implements TransactionService {
         Transaction transaction = getTransaction(dto.transactionId());
         Account sourceAccount = transaction.getSourceAccount();
         String sourcePhone = sourceAccount.getHolder().getUser().getPreferredPhoneNumber();
-        if (!check2fa(sourceAccount)) {
+        if (!transactionUtils.check2fa(sourceAccount)) {
             throw new Disabled2FAException("Attempted transaction confirmation on disabled 2FA config.");
         }
         mfaTransactionService.get().validateOTP(sourcePhone, dto.otp());
@@ -195,21 +195,16 @@ public class CoreTransactionServiceImpl implements TransactionService {
 
     @NotNull
     private TransactionResponse finalizeTransaction(Transaction transaction, Transaction processedTransaction) {
-        handleConfirmation(transaction.getSourceAccount(), processedTransaction);
+        confirmationService.handleConfirmation(transaction.getSourceAccount(), processedTransaction);
         return new TransactionResultDto(processedTransaction, messageSource.getMessage("transaction.transfer.processed",
                                                                                        new UUID[]{transaction.getId()},
                                                                                        LocaleContextHolder.getLocale()));
     }
 
 
-    private @NotNull Supplier<NotFoundException> getNotFoundExceptionSupplier(UUID transactionId) {
-        return () -> new NotFoundException(messageSource.getMessage("transaction.notfound", new UUID[]{transactionId},
-                                                                    LocaleContextHolder.getLocale()));
-    }
-
     @SuppressWarnings("OptionalGetWithoutIsPresent")
     private TransactionResponse handleTransaction(Transaction transaction) {
-        if (check2fa(transaction.getSourceAccount())) {
+        if (transactionUtils.check2fa(transaction.getSourceAccount())) {
             mfaTransactionService.get().sendOTP(transaction);
             return new TransactionResultDto(transaction, messageSource.getMessage(
                     "transaction.transfer" + ".awaiting" + "-validation", new UUID[]{transaction.getId()},
@@ -221,7 +216,7 @@ public class CoreTransactionServiceImpl implements TransactionService {
 
     @SuppressWarnings("OptionalGetWithoutIsPresent")
     private ScheduledTransactionDto handleScheduledTransaction(Transaction transaction) {
-        if (check2fa(transaction.getSourceAccount())) {
+        if (transactionUtils.check2fa(transaction.getSourceAccount())) {
             mfaTransactionService.get().sendOTP(transaction);
             return ScheduledTransactionDto.builder().transaction(transaction).message(messageSource.getMessage(
                     "transaction.transfer.awaiting-validation",
@@ -231,15 +226,5 @@ public class CoreTransactionServiceImpl implements TransactionService {
         return scheduleTransaction(transaction);
     }
 
-    private void handleConfirmation(Account sourceAccount, Transaction processedTransaction) {
-        if (check2fa(sourceAccount)) {
-            String initiator = sourceAccount.getHolder().getUser().getPreferredPhoneNumber();
-            confirmationService.sendSMS(initiator, processedTransaction);
-        }
-    }
-
-    private boolean check2fa(Account sourceAccount) {
-        return mfaTransactionService.isPresent() && sourceAccount.getTransaction2FAEnabled();
-    }
 
 }
