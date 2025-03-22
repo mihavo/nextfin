@@ -71,7 +71,7 @@ public class TestRedisService {
 
     @Test
     public void getOrFetch_cacheHit_returnsValue() {
-        try (MockedStatic<RedisConfig> redisConfig = configureCachingEnabled(true)) {
+        try (MockedStatic<RedisConfig> ignored = configureCachingEnabled(true)) {
             when(valueOperations.get("key")).thenReturn("cachedValue");
             Supplier<String> supplier = mock(Supplier.class);
             Optional<String> result = cacheService.getOrFetch("key", String.class, supplier);
@@ -87,7 +87,7 @@ public class TestRedisService {
 
     @Test
     public void getOrFetch_cacheMiss_returnsValue() {
-        try (MockedStatic<RedisConfig> redisConfig = configureCachingEnabled(true)) {
+        try (MockedStatic<RedisConfig> ignored = configureCachingEnabled(true)) {
             when(valueOperations.get("key")).thenReturn(null);
             Supplier<String> supplier = () -> "fetched value";
             Optional<String> result = cacheService.getOrFetch("key", String.class, supplier);
@@ -101,7 +101,7 @@ public class TestRedisService {
 
     @Test
     public void getOrFetchHashField_cacheHit_returnsValue() {
-        try (MockedStatic<RedisConfig> redisConfig = configureCachingEnabled(true)) {
+        try (MockedStatic<RedisConfig> ignored = configureCachingEnabled(true)) {
             when(hashOperations.get("key", "field")).thenReturn("cachedValue");
             Supplier<String> supplier = mock(Supplier.class);
             Optional<String> result = cacheService.getOrFetchHashField("key", "field", String.class, supplier);
@@ -115,7 +115,7 @@ public class TestRedisService {
 
     @Test
     public void get_cachingEnabled_returnsValue() {
-        try (MockedStatic<RedisConfig> redisConfig = configureCachingEnabled(true)) {
+        try (MockedStatic<RedisConfig> ignored = configureCachingEnabled(true)) {
             when(valueOperations.get("key")).thenReturn("cachedValue");
             Optional<String> result = cacheService.get("key", String.class);
             Assertions.assertTrue(result.isPresent());
@@ -127,7 +127,7 @@ public class TestRedisService {
 
     @Test
     public void set_withTimeout_cachingEnabled_setsValue() {
-        try (MockedStatic<RedisConfig> redisConfig = configureCachingEnabled(true)) {
+        try (MockedStatic<RedisConfig> ignored = configureCachingEnabled(true)) {
             cacheService.set("key", "value", 5, TimeUnit.HOURS);
             verify(valueOperations).set("key", "value", 5, TimeUnit.HOURS);
             verifyNoMoreInteractions(valueOperations);
@@ -136,7 +136,7 @@ public class TestRedisService {
 
     @Test
     public void set_defaultTimeout_cachingEnabled_setsValue() {
-        try (MockedStatic<RedisConfig> redisConfig = configureCachingEnabled(true)) {
+        try (MockedStatic<RedisConfig> ignored = configureCachingEnabled(true)) {
             cacheService.set("key", "value");
             verify(valueOperations).set("key", "value", DEFAULT_TIMEOUT, DEFAULT_TIME_UNIT);
         }
@@ -144,7 +144,7 @@ public class TestRedisService {
 
     @Test
     public void getHashField_cachingEnabled_returnsValue() {
-        try (MockedStatic<RedisConfig> redisConfig = configureCachingEnabled(true)) {
+        try (MockedStatic<RedisConfig> ignored = configureCachingEnabled(true)) {
             when(hashOperations.get("hashKey", "field")).thenReturn("hashValue");
 
             Optional<String> result = cacheService.getHashField("hashKey", "field", String.class);
@@ -158,7 +158,7 @@ public class TestRedisService {
 
     @Test
     public void setHashField_withTimeout_cachingEnabled_setsValue() {
-        try (MockedStatic<RedisConfig> redisConfig = configureCachingEnabled(true)) {
+        try (MockedStatic<RedisConfig> ignored = configureCachingEnabled(true)) {
             cacheService.setHashField("hashKey", "field", "value", 1, TimeUnit.DAYS);
 
             verify(hashOperations).put("hashKey", "field", "value");
@@ -169,7 +169,7 @@ public class TestRedisService {
 
     @Test
     public void setHashField_defaultTimeout_cachingEnabled_setsValue() {
-        try (MockedStatic<RedisConfig> redisConfig = configureCachingEnabled(true)) {
+        try (MockedStatic<RedisConfig> ignored = configureCachingEnabled(true)) {
             cacheService.setHashField("hashKey", "field", "value");
 
             verify(hashOperations).put("hashKey", "field", "value");
@@ -180,7 +180,7 @@ public class TestRedisService {
 
     @Test
     public void delete_cachingEnabled_deletesKey() {
-        try (MockedStatic<RedisConfig> redisConfig = configureCachingEnabled(true)) {
+        try (MockedStatic<RedisConfig> ignored = configureCachingEnabled(true)) {
             cacheService.deleteKey("key");
             verify(hashOperations).delete("key");
             verifyNoMoreInteractions(hashOperations);
@@ -189,7 +189,7 @@ public class TestRedisService {
 
     @Test
     public void getFromSortedSet_cachingEnabled_returnsValues() {
-        try (MockedStatic<RedisConfig> redisConfig = configureCachingEnabled(true)) {
+        try (MockedStatic<RedisConfig> ignored = configureCachingEnabled(true)) {
             Set<String> expected = Set.of("txn1", "txn2", "txn3");
             when(stringRedisTemplate.opsForZSet().reverseRange("transactions:account1", 0, 2)).thenReturn(expected);
 
@@ -204,7 +204,7 @@ public class TestRedisService {
 
     @Test
     public void addToSortedSet_cachingEnabled_addsMember() {
-        try (MockedStatic<RedisConfig> redisConfig = configureCachingEnabled(true)) {
+        try (MockedStatic<RedisConfig> ignored = configureCachingEnabled(true)) {
             when(stringRedisTemplate.opsForZSet().addIfAbsent("transactions:account1", "txn4", 10.0)).thenReturn(true);
 
             cacheService.addToSortedSet("transactions:account1", "txn4", 10.0);
@@ -216,7 +216,7 @@ public class TestRedisService {
 
     @Test
     public void deleteFromSortedSet_cachingEnabled_deletesMembers() {
-        try (MockedStatic<RedisConfig> redisConfig = configureCachingEnabled(true)) {
+        try (MockedStatic<RedisConfig> ignored = configureCachingEnabled(true)) {
             cacheService.deleteFromSortedSet("transactions:account1", "txn1", "txn2");
             verify(stringRedisTemplate.opsForZSet()).remove("transactions:account1", "txn1", "txn2");
             verifyNoMoreInteractions(zSetOperations);
@@ -227,7 +227,7 @@ public class TestRedisService {
 
     @Test
     public void getOrFetch_cachingDisabled_throwsException() {
-        try (MockedStatic<RedisConfig> redisConfig = configureCachingEnabled(false)) {
+        try (MockedStatic<RedisConfig> ignored = configureCachingEnabled(false)) {
             Supplier<String> supplier = mock(Supplier.class);
             Optional<String> result = cacheService.getOrFetch("key", String.class, supplier);
 
@@ -238,7 +238,7 @@ public class TestRedisService {
 
     @Test
     public void get_cachingDisabled_throwsException() {
-        try (MockedStatic<RedisConfig> redisConfig = configureCachingEnabled(false)) {
+        try (MockedStatic<RedisConfig> ignored = configureCachingEnabled(false)) {
             Optional<String> result = cacheService.get("key", String.class);
 
             Assertions.assertTrue(result.isEmpty());
@@ -248,7 +248,7 @@ public class TestRedisService {
 
     @Test
     public void set_withTimeout_cachingDisabled_throwsException() {
-        try (MockedStatic<RedisConfig> redisConfig = configureCachingEnabled(false)) {
+        try (MockedStatic<RedisConfig> ignored = configureCachingEnabled(false)) {
             assertThrows(CacheDisabledException.class, () -> cacheService.set("key", "value", 5, TimeUnit.HOURS));
             verifyNoMoreInteractions(redisTemplate);
         }
@@ -256,7 +256,7 @@ public class TestRedisService {
 
     @Test
     public void set_defaultTimeout_cachingDisabled_throwsException() {
-        try (MockedStatic<RedisConfig> redisConfig = configureCachingEnabled(false)) {
+        try (MockedStatic<RedisConfig> ignored = configureCachingEnabled(false)) {
             assertThrows(CacheDisabledException.class, () -> cacheService.set("key", "value"));
             verifyNoMoreInteractions(redisTemplate);
         }
@@ -264,7 +264,7 @@ public class TestRedisService {
 
     @Test
     public void getHashField_cachingDisabled_throwsException() {
-        try (MockedStatic<RedisConfig> redisConfig = configureCachingEnabled(false)) {
+        try (MockedStatic<RedisConfig> ignored = configureCachingEnabled(false)) {
             Optional<String> result = cacheService.getHashField("hashKey", "field", String.class);
 
             Assertions.assertTrue(result.isEmpty());
@@ -274,7 +274,7 @@ public class TestRedisService {
 
     @Test
     public void setHashField_withTimeout_cachingDisabled_throwsException() {
-        try (MockedStatic<RedisConfig> redisConfig = configureCachingEnabled(false)) {
+        try (MockedStatic<RedisConfig> ignored = configureCachingEnabled(false)) {
             assertThrows(CacheDisabledException.class,
                          () -> cacheService.setHashField("hashKey", "field", "value", 1, TimeUnit.DAYS));
 
@@ -284,7 +284,7 @@ public class TestRedisService {
 
     @Test
     public void setHashField_defaultTimeout_cachingDisabled_throwsException() {
-        try (MockedStatic<RedisConfig> redisConfig = configureCachingEnabled(false)) {
+        try (MockedStatic<RedisConfig> ignored = configureCachingEnabled(false)) {
             assertThrows(CacheDisabledException.class, () -> cacheService.setHashField("hashKey", "field", "value"));
 
             verifyNoMoreInteractions(redisTemplate);
@@ -293,7 +293,7 @@ public class TestRedisService {
 
     @Test
     public void delete_cachingDisabled_throwsException() {
-        try (MockedStatic<RedisConfig> redisConfig = configureCachingEnabled(false)) {
+        try (MockedStatic<RedisConfig> ignored = configureCachingEnabled(false)) {
             assertThrows(CacheDisabledException.class, () -> cacheService.deleteKey("key"));
 
             verifyNoMoreInteractions(redisTemplate);
@@ -302,7 +302,7 @@ public class TestRedisService {
 
     @Test
     public void getFromSortedSet_cachingDisabled_returnsEmptySet() {
-        try (MockedStatic<RedisConfig> redisConfig = configureCachingEnabled(false)) {
+        try (MockedStatic<RedisConfig> ignored = configureCachingEnabled(false)) {
             Set<String> result = cacheService.getFromSortedSet("transactions:account1", 1, 3);
 
             Assertions.assertTrue(result.isEmpty());
@@ -312,7 +312,7 @@ public class TestRedisService {
 
     @Test
     public void addToSortedSet_cachingDisabled_throwsCacheDisabledException() {
-        try (MockedStatic<RedisConfig> redisConfig = configureCachingEnabled(false)) {
+        try (MockedStatic<RedisConfig> ignored = configureCachingEnabled(false)) {
             Assertions.assertThrows(CacheDisabledException.class,
                                     () -> cacheService.addToSortedSet("transactions:account1", "txn4", 10.0));
             verifyNoMoreInteractions(stringRedisTemplate);
@@ -321,7 +321,7 @@ public class TestRedisService {
 
     @Test
     public void deleteFromSortedSet_cachingDisabled_throwsCacheDisabledException() {
-        try (MockedStatic<RedisConfig> redisConfig = configureCachingEnabled(false)) {
+        try (MockedStatic<RedisConfig> ignored = configureCachingEnabled(false)) {
             Assertions.assertThrows(CacheDisabledException.class,
                                     () -> cacheService.deleteFromSortedSet("transactions:account1", "txn1", "txn2"));
 
