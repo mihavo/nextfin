@@ -43,6 +43,8 @@ It offers a suite of features that enable seamless financial management and tran
 - 📊 Portfolio Management – Tools for overseeing and managing investment portfolios.
 - 🏦 Account Services – Access account details, balances, and transaction histories.
 - 🔔 Real-Time Notifications – Stay updated with instant alerts on account activities.
+- ⚙️ Standalone Executor Service - Execute transaction independently of the core app
+  with <a href="https://github.com/mihavo/nextfin-executor" alt="Nextfin Executor">Nextfin Executor</a>
 
 ## 🚀 Quick Start
 
