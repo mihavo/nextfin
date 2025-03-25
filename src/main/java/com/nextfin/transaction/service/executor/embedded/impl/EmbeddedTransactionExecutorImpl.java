@@ -28,7 +28,7 @@ import java.util.Currency;
 @Transactional(isolation = Isolation.READ_COMMITTED)
 @RequiredArgsConstructor(onConstructor_ = {@Lazy})
 @EnableConfigurationProperties(TransactionProperties.class)
-@ConditionalOnProperty(name = "nextfin.embedded-executor", value = "true", matchIfMissing = true)
+@ConditionalOnProperty(name = "nextfin.embedded-executor", havingValue = "true", matchIfMissing = true)
 @Slf4j
 public class EmbeddedTransactionExecutorImpl implements EmbeddedTransactionExecutor {
 
