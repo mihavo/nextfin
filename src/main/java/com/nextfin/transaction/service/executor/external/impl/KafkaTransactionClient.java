@@ -42,20 +42,20 @@ public class KafkaTransactionClient implements AsyncTransactionClient {
         }).start();
 
         //Consume the result in the main thread
-        KafkaTransactionListenerService listener = new KafkaTransactionListenerService();
-
+        KafkaTransactionListenerService listener = new KafkaTransactionListenerService(future, latch);
+        return future;
     }
 
     @Override
     public boolean cancel() {
-        return false;
+        return false; //TODO: add cancellation flow
     }
 
     @Override
     public CompletableFuture<Transaction> submitWithHandlers(Transaction transaction,
                                                              TransactionSuccessHandler<Transaction> successHandler,
                                                              TransactionFailureHandler failureHandler) {
-        return AsyncTransactionClient.super.submitWithHandlers(successHandler, failureHandler);
+        return AsyncTransactionClient.super.submitWithHandlers(transaction, successHandler, failureHandler);
     }
 
 
