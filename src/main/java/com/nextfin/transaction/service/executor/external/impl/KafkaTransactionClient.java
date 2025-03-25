@@ -22,11 +22,10 @@ public class KafkaTransactionClient implements AsyncTransactionClient {
     @Override
     public CompletableFuture<Transaction> submit(Transaction transaction) {
         CompletableFuture<Transaction> future = new CompletableFuture<>();
-        log.debug("Submitting transaction " + transaction.getId() + "  to external executor");
+        log.debug("Submitting transaction {}  to external executor", transaction.getId());
         transactionTemplate.send("transactions", transaction).whenComplete((result, ex) -> {
             if (ex != null) future.completeExceptionally(ex);
-            else log.debug(
-                    "Transaction " + transaction.getId() + " submitted with offset " + result.getRecordMetadata().offset());
+            else log.debug("Transaction {} submitted with offset {}", transaction.getId(), result.getRecordMetadata().offset());
         });
 
         //Consume the response asynchronously
@@ -41,8 +40,8 @@ public class KafkaTransactionClient implements AsyncTransactionClient {
             }
         }).start();
 
-        //Consume the result in the main thread
-        KafkaTransactionListenerService listener = new KafkaTransactionListenerService(future, latch);
+        //Listen & Consume the result in the main thread
+        new KafkaTransactionListenerService(future, latch);
         return future;
     }
 
