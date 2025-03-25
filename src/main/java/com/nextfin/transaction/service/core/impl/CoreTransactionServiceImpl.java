@@ -14,7 +14,7 @@ import com.nextfin.transaction.scheduler.TransactionScheduler;
 import com.nextfin.transaction.service.cache.TransactionCacheService;
 import com.nextfin.transaction.service.confirmation.ConfirmationService;
 import com.nextfin.transaction.service.core.TransactionService;
-import com.nextfin.transaction.service.processor.TransactionProcessor;
+import com.nextfin.transaction.service.executor.embedded.EmbeddedTransactionExecutor;
 import com.nextfin.transaction.service.security.MFATransactionService;
 import com.nextfin.transaction.service.security.TransactionSecurityService;
 import com.nextfin.transaction.service.utils.TransactionUtils;
@@ -44,7 +44,7 @@ public class CoreTransactionServiceImpl implements TransactionService {
 
     private final TransactionRepository transactionRepository;
 
-    private final TransactionProcessor transactionProcessor;
+    private final Optional<EmbeddedTransactionExecutor> transactionProcessor;
 
     private final TransactionUtils transactionUtils;
 
@@ -168,7 +168,11 @@ public class CoreTransactionServiceImpl implements TransactionService {
         if (transaction.getTransactionType() != TransactionType.INSTANT) {
             throw new IllegalArgumentException("Transaction must be of type INSTANT");
         }
-        Transaction processedTransaction = transactionProcessor.process(transaction);
+        Transaction processedTransaction = new Transaction();
+        if (transactionProcessor.isPresent()) processedTransaction = transactionProcessor.get().process(transaction);
+        else {
+            //TODO: use external executor
+        }
         return finalizeTransaction(transaction, processedTransaction);
     }
 
@@ -178,7 +182,7 @@ public class CoreTransactionServiceImpl implements TransactionService {
         if (transaction.getTransactionType() != TransactionType.SCHEDULED) {
             throw new IllegalArgumentException("Transaction must be of type SCHEDULED");
         }
-        Transaction processedTransaction = transactionProcessor.process(transaction);
+        Transaction processedTransaction = transactionProcessor.get().process(transaction); //TODO: work on scheduling with kafka
         return finalizeTransaction(transaction, processedTransaction);
     }
 
