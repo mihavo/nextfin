@@ -14,7 +14,7 @@ import java.util.Map;
 @Configuration
 public class KafkaAdminConfig {
 
-    @Value("spring.kafka.bootstrap-servers")
+    @Value(value = "${spring.kafka.bootstrap-servers}")
     private String bootstrapAddress;
 
     @Value("${com.nextfin.transactions.partitions:3}")

@@ -15,6 +15,7 @@ import com.nextfin.transaction.service.cache.TransactionCacheService;
 import com.nextfin.transaction.service.confirmation.ConfirmationService;
 import com.nextfin.transaction.service.core.TransactionService;
 import com.nextfin.transaction.service.executor.embedded.EmbeddedTransactionExecutor;
+import com.nextfin.transaction.service.executor.external.AsyncTransactionClient;
 import com.nextfin.transaction.service.security.MFATransactionService;
 import com.nextfin.transaction.service.security.TransactionSecurityService;
 import com.nextfin.transaction.service.utils.TransactionUtils;
@@ -54,8 +55,12 @@ public class CoreTransactionServiceImpl implements TransactionService {
 
     @Lazy
     private final TransactionValidator transactionValidator;
+
     @Lazy
     private final TransactionScheduler transactionScheduler;
+
+    @Lazy
+    private final AsyncTransactionClient asyncTransactionClient;
 
     private final Optional<MFATransactionService> mfaTransactionService;
 
@@ -172,6 +177,7 @@ public class CoreTransactionServiceImpl implements TransactionService {
         if (transactionProcessor.isPresent()) processedTransaction = transactionProcessor.get().process(transaction);
         else {
             //TODO: use external executor
+            asyncTransactionClient.submit(transaction);
         }
         return finalizeTransaction(transaction, processedTransaction);
     }
