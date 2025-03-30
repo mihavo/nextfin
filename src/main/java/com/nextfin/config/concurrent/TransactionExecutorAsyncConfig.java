@@ -17,7 +17,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 @EnableAsync
 @RequiredArgsConstructor
 @EnableConfigurationProperties(TransactionProperties.class)
-public class TransactionProcessorAsyncConfig {
+public class TransactionExecutorAsyncConfig {
 
     private final TransactionProperties properties;
 
