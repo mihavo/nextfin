@@ -176,7 +176,6 @@ public class CoreTransactionServiceImpl implements TransactionService {
         Transaction processedTransaction = new Transaction();
         if (transactionProcessor.isPresent()) processedTransaction = transactionProcessor.get().process(transaction);
         else {
-            //TODO: use external executor
             asyncTransactionClient.submit(transaction);
         }
         return finalizeTransaction(transaction, processedTransaction);
