@@ -1,6 +1,9 @@
 package com.nextfin.account.service.core.impl;
 
-import com.nextfin.account.dto.*;
+import com.nextfin.account.dto.CreateAccountRequestDto;
+import com.nextfin.account.dto.DepositAmountRequestDto;
+import com.nextfin.account.dto.GetAccountBalanceDto;
+import com.nextfin.account.dto.WithdrawAmountRequestDto;
 import com.nextfin.account.entity.Account;
 import com.nextfin.account.enums.AccountStatus;
 import com.nextfin.account.enums.AccountType;
@@ -121,11 +124,6 @@ public class AccountServiceImpl implements AccountService {
     public GetAccountBalanceDto checkBalance(Long accountId) {
         Account account = getAccount(accountId);
         return new GetAccountBalanceDto(account.getBalance(), account.getCurrency());
-    }
-
-    @Override
-    public void validateWithdrawal(ValidateWithdrawalDto dto) {
-        accountValidator.validateWithdrawal(dto);
     }
 
     @Override

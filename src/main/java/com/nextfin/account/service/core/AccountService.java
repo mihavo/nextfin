@@ -1,9 +1,11 @@
 package com.nextfin.account.service.core;
 
-import com.nextfin.account.dto.*;
+import com.nextfin.account.dto.CreateAccountRequestDto;
+import com.nextfin.account.dto.DepositAmountRequestDto;
+import com.nextfin.account.dto.GetAccountBalanceDto;
+import com.nextfin.account.dto.WithdrawAmountRequestDto;
 import com.nextfin.account.entity.Account;
 import com.nextfin.account.enums.AccountType;
-import com.nextfin.account.service.validator.AccountValidator;
 import com.nextfin.exceptions.exception.NotFoundException;
 import com.nextfin.users.entity.User;
 import jakarta.persistence.EntityNotFoundException;
@@ -62,12 +64,6 @@ public interface AccountService {
      * @return a dto containing the current balance and currency
      */
     GetAccountBalanceDto checkBalance(Long accountId);
-
-    /**
-     * Uses an {@link AccountValidator} to validate a withdrawal
-     * @param dto the dto containing the withdrawal info
-     */
-    void validateWithdrawal(ValidateWithdrawalDto dto);
 
     /**
      * Updates the transaction limit of the account.
