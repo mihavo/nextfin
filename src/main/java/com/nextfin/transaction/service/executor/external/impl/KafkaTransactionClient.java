@@ -10,7 +10,6 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CountDownLatch;
 
 @Component
 @RequiredArgsConstructor
@@ -27,21 +26,7 @@ public class KafkaTransactionClient implements AsyncTransactionClient {
             if (ex != null) future.completeExceptionally(ex);
             else log.debug("Transaction {} submitted with offset {}", transaction.getId(), result.getRecordMetadata().offset());
         });
-
-        //Consume the response asynchronously
-        //Wait in a separate thread for the listener to provide the result of the transaction
-        CountDownLatch latch = new CountDownLatch(1);
-        new Thread(() -> {
-            try {
-                latch.await();
-            } catch (InterruptedException ex) {
-                Thread.currentThread().interrupt();
-                future.completeExceptionally(ex);
-            }
-        }).start();
-
-        //Listen & Consume the result in the main thread
-        new KafkaTransactionListenerService(future, latch);
+        future.complete(transaction);
         return future;
     }
 
