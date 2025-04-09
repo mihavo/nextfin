@@ -24,9 +24,11 @@ public class KafkaTransactionClient implements AsyncTransactionClient {
         log.debug("Submitting transaction {}  to external executor", transaction.getId());
         transactionTemplate.send("transactions", transaction).whenComplete((result, ex) -> {
             if (ex != null) future.completeExceptionally(ex);
-            else log.debug("Transaction {} submitted with offset {}", transaction.getId(), result.getRecordMetadata().offset());
+            else {
+                log.debug("Transaction {} submitted with offset {}", transaction.getId(), result.getRecordMetadata().offset());
+                future.complete(transaction);
+            }
         });
-        future.complete(transaction);
         return future;
     }
 

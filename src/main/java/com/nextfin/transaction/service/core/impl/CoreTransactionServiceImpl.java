@@ -173,12 +173,16 @@ public class CoreTransactionServiceImpl implements TransactionService {
         if (transaction.getTransactionType() != TransactionType.INSTANT) {
             throw new IllegalArgumentException("Transaction must be of type INSTANT");
         }
-        Transaction processedTransaction = new Transaction();
-        if (transactionProcessor.isPresent()) processedTransaction = transactionProcessor.get().process(transaction);
+        if (transactionProcessor.isPresent()) {
+            Transaction processedTransaction = transactionProcessor.get().process(transaction);
+            return finalizeTransaction(transaction, processedTransaction);
+        }
         else {
             asyncTransactionClient.submit(transaction);
+            return new TransactionResultDto(transaction, messageSource.getMessage("transaction.transfer.initiated",
+                                                                                  new UUID[]{transaction.getId()},
+                                                                                  LocaleContextHolder.getLocale()));
         }
-        return finalizeTransaction(transaction, processedTransaction);
     }
 
 
