@@ -29,7 +29,7 @@ public class AccountValidatorImpl implements AccountValidator {
     @Override
     public void validateWithdrawal(ValidateWithdrawalDto dto) {
         Account account = dto.getAccount();
-        validateDailyTotals(account);
+        validateDailyTotals(account, dto.getAmount());
 
         //Convert amount to account's selected currency
         BigDecimal amount = dto.getAmount();
@@ -47,14 +47,19 @@ public class AccountValidatorImpl implements AccountValidator {
     }
 
     //Check if current account has not exceeded daily transaction limit
-    private void validateDailyTotals(Account account) {
-        if (account.getTransactionLimitEnabled() && account.getDailyTotal().compareTo(
+    private void validateDailyTotals(Account account, BigDecimal amount) {
+        if (account.getTransactionLimitEnabled() && calculateNewDailyTotal(account, amount).compareTo(
                 BigDecimal.valueOf(account.getTransactionLimit())) > 0) {
             throw new BadRequestException(messageSource.getMessage("account.transaction-limit.surpassed",
                                                                    new String[]{account.getTransactionLimit().toString(),
                                                                                 account.getCurrency().getSymbol()},
                                                                    LocaleContextHolder.getLocale()));
         }
+    }
+
+    // Calculates the new daily total after this transaction
+    private BigDecimal calculateNewDailyTotal(Account account, BigDecimal amount) {
+        return account.getDailyTotal().add(amount);
     }
 
 
