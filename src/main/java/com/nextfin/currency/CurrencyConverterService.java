@@ -18,10 +18,10 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class CurrencyConverterService {
 
-    @Value("${com.nextfin-executor.currency-converter.root-uri}")
+    @Value("${nextfin-executor.currency-converter.root-uri}")
     private String rootURI;
 
-    @Value("${com.nextfin-executor.currency-converter.api-key}")
+    @Value("${nextfin-executor.currency-converter.api-key}")
     private String apiKey;
 
 
