@@ -7,12 +7,11 @@ import com.nextfin.currency.CurrencyConverterService;
 import com.nextfin.exceptions.exception.BadRequestException;
 import com.nextfin.exceptions.exception.ForbiddenException;
 import com.nextfin.transaction.service.core.TransactionService;
+import com.nextfin.users.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -25,22 +24,13 @@ public class AccountValidatorImpl implements AccountValidator {
     private final TransactionService transactionService;
     private final CurrencyConverterService currencyConverterService;
     private final MessageSource messageSource;
+    private final UserService userService;
 
     @Override
     public void validateWithdrawal(ValidateWithdrawalDto dto) {
         Account account = dto.getAccount();
         validateDailyTotals(account, dto.getAmount());
-
-        //Convert amount to account's selected currency
-        BigDecimal amount = dto.getAmount();
-        Currency currency = dto.getCurrency();
-        Currency targetCurrency = account.getCurrency();
-        BigDecimal convertedAmount = currencyConverterService.convert(amount, currency, targetCurrency);
-        if (account.getBalance().compareTo(convertedAmount) < 0) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                                              messageSource.getMessage("account.withdraw.insufficient", null,
-                                                                       LocaleContextHolder.getLocale()));
-        }
+        validateSufficientFunds(dto, account);
     }
 
     //Check if current account has not exceeded daily transaction limit
@@ -54,6 +44,18 @@ public class AccountValidatorImpl implements AccountValidator {
         }
     }
 
+    //Validates that the requested amount can be withdrawn from the account's balance
+    private void validateSufficientFunds(ValidateWithdrawalDto dto, Account account) {
+        BigDecimal amount = dto.getAmount();
+        Currency currency = dto.getCurrency();
+        Currency targetCurrency = account.getCurrency();
+        BigDecimal convertedAmount = currencyConverterService.convert(amount, currency, targetCurrency);
+        if (account.getBalance().compareTo(convertedAmount) < 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                                              messageSource.getMessage("account.withdraw.insufficient", null,
+                                                                       LocaleContextHolder.getLocale()));
+        }
+    }
     // Calculates the new daily total after this transaction
     private BigDecimal calculateNewDailyTotal(Account account, BigDecimal amount) {
         return account.getDailyTotal().add(amount);
@@ -66,10 +68,7 @@ public class AccountValidatorImpl implements AccountValidator {
             throw new BadRequestException(messageSource.getMessage("account.notfound", null,
                     LocaleContextHolder.getLocale()));
         }
-        UserDetails authenticatedUserDetails = (UserDetails) SecurityContextHolder.getContext()
-                .getAuthentication()
-                .getPrincipal();
-        if (!account.getHolder().getUser().equals(authenticatedUserDetails)) {
+        if (!account.getHolder().getUser().equals(userService.getCurrentUser())) {
             throw new ForbiddenException(
                     messageSource.getMessage("account.forbidden", null,
                             LocaleContextHolder.getLocale()));
