@@ -15,6 +15,7 @@ import com.nextfin.employee.service.EmployeeService;
 import com.nextfin.exceptions.exception.NotFoundException;
 import com.nextfin.holder.entity.Holder;
 import com.nextfin.holder.service.HolderService;
+import com.nextfin.transaction.entity.Transaction;
 import com.nextfin.users.entity.User;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -174,6 +175,14 @@ public class AccountServiceImpl implements AccountService {
                             LocaleContextHolder.getLocale()));
         }
         return accountRepository.findAllByHolderAndAccountType(holder, type);
+    }
+
+    @Override
+    public void updateDailyTotal(Transaction transaction) {
+        Account sourceAccount = transaction.getSourceAccount();
+        BigDecimal newTotal = sourceAccount.getDailyTotal().add(transaction.getAmount());
+        sourceAccount.setDailyTotal(newTotal);
+        accountRepository.save(sourceAccount);
     }
 
 }

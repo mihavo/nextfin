@@ -213,6 +213,7 @@ public class CoreTransactionServiceImpl implements TransactionService {
 
     @NotNull
     private TransactionResponse finalizeTransaction(Transaction transaction, Transaction processedTransaction) {
+        accountService.updateDailyTotal(transaction);
         confirmationService.handleConfirmation(transaction.getSourceAccount(), processedTransaction);
         return new TransactionResultDto(processedTransaction, messageSource.getMessage("transaction.transfer.processed",
                                                                                        new UUID[]{transaction.getId()},

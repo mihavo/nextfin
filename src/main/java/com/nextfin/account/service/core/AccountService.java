@@ -7,6 +7,7 @@ import com.nextfin.account.dto.WithdrawAmountRequestDto;
 import com.nextfin.account.entity.Account;
 import com.nextfin.account.enums.AccountType;
 import com.nextfin.exceptions.exception.NotFoundException;
+import com.nextfin.transaction.entity.Transaction;
 import com.nextfin.users.entity.User;
 import jakarta.persistence.EntityNotFoundException;
 
@@ -95,4 +96,11 @@ public interface AccountService {
     Boolean toggleTransactionSMSConfirmation(Account account);
 
     List<Account> getAccountsByUser(User owner, AccountType type);
+
+    /**
+     * Updates the daily total field of the source account, adding the transaction amount
+     *
+     * @param transaction the transaction
+     */
+    void updateDailyTotal(Transaction transaction);
 }
