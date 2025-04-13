@@ -7,6 +7,7 @@ import jakarta.persistence.LockModeType;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -26,4 +27,8 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
 
     @Query("SELECT us.id FROM User us JOIN Holder ho ON ho.user = us JOIN ho.accounts acc WHERE acc.id = :id")
     UUID findUserIdByAccountId(Long id);
+
+    @Modifying
+    @Query("UPDATE Account a SET a.dailyTotal = 0")
+    void resetDailyTotals();
 }
