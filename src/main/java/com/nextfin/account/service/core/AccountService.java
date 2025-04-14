@@ -103,4 +103,11 @@ public interface AccountService {
      * @param transaction the transaction
      */
     void updateDailyTotal(Transaction transaction);
+
+    /**
+     * Gets current user's accounts
+     *
+     * @return the accounts
+     */
+    List<Account> getCurrentUserAccounts();
 }

@@ -198,9 +198,9 @@ public class CoreTransactionServiceImpl implements TransactionService {
 
     private @NotNull Transaction storeTransaction(TransferRequestDto dto, TransactionType type,
                                                   LocalDateTime scheduledAt) {
-        Transaction transaction = Transaction.builder().amount(dto.getAmount()).currency(
-                dto.getCurrency()).transactionStatus(TransactionStatus.CREATED).transactionType(type).scheduledAt(
-                scheduledAt).sourceAccount(accountService.getAccount(dto.getSourceAccountId())).targetAccount(
+        Transaction transaction = Transaction.builder().amount(dto.getAmount()).currency(dto.getCurrency()).transactionStatus(
+                TransactionStatus.CREATED).transactionType(type).scheduledAt(scheduledAt).sourceAccount(
+                accountService.getAccount(dto.getSourceAccountId())).targetAccount(
                 accountService.getAccount(dto.getTargetAccountId())).build();
         Transaction saved = transactionRepository.save(transaction);
         try {

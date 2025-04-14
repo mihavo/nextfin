@@ -14,8 +14,8 @@ import com.nextfin.employee.entity.Employee;
 import com.nextfin.employee.service.EmployeeService;
 import com.nextfin.exceptions.exception.NotFoundException;
 import com.nextfin.holder.entity.Holder;
-import com.nextfin.holder.service.HolderService;
 import com.nextfin.transaction.entity.Transaction;
+import com.nextfin.users.entity.NextfinUserDetails;
 import com.nextfin.users.entity.User;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +34,7 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Currency;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -44,7 +45,6 @@ public class AccountServiceImpl implements AccountService {
     private final AccountRepository accountRepository;
     @Lazy private final AccountValidator accountValidator;
 
-    private final HolderService holderService;
     private final EmployeeService employeeService;
 
     private final MessageSource messageSource;
@@ -183,6 +183,12 @@ public class AccountServiceImpl implements AccountService {
         BigDecimal newTotal = sourceAccount.getDailyTotal().add(transaction.getAmount());
         sourceAccount.setDailyTotal(newTotal);
         accountRepository.save(sourceAccount);
+    }
+
+    @Override
+    public List<Account> getCurrentUserAccounts() {
+        UUID id = ((NextfinUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
+        return accountRepository.getCurrentUserAccounts(id);
     }
 
 }

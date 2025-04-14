@@ -3,10 +3,11 @@ package com.nextfin.account.service.validator.impl;
 import com.nextfin.account.dto.ValidateWithdrawalDto;
 import com.nextfin.account.entity.Account;
 import com.nextfin.account.service.validator.AccountValidator;
+import com.nextfin.cache.CacheService;
+import com.nextfin.cache.utils.CacheUtils;
 import com.nextfin.currency.CurrencyConverterService;
 import com.nextfin.exceptions.exception.BadRequestException;
 import com.nextfin.exceptions.exception.ForbiddenException;
-import com.nextfin.transaction.service.core.TransactionService;
 import com.nextfin.users.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
@@ -17,14 +18,18 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.util.Currency;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
 public class AccountValidatorImpl implements AccountValidator {
-    private final TransactionService transactionService;
     private final CurrencyConverterService currencyConverterService;
     private final MessageSource messageSource;
     private final UserService userService;
+    private final CacheService cache;
+
+    private static final int ACCOUNTS_CACHE_SIZE = 20;
+
 
     @Override
     public void validateWithdrawal(ValidateWithdrawalDto dto) {
@@ -64,14 +69,21 @@ public class AccountValidatorImpl implements AccountValidator {
 
     @Override
     public void validateAccountOwnership(Account account) {
-        if (account == null) {
-            throw new BadRequestException(messageSource.getMessage("account.notfound", null,
-                    LocaleContextHolder.getLocale()));
-        }
-        if (!account.getHolder().getUser().equals(userService.getCurrentUser())) {
-            throw new ForbiddenException(
-                    messageSource.getMessage("account.forbidden", null,
-                            LocaleContextHolder.getLocale()));
-        }
+        boolean isValidated;
+        if (account == null)
+            throw new BadRequestException(messageSource.getMessage("account.notfound", null, LocaleContextHolder.getLocale()));
+
+        Set<String> accounts = getCurrentAccounts();
+        if (accounts == null || accounts.isEmpty()) // Fetch from Cache
+            isValidated = account.getHolder().getUser().equals(userService.getCurrentUser());
+        else isValidated = accounts.contains(account.getId().toString()); //Fetch from DB via lazy-loaded relations
+
+        if (!isValidated)
+            throw new ForbiddenException(messageSource.getMessage("account.forbidden", null, LocaleContextHolder.getLocale()));
+    }
+
+    private Set<String> getCurrentAccounts() {
+        String key = CacheUtils.buildAccountsSetKey(userService.getCurrentUser().getId());
+        return cache.getFromSortedSet(key, 1, ACCOUNTS_CACHE_SIZE);
     }
 }

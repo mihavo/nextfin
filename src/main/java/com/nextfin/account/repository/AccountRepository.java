@@ -31,4 +31,7 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
     @Modifying
     @Query("UPDATE Account a SET a.dailyTotal = 0")
     void resetDailyTotals();
+
+    @Query("SELECT a FROM Account a WHERE a.holder.user.id = :userId")
+    List<Account> getCurrentUserAccounts(UUID userId);
 }
