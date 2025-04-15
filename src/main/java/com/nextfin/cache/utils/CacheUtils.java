@@ -11,6 +11,10 @@ public class CacheUtils {
         return "transactions:user:" + userId;
     }
 
+    public String buildAccountsSetKey(UUID userId) {
+        return "accounts:user:" + userId;
+    }
+
     public String buildTransactionHashKey(UUID transactionId) {
         return "tnx:" + transactionId;
     }

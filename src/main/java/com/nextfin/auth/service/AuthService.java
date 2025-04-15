@@ -8,4 +8,5 @@ import jakarta.servlet.http.HttpServletResponse;
 public interface AuthService {
 
     void authenticate(LoginRequestDto loginRequestDto, HttpServletRequest request, HttpServletResponse response);
+
 }

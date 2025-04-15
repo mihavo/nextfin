@@ -1,8 +1,8 @@
-package com.nextfin.transaction.service.processor;
+package com.nextfin.transaction.service.executor.embedded;
 
 import com.nextfin.transaction.entity.Transaction;
 
-public interface TransactionProcessor {
+public interface EmbeddedTransactionExecutor {
     /**
      * Facilitates the actual transaction. Any given transaction has already been checked for
      * potential validation errors.

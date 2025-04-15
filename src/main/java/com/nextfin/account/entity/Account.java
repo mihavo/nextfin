@@ -62,6 +62,10 @@ public class Account {
     @Builder.Default
     Long transactionLimit = 1000L;
 
+    @Column(name = "daily_total")
+    @Builder.Default
+    BigDecimal dailyTotal = BigDecimal.ZERO;
+
     @Column(name = "transaction_limit_enabled", nullable = false)
     @Builder.Default
     Boolean transactionLimitEnabled = true;

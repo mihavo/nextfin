@@ -29,4 +29,9 @@ public interface UserService extends NextfinUserDetailsService {
 	 * @return the current user
 	 */
 	User getCurrentUser() throws UserNotFoundException;
+
+	/**
+	 * Saves current authenticated user's accounts in cache for future reference
+	 */
+	void cacheAccounts();
 }

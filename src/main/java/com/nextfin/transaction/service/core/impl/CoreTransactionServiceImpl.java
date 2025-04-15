@@ -14,7 +14,8 @@ import com.nextfin.transaction.scheduler.TransactionScheduler;
 import com.nextfin.transaction.service.cache.TransactionCacheService;
 import com.nextfin.transaction.service.confirmation.ConfirmationService;
 import com.nextfin.transaction.service.core.TransactionService;
-import com.nextfin.transaction.service.processor.TransactionProcessor;
+import com.nextfin.transaction.service.executor.embedded.EmbeddedTransactionExecutor;
+import com.nextfin.transaction.service.executor.external.AsyncTransactionClient;
 import com.nextfin.transaction.service.security.MFATransactionService;
 import com.nextfin.transaction.service.security.TransactionSecurityService;
 import com.nextfin.transaction.service.utils.TransactionUtils;
@@ -44,7 +45,7 @@ public class CoreTransactionServiceImpl implements TransactionService {
 
     private final TransactionRepository transactionRepository;
 
-    private final TransactionProcessor transactionProcessor;
+    private final Optional<EmbeddedTransactionExecutor> transactionProcessor;
 
     private final TransactionUtils transactionUtils;
 
@@ -54,8 +55,12 @@ public class CoreTransactionServiceImpl implements TransactionService {
 
     @Lazy
     private final TransactionValidator transactionValidator;
+
     @Lazy
     private final TransactionScheduler transactionScheduler;
+
+    @Lazy
+    private final AsyncTransactionClient asyncTransactionClient;
 
     private final Optional<MFATransactionService> mfaTransactionService;
 
@@ -168,8 +173,16 @@ public class CoreTransactionServiceImpl implements TransactionService {
         if (transaction.getTransactionType() != TransactionType.INSTANT) {
             throw new IllegalArgumentException("Transaction must be of type INSTANT");
         }
-        Transaction processedTransaction = transactionProcessor.process(transaction);
-        return finalizeTransaction(transaction, processedTransaction);
+        if (transactionProcessor.isPresent()) {
+            Transaction processedTransaction = transactionProcessor.get().process(transaction);
+            return finalizeTransaction(transaction, processedTransaction);
+        }
+        else {
+            asyncTransactionClient.submit(transaction);
+            return new TransactionResultDto(transaction, messageSource.getMessage("transaction.transfer.initiated",
+                                                                                  new UUID[]{transaction.getId()},
+                                                                                  LocaleContextHolder.getLocale()));
+        }
     }
 
 
@@ -178,17 +191,22 @@ public class CoreTransactionServiceImpl implements TransactionService {
         if (transaction.getTransactionType() != TransactionType.SCHEDULED) {
             throw new IllegalArgumentException("Transaction must be of type SCHEDULED");
         }
-        Transaction processedTransaction = transactionProcessor.process(transaction);
+        Transaction processedTransaction = transactionProcessor.get().process(transaction); //TODO: work on scheduling with kafka
         return finalizeTransaction(transaction, processedTransaction);
     }
 
 
     private @NotNull Transaction storeTransaction(TransferRequestDto dto, TransactionType type,
                                                   LocalDateTime scheduledAt) {
-        Transaction transaction = Transaction.builder().amount(dto.getAmount()).currency(
-                dto.getCurrency()).transactionStatus(TransactionStatus.CREATED).transactionType(type).scheduledAt(
-                scheduledAt).sourceAccount(accountService.getAccount(dto.getSourceAccountId())).targetAccount(
-                accountService.getAccount(dto.getTargetAccountId())).build();
+        Transaction transaction = Transaction.builder()
+                                             .amount(dto.getAmount())
+                                             .currency(dto.getCurrency())
+                                             .transactionStatus(TransactionStatus.CREATED)
+                                             .transactionType(type)
+                                             .scheduledAt(scheduledAt)
+                                             .sourceAccountId(dto.getSourceAccountId())
+                                             .targetAccountId(dto.getTargetAccountId())
+                                             .build();
         Transaction saved = transactionRepository.save(transaction);
         try {
             cache.cacheTransaction(userService.getCurrentUser().getId(), saved);
@@ -200,6 +218,7 @@ public class CoreTransactionServiceImpl implements TransactionService {
 
     @NotNull
     private TransactionResponse finalizeTransaction(Transaction transaction, Transaction processedTransaction) {
+        accountService.updateDailyTotal(transaction);
         confirmationService.handleConfirmation(transaction.getSourceAccount(), processedTransaction);
         return new TransactionResultDto(processedTransaction, messageSource.getMessage("transaction.transfer.processed",
                                                                                        new UUID[]{transaction.getId()},

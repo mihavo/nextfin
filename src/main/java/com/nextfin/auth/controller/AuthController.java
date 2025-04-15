@@ -32,8 +32,10 @@ public class AuthController {
     private final MessageSource messageSource;
 
     @PostMapping("login")
-    public ResponseEntity<LoginResponseDto> login(@Valid @RequestBody LoginRequestDto loginRequestDto, HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<LoginResponseDto> login(@Valid @RequestBody LoginRequestDto loginRequestDto,
+                                                  HttpServletRequest request, HttpServletResponse response) {
         authService.authenticate(loginRequestDto, request, response);
+        userService.cacheAccounts();
         return new ResponseEntity<>(
                 new LoginResponseDto(messageSource.getMessage("auth.login-success", null, LocaleContextHolder.getLocale())),
                 HttpStatus.OK);

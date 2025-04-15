@@ -1,4 +1,4 @@
-package com.nextfin.transaction.service.processor.impl;
+package com.nextfin.transaction.service.executor.embedded.impl;
 
 import com.nextfin.account.dto.DepositAmountRequestDto;
 import com.nextfin.account.dto.WithdrawAmountRequestDto;
@@ -8,10 +8,11 @@ import com.nextfin.config.concurrent.props.TransactionProperties;
 import com.nextfin.transaction.entity.Transaction;
 import com.nextfin.transaction.enums.TransactionStatus;
 import com.nextfin.transaction.repository.TransactionRepository;
-import com.nextfin.transaction.service.processor.TransactionProcessor;
+import com.nextfin.transaction.service.executor.embedded.EmbeddedTransactionExecutor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.javamoney.moneta.Money;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -27,8 +28,9 @@ import java.util.Currency;
 @Transactional(isolation = Isolation.READ_COMMITTED)
 @RequiredArgsConstructor(onConstructor_ = {@Lazy})
 @EnableConfigurationProperties(TransactionProperties.class)
+@ConditionalOnProperty(name = "nextfin.embedded-executor", havingValue = "true", matchIfMissing = true)
 @Slf4j
-public class TransactionProcessorImpl implements TransactionProcessor {
+public class EmbeddedTransactionExecutorImpl implements EmbeddedTransactionExecutor {
 
     private final TransactionRepository transactionRepository;
 

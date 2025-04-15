@@ -1,6 +1,9 @@
 package com.nextfin.account.service.core.impl;
 
-import com.nextfin.account.dto.*;
+import com.nextfin.account.dto.CreateAccountRequestDto;
+import com.nextfin.account.dto.DepositAmountRequestDto;
+import com.nextfin.account.dto.GetAccountBalanceDto;
+import com.nextfin.account.dto.WithdrawAmountRequestDto;
 import com.nextfin.account.entity.Account;
 import com.nextfin.account.enums.AccountStatus;
 import com.nextfin.account.enums.AccountType;
@@ -11,7 +14,8 @@ import com.nextfin.employee.entity.Employee;
 import com.nextfin.employee.service.EmployeeService;
 import com.nextfin.exceptions.exception.NotFoundException;
 import com.nextfin.holder.entity.Holder;
-import com.nextfin.holder.service.HolderService;
+import com.nextfin.transaction.entity.Transaction;
+import com.nextfin.users.entity.NextfinUserDetails;
 import com.nextfin.users.entity.User;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +34,7 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Currency;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -40,7 +45,6 @@ public class AccountServiceImpl implements AccountService {
     private final AccountRepository accountRepository;
     @Lazy private final AccountValidator accountValidator;
 
-    private final HolderService holderService;
     private final EmployeeService employeeService;
 
     private final MessageSource messageSource;
@@ -124,11 +128,6 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public void validateWithdrawal(ValidateWithdrawalDto dto) {
-        accountValidator.validateWithdrawal(dto);
-    }
-
-    @Override
     public void updateTransactionLimit(Account account, Long transactionLimit) {
         if (transactionLimit <= 0L) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
@@ -176,6 +175,20 @@ public class AccountServiceImpl implements AccountService {
                             LocaleContextHolder.getLocale()));
         }
         return accountRepository.findAllByHolderAndAccountType(holder, type);
+    }
+
+    @Override
+    public void updateDailyTotal(Transaction transaction) {
+        Account sourceAccount = transaction.getSourceAccount();
+        BigDecimal newTotal = sourceAccount.getDailyTotal().add(transaction.getAmount());
+        sourceAccount.setDailyTotal(newTotal);
+        accountRepository.save(sourceAccount);
+    }
+
+    @Override
+    public List<Account> getCurrentUserAccounts() {
+        UUID id = ((NextfinUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
+        return accountRepository.getCurrentUserAccounts(id);
     }
 
 }

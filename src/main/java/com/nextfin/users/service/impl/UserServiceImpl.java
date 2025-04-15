@@ -1,5 +1,9 @@
 package com.nextfin.users.service.impl;
 
+import com.nextfin.account.entity.Account;
+import com.nextfin.account.service.core.AccountService;
+import com.nextfin.cache.CacheService;
+import com.nextfin.cache.utils.CacheUtils;
 import com.nextfin.exceptions.exception.BadRequestException;
 import com.nextfin.exceptions.exception.ForbiddenException;
 import com.nextfin.exceptions.exception.UserNotFoundException;
@@ -18,6 +22,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -29,6 +34,8 @@ public class UserServiceImpl implements UserService {
 	private final UserRepository userRepository;
 	private final MessageSource messageSource;
 	private final PasswordEncoder passwordEncoder;
+	private final AccountService accountService;
+	private final CacheService cache;
 
 
 	@Override
@@ -63,6 +70,15 @@ public class UserServiceImpl implements UserService {
 			throw new ForbiddenException();
 		}
 		return currentUser;
+	}
+
+	@Override
+	public void cacheAccounts() {
+		User user = getCurrentUser();
+		List<Account> accounts = accountService.getCurrentUserAccounts();
+		String cacheKey = CacheUtils.buildAccountsSetKey(user.getId());
+		accounts.forEach(account -> cache.addToSortedSet(cacheKey, account.getId().toString(),
+														 account.getDateOpened().toEpochMilli() / 1000.0));
 	}
 
 	@Override

@@ -1,10 +1,13 @@
 package com.nextfin.account.service.core;
 
-import com.nextfin.account.dto.*;
+import com.nextfin.account.dto.CreateAccountRequestDto;
+import com.nextfin.account.dto.DepositAmountRequestDto;
+import com.nextfin.account.dto.GetAccountBalanceDto;
+import com.nextfin.account.dto.WithdrawAmountRequestDto;
 import com.nextfin.account.entity.Account;
 import com.nextfin.account.enums.AccountType;
-import com.nextfin.account.service.validator.AccountValidator;
 import com.nextfin.exceptions.exception.NotFoundException;
+import com.nextfin.transaction.entity.Transaction;
 import com.nextfin.users.entity.User;
 import jakarta.persistence.EntityNotFoundException;
 
@@ -64,12 +67,6 @@ public interface AccountService {
     GetAccountBalanceDto checkBalance(Long accountId);
 
     /**
-     * Uses an {@link AccountValidator} to validate a withdrawal
-     * @param dto the dto containing the withdrawal info
-     */
-    void validateWithdrawal(ValidateWithdrawalDto dto);
-
-    /**
      * Updates the transaction limit of the account.
      * @param account          the account to update
      * @param transactionLimit the new transaction limit
@@ -99,4 +96,18 @@ public interface AccountService {
     Boolean toggleTransactionSMSConfirmation(Account account);
 
     List<Account> getAccountsByUser(User owner, AccountType type);
+
+    /**
+     * Updates the daily total field of the source account, adding the transaction amount
+     *
+     * @param transaction the transaction
+     */
+    void updateDailyTotal(Transaction transaction);
+
+    /**
+     * Gets current user's accounts
+     *
+     * @return the accounts
+     */
+    List<Account> getCurrentUserAccounts();
 }

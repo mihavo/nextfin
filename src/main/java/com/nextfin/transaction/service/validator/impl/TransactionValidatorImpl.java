@@ -44,7 +44,7 @@ public class TransactionValidatorImpl implements TransactionValidator {
                                                                        LocaleContextHolder.getLocale()));
         }
 
-        accountService.validateWithdrawal(ValidateWithdrawalDto.builder()
+        accountValidator.validateWithdrawal(ValidateWithdrawalDto.builder()
                                                                .account(sourceAccount)
                                                                .amount(amount)
                                                                .currency(currency)
