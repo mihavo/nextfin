@@ -3,21 +3,8 @@ package com.nextfin.transaction.entity;
 import com.nextfin.account.entity.Account;
 import com.nextfin.transaction.enums.TransactionStatus;
 import com.nextfin.transaction.enums.TransactionType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import jakarta.persistence.*;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
@@ -49,13 +36,19 @@ public class Transaction {
     private Currency currency;
 
     @ManyToOne
-    @JoinColumn(name = "source_account_id", nullable = false)
+    @JoinColumn(name = "source_account_id", insertable = false, updatable = false, nullable = false)
     private Account sourceAccount;
 
+    @Column(name = "source_account_id", nullable = false)
+    private Long sourceAccountId;
+
     @ManyToOne
-    @JoinColumn(name = "target_account_id", nullable = false)
+    @JoinColumn(name = "target_account_id", insertable = false, updatable = false, nullable = false)
     private Account targetAccount;
 
+    @Column(name = "target_account_id", nullable = false)
+    private Long targetAccountId;
+    
     @Enumerated
     @Column(name = "transaction_status", nullable = false)
     @Builder.Default
