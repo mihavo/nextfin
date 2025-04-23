@@ -154,7 +154,7 @@ public class CoreTransactionServiceImpl implements TransactionService {
             case OUTGOING -> {
                 List<Transaction> recents = fetchRecentsFromCache(options);
                 if (recents.isEmpty()) return transactionRepository.findAllBySourceAccounts(accounts, pageRequest);
-                else new PageImpl<>(recents);
+                else return new PageImpl<>(recents);
             }
             default -> {
                 List<Transaction> targets = transactionRepository.findAllByTargetAccounts(accounts, pageRequest).getContent();
