@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -51,6 +52,14 @@ public class TransactionController {
         Transaction transaction = transactionService.getTransaction(id);
         TransactionDetailsDto response = transactionMapper.toTransactionDetails(transaction);
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("")
+    @Operation(summary = "Gets the transactions from all user's accounts")
+    public ResponseEntity<Page<TransactionDetailsDto>> getTransactions(@Valid GetTransactionOptions options) {
+        Page<Transaction> filteredTransactions = transactionService.getTransactions(options);
+        Page<TransactionDetailsDto> filteredTrnDetails = filteredTransactions.map(transactionMapper::toTransactionDetails);
+        return new ResponseEntity<>(filteredTrnDetails, HttpStatus.OK);
     }
 
     @GetMapping("/{id}/status")

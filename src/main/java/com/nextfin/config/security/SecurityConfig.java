@@ -5,6 +5,7 @@ import com.nextfin.account.service.security.session.MultiSessionRepository;
 import com.nextfin.auth.oauth2.service.OidcService;
 import com.nextfin.auth.providers.UserAuthProvider;
 import com.nextfin.users.service.impl.NextfinUserDetailsService;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
@@ -66,6 +67,9 @@ public class SecurityConfig {
             logout.logoutSuccessUrl(AppConstants.API_BASE_URL + "/auth/logout/success").permitAll();
             ClearSiteDataHeaderWriter clearSiteDataHeader = new ClearSiteDataHeaderWriter(ClearSiteDataHeaderWriter.Directive.COOKIES);
             logout.addLogoutHandler(new HeaderWriterLogoutHandler(clearSiteDataHeader));
+            logout.logoutSuccessHandler((request, response, authentication) -> {
+                response.setStatus(HttpServletResponse.SC_OK);
+            });
             logout.deleteCookies("JSESSIONID");
         });
 

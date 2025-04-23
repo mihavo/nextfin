@@ -122,14 +122,44 @@ public class CoreTransactionServiceImpl implements TransactionService {
                 //Attempt to fetch recents from cache,
                 // with repository fallback if page size is bigger than cache size / page skip is provided.
                 List<Transaction> recents = fetchRecentsFromCache(options);
-                return recents.isEmpty() ? transactionRepository.findBySourceAccount(account, pageRequest) : new PageImpl<>(
-                        recents);
+                if (recents.isEmpty()) return transactionRepository.findBySourceAccount(account, pageRequest);
+                else return new PageImpl<>(filterRecentsForAccount(recents, account));
             }
             default -> {
                 List<Transaction> targets = transactionRepository.findByTargetAccount(account, pageRequest).getContent();
                 List<Transaction> recents = fetchRecentsFromCache(options);
-                if (recents.isEmpty()) return transactionRepository.findBySourceAccountOrTargetAccount(account, account,
-                                                                                                       pageRequest);
+                if (recents.isEmpty()) transactionRepository.findBySourceAccountOrTargetAccount(account, account, pageRequest);
+                else recents = filterRecentsForAccount(recents, account);
+                recents.addAll(targets);
+                return new PageImpl<>(recents);
+            }
+        }
+    }
+
+    private List<Transaction> filterRecentsForAccount(List<Transaction> recents, Account account) {
+        return recents.stream().filter(recent -> recent.getSourceAccount().equals(account)).collect(Collectors.toList());
+    }
+
+    @Override
+    public Page<Transaction> getTransactions(GetTransactionOptions options) {
+        TransactionDirection direction = options.getDirection();
+
+        List<Account> accounts = accountService.getCurrentUserAccounts();
+        PageRequest pageRequest = PageRequest.of(options.getSkip(), options.getPageSize(),
+                                                 Sort.by(options.getSortDirection(), options.getSortBy().getValue()));
+        switch (direction) {
+            case INCOMING -> {
+                return transactionRepository.findAllByTargetAccounts(accounts, pageRequest);
+            }
+            case OUTGOING -> {
+                List<Transaction> recents = fetchRecentsFromCache(options);
+                if (recents.isEmpty()) return transactionRepository.findAllBySourceAccounts(accounts, pageRequest);
+                else new PageImpl<>(recents);
+            }
+            default -> {
+                List<Transaction> targets = transactionRepository.findAllByTargetAccounts(accounts, pageRequest).getContent();
+                List<Transaction> recents = fetchRecentsFromCache(options);
+                if (recents.isEmpty()) transactionRepository.findAllBySourceOrTargetAccounts(accounts, pageRequest);
                 recents.addAll(targets);
                 return new PageImpl<>(recents);
             }

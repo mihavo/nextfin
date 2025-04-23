@@ -76,6 +76,14 @@ public interface TransactionService {
     Page<Transaction> getAccountTransactions(Account account, GetTransactionOptions options);
 
     /**
+     * Get a subset of transactions for all user's accounts based on a {@link PageRequest}
+     *
+     * @param options the {@link GetTransactionOptions}
+     * @return a page containing transactions
+     */
+    Page<Transaction> getTransactions(@Valid GetTransactionOptions options);
+
+    /**
      * Gets the latest transactions that have been initiated (source transactions) from a specified account beginning from a given datetime
      * @param sourceAccount the source account
      * @param instant the earliest timestamp of the transactions

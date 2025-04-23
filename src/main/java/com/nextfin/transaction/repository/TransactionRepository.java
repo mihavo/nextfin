@@ -23,4 +23,13 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
 
     @Query(value = "SELECT * FROM TRANSACTIONS T WHERE T.SOURCE_ACCOUNT_ID = :ACCOUNT_ID AND T.CREATED_AT >= :START_DATE", nativeQuery = true)
     List<Transaction> getTransactionsByAccountAndDate(@Param("ACCOUNT_ID") Long accountId, @Param("START_DATE") Instant instant);
+
+    @Query("SELECT t FROM Transaction t WHERE t.sourceAccount IN :accounts")
+    Page<Transaction> findAllBySourceAccounts(List<Account> accounts, Pageable pageable);
+
+    @Query("SELECT t FROM Transaction t WHERE t.targetAccount IN :accounts")
+    Page<Transaction> findAllByTargetAccounts(List<Account> accounts, Pageable pageable);
+
+    @Query("SELECT t FROM Transaction t WHERE t.targetAccount IN :accounts OR t.sourceAccount IN :accounts")
+    Page<Transaction> findAllBySourceOrTargetAccounts(List<Account> accounts, Pageable pageable);
 }
