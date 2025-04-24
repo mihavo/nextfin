@@ -9,14 +9,14 @@ public interface TransactionMapper {
 
     @Mapping(source = "transaction.updatedAt", target = "timestamp")
     @Mapping(source = "transaction.id", target = "transactionId")
-    @Mapping(source = "transaction.sourceAccount.id", target = "sourceAccountId")
-    @Mapping(source = "transaction.targetAccount.id", target = "targetAccountId")
+    @Mapping(source = "transaction.sourceAccountId", target = "sourceAccountId")
+    @Mapping(source = "transaction.targetAccountId", target = "targetAccountId")
     @Mapping(source = "transaction.currency", target = "currency")
     @Mapping(source = "transaction.transactionStatus", target = "status")
     TransactionResponseDto toTransactionResponse(TransactionResponse response);
 
-    @Mapping(source = "sourceAccount.id", target = "sourceAccountId")
-    @Mapping(source = "targetAccount.id", target = "targetAccountId")
+    @Mapping(source = "sourceAccountId", target = "sourceAccountId")
+    @Mapping(source = "targetAccountId", target = "targetAccountId")
     @Mapping(source = "sourceAccount.holder.user.id", target = "sourceUserId")
     @Mapping(source = "targetAccount.holder.user.id", target = "targetUserId")
     @Mapping(source = "transactionStatus", target = "status")
@@ -25,8 +25,8 @@ public interface TransactionMapper {
 
     @Mapping(source = "status", target = "transactionStatus")
     @Mapping(source = "type", target = "transactionType")
-    @Mapping(source = "sourceAccountId", target = "sourceAccount.id")
-    @Mapping(source = "targetAccountId", target = "targetAccount.id")
+    @Mapping(source = "sourceAccountId", target = "sourceAccountId")
+    @Mapping(source = "targetAccountId", target = "targetAccountId")
     @Mapping(source = "sourceUserId", target = "sourceAccount.holder.user.id")
     @Mapping(source = "targetUserId", target = "targetAccount.holder.user.id")
     Transaction toTransaction(TransactionDetailsDto transactionDetails);

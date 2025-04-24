@@ -37,6 +37,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -128,10 +129,10 @@ public class CoreTransactionServiceImpl implements TransactionService {
             default -> {
                 List<Transaction> targets = transactionRepository.findByTargetAccount(account, pageRequest).getContent();
                 List<Transaction> recents = fetchRecentsFromCache(options);
-                if (recents.isEmpty()) transactionRepository.findBySourceAccountOrTargetAccount(account, account, pageRequest);
+                if (recents.isEmpty()) recents = transactionRepository.findBySourceAccount(account, pageRequest).getContent();
                 else recents = filterRecentsForAccount(recents, account);
-                recents.addAll(targets);
-                return new PageImpl<>(recents);
+                List<Transaction> results = Stream.concat(recents.stream(), targets.stream()).toList();
+                return new PageImpl<>(results);
             }
         }
     }
@@ -159,9 +160,10 @@ public class CoreTransactionServiceImpl implements TransactionService {
             default -> {
                 List<Transaction> targets = transactionRepository.findAllByTargetAccounts(accounts, pageRequest).getContent();
                 List<Transaction> recents = fetchRecentsFromCache(options);
-                if (recents.isEmpty()) transactionRepository.findAllBySourceOrTargetAccounts(accounts, pageRequest);
-                recents.addAll(targets);
-                return new PageImpl<>(recents);
+                if (recents.isEmpty()) recents = transactionRepository.findAllBySourceAccounts(accounts, pageRequest)
+                                                                      .getContent();
+                List<Transaction> results = Stream.concat(recents.stream(), targets.stream()).toList();
+                return new PageImpl<>(results);
             }
         }
     }
