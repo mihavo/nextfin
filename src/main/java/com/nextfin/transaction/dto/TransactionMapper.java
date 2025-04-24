@@ -21,6 +21,7 @@ public interface TransactionMapper {
     @Mapping(source = "targetAccount.holder.user.id", target = "targetUserId")
     @Mapping(source = "transactionStatus", target = "status")
     @Mapping(source = "transactionType", target = "type")
+    @Mapping(target = "targetName", expression = "java(transaction.getTargetName())")
     TransactionDetailsDto toTransactionDetails(Transaction transaction);
 
     @Mapping(source = "status", target = "transactionStatus")

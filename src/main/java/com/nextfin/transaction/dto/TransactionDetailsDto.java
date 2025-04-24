@@ -8,8 +8,8 @@ import java.time.Instant;
 import java.util.Currency;
 import java.util.UUID;
 
-public record TransactionDetailsDto(UUID id, BigDecimal amount, Currency currency, Long sourceAccountId,
-                                    Long targetAccountId, UUID sourceUserId, UUID targetUserId,
+public record TransactionDetailsDto(UUID id, BigDecimal amount, Currency currency, Long sourceAccountId, Long targetAccountId,
+                                    UUID sourceUserId, UUID targetUserId, String targetName,
                                     TransactionStatus status, TransactionType type,
                                     Instant createdAt, Instant updatedAt) {
 }

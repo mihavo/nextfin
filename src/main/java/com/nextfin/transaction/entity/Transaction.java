@@ -1,6 +1,7 @@
 package com.nextfin.transaction.entity;
 
 import com.nextfin.account.entity.Account;
+import com.nextfin.holder.entity.Holder;
 import com.nextfin.transaction.enums.TransactionStatus;
 import com.nextfin.transaction.enums.TransactionType;
 import jakarta.persistence.*;
@@ -13,6 +14,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Currency;
+import java.util.Optional;
 import java.util.UUID;
 
 @Entity
@@ -46,6 +48,9 @@ public class Transaction {
     @JoinColumn(name = "target_account_id", insertable = false, updatable = false, nullable = false)
     private Account targetAccount;
 
+    @Transient
+    private String targetName;
+
     @Column(name = "target_account_id", nullable = false)
     private Long targetAccountId;
     
@@ -73,5 +78,9 @@ public class Transaction {
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
+
+    public String getTargetName() {
+        return Optional.ofNullable(targetAccount).map(Account::getHolder).map(Holder::getFullName).orElse(null);
+    }
 
 }
