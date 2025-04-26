@@ -110,4 +110,6 @@ public interface AccountService {
      * @return the accounts
      */
     List<Account> getCurrentUserAccounts();
+
+    boolean belongsToOrganization(Account account);
 }

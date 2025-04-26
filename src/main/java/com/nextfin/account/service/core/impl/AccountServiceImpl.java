@@ -14,6 +14,7 @@ import com.nextfin.employee.entity.Employee;
 import com.nextfin.employee.service.EmployeeService;
 import com.nextfin.exceptions.exception.NotFoundException;
 import com.nextfin.holder.entity.Holder;
+import com.nextfin.organization.service.OrganizationService;
 import com.nextfin.transaction.entity.Transaction;
 import com.nextfin.users.entity.NextfinUserDetails;
 import com.nextfin.users.entity.User;
@@ -46,6 +47,7 @@ public class AccountServiceImpl implements AccountService {
     @Lazy private final AccountValidator accountValidator;
 
     private final EmployeeService employeeService;
+    private final OrganizationService organizationService;
 
     private final MessageSource messageSource;
 
@@ -189,6 +191,11 @@ public class AccountServiceImpl implements AccountService {
     public List<Account> getCurrentUserAccounts() {
         UUID id = ((NextfinUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
         return accountRepository.getCurrentUserAccounts(id);
+    }
+
+    @Override
+    public boolean belongsToOrganization(Account account) {
+        return account != null && organizationService.getAccounts(account.getAccountType()).contains(account);
     }
 
 }

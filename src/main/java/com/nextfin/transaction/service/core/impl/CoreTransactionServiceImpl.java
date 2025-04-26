@@ -5,8 +5,11 @@ import com.nextfin.account.service.core.AccountService;
 import com.nextfin.exceptions.exception.CannotCacheException;
 import com.nextfin.exceptions.exception.Disabled2FAException;
 import com.nextfin.exceptions.exception.UserNotFoundException;
+import com.nextfin.organization.entity.Organization;
+import com.nextfin.organization.service.OrganizationService;
 import com.nextfin.transaction.dto.*;
 import com.nextfin.transaction.entity.Transaction;
+import com.nextfin.transaction.entity.TransactionCategory;
 import com.nextfin.transaction.enums.TransactionStatus;
 import com.nextfin.transaction.enums.TransactionType;
 import com.nextfin.transaction.repository.TransactionRepository;
@@ -72,6 +75,7 @@ public class CoreTransactionServiceImpl implements TransactionService {
     private final MessageSource messageSource;
 
     private final UserService userService;
+    private final OrganizationService organizationService;
 
 
     @Override
@@ -230,11 +234,12 @@ public class CoreTransactionServiceImpl implements TransactionService {
 
     private @NotNull Transaction storeTransaction(TransferRequestDto dto, TransactionType type,
                                                   LocalDateTime scheduledAt) {
+        TransactionCategory transactionCategory = resolveTransactionCategory(dto);
         Transaction transaction = Transaction.builder()
                                              .amount(dto.getAmount())
                                              .currency(dto.getCurrency())
                                              .transactionStatus(TransactionStatus.CREATED)
-                                             .transactionType(type)
+                                             .transactionType(type).category(transactionCategory)
                                              .scheduledAt(scheduledAt)
                                              .sourceAccountId(dto.getSourceAccountId())
                                              .targetAccountId(dto.getTargetAccountId())
@@ -246,6 +251,11 @@ public class CoreTransactionServiceImpl implements TransactionService {
             throw new CannotCacheException("User not found, cannot cache transaction " + transaction.getId());
         }
         return saved;
+    }
+
+    private TransactionCategory resolveTransactionCategory(TransferRequestDto dto) {
+        Organization organization = organizationService.getOrganizationByAccountId(dto.getTargetAccountId());
+        return organization != null ? organization.getIndustryType().getCategory() : TransactionCategory.TRANSFERS;
     }
 
     @NotNull

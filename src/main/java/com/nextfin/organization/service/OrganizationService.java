@@ -24,4 +24,5 @@ public interface OrganizationService {
 
     void organizationExists(UUID organizationId) throws NoSuchElementException;
 
+    Organization getOrganizationByAccountId(Long targetAccountId);
 }

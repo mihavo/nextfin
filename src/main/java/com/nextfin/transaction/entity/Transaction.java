@@ -51,7 +51,7 @@ public class Transaction {
     @Transient
     private String targetName;
 
-    private TransactionCategory category = TransactionCategory.OTHER;
+    private TransactionCategory category = TransactionCategory.TRANSFERS;
 
     @Column(name = "target_account_id", nullable = false)
     private Long targetAccountId;
