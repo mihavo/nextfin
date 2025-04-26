@@ -9,5 +9,5 @@ import java.util.UUID;
 
 @Builder
 public record CreateAccountResponseDto(Long id, BigDecimal balance, Currency currency, AccountType accountType, UUID holderId,
-                                       Long transactionLimit) {
+                                       Long transactionLimit, String friendlyName) {
 }

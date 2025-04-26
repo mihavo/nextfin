@@ -31,4 +31,9 @@ public class CreateAccountRequestDto {
     @Builder.Default
     @JsonSetter(nulls = Nulls.SKIP)
     public AccountType accountType = AccountType.SAVINGS;
+
+    /**
+     * Represents the nickname for the account
+     */
+    public String friendlyName;
 }

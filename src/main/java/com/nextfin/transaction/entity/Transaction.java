@@ -48,13 +48,14 @@ public class Transaction {
     @JoinColumn(name = "target_account_id", insertable = false, updatable = false, nullable = false)
     private Account targetAccount;
 
+    @Column(name = "target_account_id", nullable = false)
+    private Long targetAccountId;
+
     @Transient
     private String targetName;
 
+    @Column(name = "category", nullable = false)
     private TransactionCategory category = TransactionCategory.TRANSFERS;
-
-    @Column(name = "target_account_id", nullable = false)
-    private Long targetAccountId;
     
     @Enumerated
     @Column(name = "transaction_status", nullable = false)

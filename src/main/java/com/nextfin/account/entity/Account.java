@@ -62,6 +62,9 @@ public class Account {
     @Builder.Default
     Long transactionLimit = 1000L;
 
+    @Column(name = "friendly_name")
+    private String friendlyName;
+
     @Column(name = "daily_total")
     @Builder.Default
     BigDecimal dailyTotal = BigDecimal.ZERO;

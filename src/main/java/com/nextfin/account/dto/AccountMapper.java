@@ -10,3 +10,4 @@ public interface AccountMapper {
     @Mapping(source = "holder.id", target = "holderId")
     CreateAccountResponseDto toCreateAccountResponseDto(Account account);
 }
+    
