@@ -1,5 +1,6 @@
 package com.nextfin.transaction.dto;
 
+import com.nextfin.transaction.entity.TransactionCategory;
 import com.nextfin.transaction.enums.TransactionStatus;
 
 import java.time.Instant;
@@ -11,7 +12,7 @@ public record TransactionResponseDto(
         Long sourceAccountId,
         Long targetAccountId,
         Currency currency,
-        TransactionStatus status,
+        TransactionStatus status, TransactionCategory category,
         String message,
         Instant timestamp
 ) {

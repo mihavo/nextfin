@@ -35,7 +35,7 @@ public class OrganizationServiceImpl implements OrganizationService {
     private final AccountService accountService;
     private final UserService userService;
 
-    private MessageSource messageSource;
+    private final MessageSource messageSource;
 
     @Override
     public Organization createOrganization(CreateOrganizationDto dto, User owner) {
@@ -72,7 +72,7 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
     @Override
-    public Organization getOrganizationByAccountId(Long targetAccountId) {
+    public Optional<Organization> getOrganizationByAccountId(Long targetAccountId) {
         Account account = accountService.getAccount(targetAccountId);
         if (account == null) {
             throw new NotFoundException(messageSource.getMessage("account.notfound", new String[]{targetAccountId.toString()},
@@ -84,7 +84,6 @@ public class OrganizationServiceImpl implements OrganizationService {
                                                                  LocaleContextHolder.getLocale()));
         }
         User user = holder.getUser();
-        return organizationRepository.getByOwner(user).orElseThrow(() -> new NotFoundException(
-                messageSource.getMessage("organization.not.found", null, LocaleContextHolder.getLocale())));
+        return organizationRepository.getByOwner(user);
     }
 }

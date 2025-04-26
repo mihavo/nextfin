@@ -62,12 +62,12 @@ public class EmbeddedTransactionExecutorImpl implements EmbeddedTransactionExecu
 
     @Override
     public Transaction process(Transaction transaction) {
-        transaction.setTransactionStatus(TransactionStatus.PROCESSING);
+        transaction.setStatus(TransactionStatus.PROCESSING);
         transactionRepository.save(transaction);
         log.debug("Transaction with id {} submitted for processing", transaction.getId());
         submitTransactionTask(transaction);
         log.debug("Transaction with id {} completed", transaction.getId());
-        transaction.setTransactionStatus(TransactionStatus.COMPLETED);
+        transaction.setStatus(TransactionStatus.COMPLETED);
         return transactionRepository.save(transaction);
     }
 

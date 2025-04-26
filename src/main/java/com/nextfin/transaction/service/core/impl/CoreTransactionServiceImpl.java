@@ -110,7 +110,7 @@ public class CoreTransactionServiceImpl implements TransactionService {
 
     @Override
     public TransactionStatus checkStatus(UUID transactionId) {
-        return getTransaction(transactionId).getTransactionStatus();
+        return getTransaction(transactionId).getStatus();
     }
 
     @Override
@@ -198,7 +198,7 @@ public class CoreTransactionServiceImpl implements TransactionService {
 
     @Override
     public @NotNull ScheduledTransactionDto scheduleTransaction(Transaction transaction) {
-        if (transaction.getTransactionType() != TransactionType.SCHEDULED) {
+        if (transaction.getType() != TransactionType.SCHEDULED) {
             throw new IllegalArgumentException("Transaction must be of type SCHEDULED");
         }
         return transactionScheduler.scheduleTransaction(transaction);
@@ -206,7 +206,7 @@ public class CoreTransactionServiceImpl implements TransactionService {
 
 
     public @NotNull TransactionResponse processTransaction(Transaction transaction) {
-        if (transaction.getTransactionType() != TransactionType.INSTANT) {
+        if (transaction.getType() != TransactionType.INSTANT) {
             throw new IllegalArgumentException("Transaction must be of type INSTANT");
         }
         if (transactionProcessor.isPresent()) {
@@ -224,7 +224,7 @@ public class CoreTransactionServiceImpl implements TransactionService {
 
     @Override
     public TransactionResponse processScheduledTransaction(Transaction transaction) {
-        if (transaction.getTransactionType() != TransactionType.SCHEDULED) {
+        if (transaction.getType() != TransactionType.SCHEDULED) {
             throw new IllegalArgumentException("Transaction must be of type SCHEDULED");
         }
         Transaction processedTransaction = transactionProcessor.get().process(transaction); //TODO: work on scheduling with kafka
@@ -235,11 +235,8 @@ public class CoreTransactionServiceImpl implements TransactionService {
     private @NotNull Transaction storeTransaction(TransferRequestDto dto, TransactionType type,
                                                   LocalDateTime scheduledAt) {
         TransactionCategory transactionCategory = resolveTransactionCategory(dto);
-        Transaction transaction = Transaction.builder()
-                                             .amount(dto.getAmount())
-                                             .currency(dto.getCurrency())
-                                             .transactionStatus(TransactionStatus.CREATED)
-                                             .transactionType(type).category(transactionCategory)
+        Transaction transaction = Transaction.builder().amount(dto.getAmount()).currency(dto.getCurrency()).status(
+                                                     TransactionStatus.CREATED).type(type).category(transactionCategory)
                                              .scheduledAt(scheduledAt)
                                              .sourceAccountId(dto.getSourceAccountId())
                                              .targetAccountId(dto.getTargetAccountId())
@@ -254,8 +251,8 @@ public class CoreTransactionServiceImpl implements TransactionService {
     }
 
     private TransactionCategory resolveTransactionCategory(TransferRequestDto dto) {
-        Organization organization = organizationService.getOrganizationByAccountId(dto.getTargetAccountId());
-        return organization != null ? organization.getIndustryType().getCategory() : TransactionCategory.TRANSFERS;
+        Optional<Organization> organization = organizationService.getOrganizationByAccountId(dto.getTargetAccountId());
+        return organization.isPresent() ? organization.get().getIndustryType().getCategory() : TransactionCategory.TRANSFERS;
     }
 
     @NotNull

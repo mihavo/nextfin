@@ -59,12 +59,12 @@ public class Transaction {
     @Enumerated
     @Column(name = "transaction_status", nullable = false)
     @Builder.Default
-    private TransactionStatus transactionStatus = TransactionStatus.CREATED;
+    private TransactionStatus status = TransactionStatus.CREATED;
 
     @Enumerated
     @Column(name = "transaction_type", nullable = false)
     @Builder.Default
-    private TransactionType transactionType = TransactionType.INSTANT;
+    private TransactionType type = TransactionType.INSTANT;
 
     @Column(name = "scheduled_at")
     private LocalDateTime scheduledAt;

@@ -48,7 +48,7 @@ public class MFATransactionService {
         Verification verification = Verification.creator(verificationSid, sourcePhone, "sms").create();
         log.info("OTP sent to {} for transaction {}, status: {}", sourcePhone, transaction.getId(),
                  verification.getStatus());
-        transaction.setTransactionStatus(TransactionStatus.OTP_SENT);
+        transaction.setStatus(TransactionStatus.OTP_SENT);
         transactionRepository.save(transaction);
         return verification;
     }
