@@ -2,16 +2,16 @@ version: '3'
 
 services:
   app:
-    container_name: aa-banking-app
+    container_name: nextfin
     build:
       context: ../../../
       dockerfile: src/main/docker/Dockerfile
     image:
-      aa-banking-app:1.0
+      nextfin:1.0
     ports:
       - '8080:8080'
     environment:
-      - DB_URL=aa-banking-db
+      - DB_URL=nextfin-db
       - DB_USER=postgres
       - DB_PASSWORD=postgres
       - DB_DATABASE=bankdb
@@ -20,7 +20,7 @@ services:
       - psql-db
   psql-db:
     image: postgres
-    container_name: aa-banking-db
+    container_name: nextfin-db
     restart: always
     environment:
       - POSTGRES_USER=postgres
