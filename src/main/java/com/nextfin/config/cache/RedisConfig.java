@@ -70,7 +70,7 @@ public class RedisConfig {
 
     private @NotNull JedisClientConfiguration buildClientConfig() {
         JedisClientConfiguration.JedisClientConfigurationBuilder builder = JedisClientConfiguration.builder();
-        builder.connectTimeout(Duration.ofSeconds(10));
+        builder.connectTimeout(Duration.ofSeconds(120));
         builder.usePooling().poolConfig(buildPoolConfig());
         if (useSsl) builder.useSsl();
         return builder.build();
@@ -163,7 +163,7 @@ public class RedisConfig {
         JedisPoolConfig poolConfig = new JedisPoolConfig();
         poolConfig.setMaxTotal(20);
         poolConfig.setMaxIdle(10);
-        poolConfig.setMaxWait(Duration.ofSeconds(10));
+        poolConfig.setMaxWait(Duration.ofSeconds(120));
         return poolConfig;
     }
 }
