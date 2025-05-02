@@ -1,22 +1,10 @@
 package com.nextfin.employee.entity;
 
 import com.nextfin.common.address.entity.Address;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.SequenceGenerator;
-import jakarta.persistence.Table;
+import com.nextfin.employee.enums.EmployeeRole;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import java.time.LocalDate;
 
@@ -50,4 +38,7 @@ public class Employee {
     @ManyToOne
     @JoinColumn(name = "address_id")
     private Address address;
+
+    @Column(name = "employee_role", nullable = false)
+    private EmployeeRole role;
 }

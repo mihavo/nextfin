@@ -12,7 +12,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -37,9 +36,8 @@ public class EmployeeController {
     @Operation(summary = "Creates a bank employee")
     public ResponseEntity<CreateEmployeeResponseDto> createEmployee(@Valid @RequestBody CreateEmployeeRequestDto requestDto) {
         Employee employee = employeeService.createEmployee(requestDto);
-        String message = messageSource.getMessage("employee.create.success", null, LocaleContextHolder.getLocale());
-        CreateEmployeeResponseDto employeeResponse = employeeMapper.toCreateEmployeeResponseDto(employee, message);
-        return new ResponseEntity<>(employeeResponse, HttpStatus.CREATED);
+        CreateEmployeeResponseDto response = employeeMapper.toCreateEmployeeResponseDto(employee);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     /**

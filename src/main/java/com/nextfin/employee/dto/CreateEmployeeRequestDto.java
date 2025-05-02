@@ -2,6 +2,7 @@ package com.nextfin.employee.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.nextfin.common.address.dto.AddressDataDto;
+import com.nextfin.employee.enums.EmployeeRole;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -29,4 +30,8 @@ public class CreateEmployeeRequestDto {
     @Valid
     @NotNull(message = "Employee must have a valid address")
     public AddressDataDto address;
+
+    @NotNull(message = "Employee must have a valid role")
+    public EmployeeRole role;
+
 }
