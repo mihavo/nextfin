@@ -6,6 +6,7 @@ import com.nextfin.employee.dto.CreateEmployeeResponseDto;
 import com.nextfin.employee.dto.EmployeeMapper;
 import com.nextfin.employee.dto.GetEmployeeDto;
 import com.nextfin.employee.entity.Employee;
+import com.nextfin.employee.enums.EmployeeRole;
 import com.nextfin.employee.service.EmployeeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -15,6 +16,8 @@ import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping(AppConstants.API_BASE_URL + "/employees/")
@@ -38,6 +41,19 @@ public class EmployeeController {
         Employee employee = employeeService.createEmployee(requestDto);
         CreateEmployeeResponseDto response = employeeMapper.toCreateEmployeeResponseDto(employee);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    /**
+     * Gets all employees
+     *
+     * @param role the role filter
+     * @return the list of employees
+     */
+    @GetMapping("")
+    @Operation(summary = "Returns all employees")
+    public ResponseEntity<List<Employee>> createEmployee(@Valid @RequestParam(required = false) EmployeeRole role) {
+        List<Employee> employees = employeeService.getEmployees(role);
+        return new ResponseEntity<>(employees, HttpStatus.OK);
     }
 
     /**

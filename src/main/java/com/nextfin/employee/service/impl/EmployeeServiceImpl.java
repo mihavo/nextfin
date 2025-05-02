@@ -5,6 +5,7 @@ import com.nextfin.common.address.service.def.AddressService;
 import com.nextfin.employee.dto.CreateEmployeeRequestDto;
 import com.nextfin.employee.dto.EmployeeMapper;
 import com.nextfin.employee.entity.Employee;
+import com.nextfin.employee.enums.EmployeeRole;
 import com.nextfin.employee.repository.EmployeeRepository;
 import com.nextfin.employee.service.EmployeeService;
 import com.nextfin.exceptions.exception.NotFoundException;
@@ -13,6 +14,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
@@ -41,5 +43,13 @@ public class EmployeeServiceImpl implements EmployeeService {
                                  .orElseThrow(() -> new NotFoundException(messageSource.getMessage("employee.notfound",
                                                                                                    new Long[]{employeeId},
                                                                                                    LocaleContextHolder.getLocale())));
+    }
+
+    @Override
+    public List<Employee> getEmployees(EmployeeRole role) {
+        if (role == null) {
+            return employeeRepository.findAll();
+        }
+        return employeeRepository.findAllByRole(role);
     }
 }
