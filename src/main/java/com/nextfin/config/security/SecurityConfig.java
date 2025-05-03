@@ -22,11 +22,13 @@ import org.springframework.security.config.annotation.web.configurers.SessionMan
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.Http403ForbiddenEntryPoint;
 import org.springframework.security.web.authentication.logout.HeaderWriterLogoutHandler;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.web.header.writers.ClearSiteDataHeaderWriter;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.session.MapSessionRepository;
 import org.springframework.session.SessionRepository;
 import org.springframework.session.config.annotation.web.http.EnableSpringHttpSession;
@@ -81,6 +83,10 @@ public class SecurityConfig {
             oauth2.userInfoEndpoint(userInfo -> userInfo.oidcUserService(oidcUserService));
         });
         http.oauth2Client(Customizer.withDefaults());
+
+        http.exceptionHandling().defaultAuthenticationEntryPointFor(new Http403ForbiddenEntryPoint(),
+                                                                    new AntPathRequestMatcher("/api/**"));
+
         return http.build();
     }
 
