@@ -46,10 +46,10 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public List<Employee> getEmployees(EmployeeRole role) {
-        if (role == null) {
+    public List<Employee> getEmployees(List<EmployeeRole> roles) {
+        if (roles == null || roles.isEmpty()) {
             return employeeRepository.findAll();
         }
-        return employeeRepository.findAllByRole(role);
+        return employeeRepository.findByRoleIn(roles);
     }
 }

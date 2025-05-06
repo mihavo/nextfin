@@ -10,4 +10,6 @@ import java.util.List;
 @Repository
 public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     List<Employee> findAllByRole(EmployeeRole role);
+
+    List<Employee> findByRoleIn(List<EmployeeRole> roles);
 }

@@ -28,10 +28,10 @@ public interface EmployeeService {
     Employee getEmployeeById(Long employeeId) throws NoSuchElementException;
 
     /**
-     * Fetches all employees from persistence
+     * Fetches all employees from persistence (with optional roles filter
      *
-     * @param role the role filter
+     * @param roles the roles filter
      * @return the list of employees
      */
-    List<Employee> getEmployees(@Valid EmployeeRole role);
+    List<Employee> getEmployees(@Valid List<EmployeeRole> roles);
 }
