@@ -51,7 +51,7 @@ public class EmployeeController {
      */
     @GetMapping("")
     @Operation(summary = "Returns all employees")
-    public ResponseEntity<List<Employee>> getEmployees(@Valid @RequestParam(required = false) List<EmployeeRole> roles) {
+    public ResponseEntity<List<Employee>> getEmployees(@Valid @RequestParam(required = false, name = "role") List<EmployeeRole> roles) {
         List<Employee> employees = employeeService.getEmployees(roles);
         return new ResponseEntity<>(employees, HttpStatus.OK);
     }
