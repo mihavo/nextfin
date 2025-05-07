@@ -46,7 +46,7 @@ public class EmployeeController {
     /**
      * Gets all employees
      *
-     * @param role the role filter
+     * @param roles the role filter
      * @return the list of employees
      */
     @GetMapping("")
