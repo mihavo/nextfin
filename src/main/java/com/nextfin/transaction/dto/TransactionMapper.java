@@ -12,6 +12,7 @@ public interface TransactionMapper {
     @Mapping(source = "transaction.sourceAccountId", target = "sourceAccountId")
     @Mapping(source = "transaction.targetAccountId", target = "targetAccountId")
     @Mapping(source = "transaction.currency", target = "currency")
+    @Mapping(source = "transaction.amount", target = "amount")
     @Mapping(source = "transaction.status", target = "status")
     @Mapping(source = "transaction.category", target = "category")
     TransactionResponseDto toTransactionResponse(TransactionResponse response);
