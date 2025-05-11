@@ -69,12 +69,9 @@ public class AccountServiceImpl implements AccountService {
                                                                        LocaleContextHolder.getLocale()));
         }
         Employee manager = employeeService.getEmployeeById(dto.managerId);
-        Account account = Account.builder()
-                                 .balance(BigDecimal.ZERO)
-                                 .status(AccountStatus.ACTIVE).holder(currentUser.getHolder()).manager(manager).accountType(
-                        dto.accountType).friendlyName(dto.friendlyName)
-                                 .currency(Currency.getInstance(dto.currencyCode))
-                                 .build();
+        Account account = Account.builder().balance(BigDecimal.ZERO).status(AccountStatus.ACTIVE).holder(currentUser.getHolder())
+                                 .manager(manager).accountType(dto.accountType).friendlyName(dto.friendlyName).currency(
+                        Currency.getInstance(dto.currencyCode)).build();
         Account savedAccount = accountRepository.save(account);
         log.trace("Account created: {}", savedAccount);
         return savedAccount;
