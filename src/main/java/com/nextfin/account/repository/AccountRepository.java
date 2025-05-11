@@ -41,7 +41,7 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
 
     @Query("""
                 SELECT new com.nextfin.account.dto.AccountSearchResultDto(
-                    a.id, a.holder.firstName, a.holder.lastName, a.currency)
+                    a.id,a.iban, a.holder.firstName, a.holder.lastName, a.currency)
                 FROM Account a
                 WHERE (
                     LOWER(a.holder.firstName) LIKE LOWER(CONCAT('%', :query, '%')) OR

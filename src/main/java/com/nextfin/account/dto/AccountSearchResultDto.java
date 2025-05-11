@@ -12,6 +12,7 @@ import java.util.Currency;
 public class AccountSearchResultDto {
 
     private Long id;
+    private String iban;
     private String firstName;
     private String lastName;
     private Currency currency;
