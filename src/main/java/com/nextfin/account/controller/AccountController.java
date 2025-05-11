@@ -162,8 +162,9 @@ public class AccountController {
 
     @GetMapping("/search")
     @Operation(summary = "Account Search", description = "Method for searching accounts by their id / holder /user info")
-    public ResponseEntity<Page<Account>> search(@RequestParam("query") String query, @Valid AccountSearchOptions options) {
-        Page<Account> results = accountService.search(query, options);
+    public ResponseEntity<Page<AccountSearchResultDto>> search(@RequestParam("query") String query,
+                                                               @Valid AccountSearchOptions options) {
+        Page<AccountSearchResultDto> results = accountService.search(query, options);
         return new ResponseEntity<>(results, HttpStatus.OK);
     }
 

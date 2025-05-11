@@ -118,5 +118,5 @@ public interface AccountService {
      * @param options options related to pagination
      * @return the account results
      */
-    Page<Account> search(String query, AccountSearchOptions options);
+    Page<AccountSearchResultDto> search(String query, AccountSearchOptions options);
 }

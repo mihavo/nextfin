@@ -197,8 +197,8 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public Page<Account> search(String query, AccountSearchOptions options) {
-        PageRequest pageRequest = PageRequest.of(options.skip(), options.pageSize());
+    public Page<AccountSearchResultDto> search(String query, AccountSearchOptions options) {
+        PageRequest pageRequest = PageRequest.of(options.getSkip(), options.getPageSize());
         return accountRepository.searchAccounts(query, pageRequest);
     }
 

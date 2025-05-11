@@ -1,17 +1,15 @@
 package com.nextfin.account.dto;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Builder
 @Getter
 @Setter
-@RequiredArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
 public class AccountSearchOptions {
     @Builder.Default
-    int pageSize = 0;
+    int pageSize = 5;
     
     @Builder.Default
     int skip = 0;

@@ -1,5 +1,6 @@
 package com.nextfin.account.repository;
 
+import com.nextfin.account.dto.AccountSearchResultDto;
 import com.nextfin.account.entity.Account;
 import com.nextfin.account.enums.AccountType;
 import com.nextfin.holder.entity.Holder;
@@ -38,8 +39,8 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
     @Query("SELECT a FROM Account a WHERE a.holder.user.id = :userId")
     List<Account> getCurrentUserAccounts(UUID userId);
 
-    @Query("SELECT a FROM Account a WHERE LOWER(a.holder.firstName) LIKE LOWER(CONCAT('%',:query,'%'))" + "OR LOWER(a.holder" +
-            ".lastName) LIKE LOWER(CONCAT('%',:query,'%'))" + "OR LOWER(a.holder.user.email) LIKE LOWER(CONCAT('%',:query,'%'))"
-            + "OR CAST(a.id AS string) LIKE CONCAT('%',:query,'%')")
-    Page<Account> searchAccounts(@Param("query") String query, Pageable pageable);
+    @Query("SELECT new com.nextfin.account.dto.AccountSearchResultDto(a.id ,a.holder.firstName ,a.holder.lastName ,a.currency) "
+            + "FROM Account a WHERE LOWER(a" + ".holder.firstName) LIKE " + "LOWER(CONCAT('%',:query,'%'))" + "OR LOWER(a" + 
+            ".holder" + ".lastName) LIKE LOWER(CONCAT" + "('%',:query,'%'))" + "OR LOWER" + "(a.holder.user.email) LIKE LOWER" + "(CONCAT('%',:query,'%'))" + "OR a.holder.user.username LIKE LOWER(CONCAT('%',:query,'%')) " + "OR CAST(a.id AS string) LIKE CONCAT('%',:query,'%')" + "AND a.status = com.nextfin.account.enums.AccountStatus.ACTIVE")
+    Page<AccountSearchResultDto> searchAccounts(@Param("query") String query, Pageable pageable);
 }
