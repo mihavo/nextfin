@@ -34,6 +34,9 @@ public class Account {
     @Column(name = "id", nullable = false)
     private Long id;
 
+    @Column(name = "iban")
+    private String iban;
+
     @Column(name = "balance", nullable = false)
     @Builder.Default
     private BigDecimal balance = BigDecimal.ZERO;

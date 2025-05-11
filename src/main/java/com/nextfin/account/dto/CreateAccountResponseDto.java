@@ -9,7 +9,8 @@ import java.util.Currency;
 import java.util.UUID;
 
 @Builder
-public record CreateAccountResponseDto(Long id, BigDecimal balance, Currency currency, AccountType accountType, UUID holderId,
+public record CreateAccountResponseDto(Long id, String iban, BigDecimal balance, Currency currency, AccountType accountType,
+                                       UUID holderId,
                                        Long transactionLimit, String friendlyName, Boolean transactionLimitEnabled,
                                        Boolean transaction2FAEnabled, Instant lastUpdated, Instant dateOpened) {
 }

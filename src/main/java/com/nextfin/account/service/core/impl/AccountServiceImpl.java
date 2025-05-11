@@ -6,6 +6,7 @@ import com.nextfin.account.enums.AccountStatus;
 import com.nextfin.account.enums.AccountType;
 import com.nextfin.account.repository.AccountRepository;
 import com.nextfin.account.service.core.AccountService;
+import com.nextfin.account.service.core.iban.IBANService;
 import com.nextfin.account.service.validator.AccountValidator;
 import com.nextfin.employee.entity.Employee;
 import com.nextfin.employee.service.EmployeeService;
@@ -18,6 +19,7 @@ import com.nextfin.users.entity.User;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.iban4j.Iban;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -47,6 +49,7 @@ public class AccountServiceImpl implements AccountService {
 
     private final EmployeeService employeeService;
     private final OrganizationService organizationService;
+    private final IBANService ibanService;
 
     private final MessageSource messageSource;
 
@@ -72,9 +75,12 @@ public class AccountServiceImpl implements AccountService {
         Account account = Account.builder().balance(BigDecimal.ZERO).status(AccountStatus.ACTIVE).holder(currentUser.getHolder())
                                  .manager(manager).accountType(dto.accountType).friendlyName(dto.friendlyName).currency(
                         Currency.getInstance(dto.currencyCode)).build();
-        Account savedAccount = accountRepository.save(account);
-        log.trace("Account created: {}", savedAccount);
-        return savedAccount;
+        account = accountRepository.save(account);
+        Iban iban = ibanService.generateIBAN(account);
+        account.setIban(iban.toString());
+        account = accountRepository.save(account);
+        log.trace("Account created: {}", account);
+        return account;
     }
 
     @Override
