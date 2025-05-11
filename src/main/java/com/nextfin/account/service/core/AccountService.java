@@ -1,15 +1,13 @@
 package com.nextfin.account.service.core;
 
-import com.nextfin.account.dto.CreateAccountRequestDto;
-import com.nextfin.account.dto.DepositAmountRequestDto;
-import com.nextfin.account.dto.GetAccountBalanceDto;
-import com.nextfin.account.dto.WithdrawAmountRequestDto;
+import com.nextfin.account.dto.*;
 import com.nextfin.account.entity.Account;
 import com.nextfin.account.enums.AccountType;
 import com.nextfin.exceptions.exception.NotFoundException;
 import com.nextfin.transaction.entity.Transaction;
 import com.nextfin.users.entity.User;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.data.domain.Page;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -112,4 +110,13 @@ public interface AccountService {
     List<Account> getCurrentUserAccounts();
 
     boolean belongsToOrganization(Account account);
+
+    /**
+     * Method for searching accounts by their id / holder /user info
+     *
+     * @param query   the query
+     * @param options options related to pagination
+     * @return the account results
+     */
+    Page<Account> search(String query, AccountSearchOptions options);
 }

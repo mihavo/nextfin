@@ -160,4 +160,11 @@ public class AccountController {
         return new ResponseEntity<>(new ToggleTransactionSMSConfirmationDto(enabled, message), HttpStatus.OK);
     }
 
+    @GetMapping("/search")
+    @Operation(summary = "Account Search", description = "Method for searching accounts by their id / holder /user info")
+    public ResponseEntity<Page<Account>> search(@RequestParam("query") String query, @Valid AccountSearchOptions options) {
+        Page<Account> results = accountService.search(query, options);
+        return new ResponseEntity<>(results, HttpStatus.OK);
+    }
+
 }

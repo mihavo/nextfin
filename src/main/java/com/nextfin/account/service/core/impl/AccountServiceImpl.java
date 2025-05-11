@@ -1,9 +1,6 @@
 package com.nextfin.account.service.core.impl;
 
-import com.nextfin.account.dto.CreateAccountRequestDto;
-import com.nextfin.account.dto.DepositAmountRequestDto;
-import com.nextfin.account.dto.GetAccountBalanceDto;
-import com.nextfin.account.dto.WithdrawAmountRequestDto;
+import com.nextfin.account.dto.*;
 import com.nextfin.account.entity.Account;
 import com.nextfin.account.enums.AccountStatus;
 import com.nextfin.account.enums.AccountType;
@@ -24,6 +21,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -195,6 +194,12 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public boolean belongsToOrganization(Account account) {
         return account != null && organizationService.getAccounts(account.getAccountType()).contains(account);
+    }
+
+    @Override
+    public Page<Account> search(String query, AccountSearchOptions options) {
+        PageRequest pageRequest = PageRequest.of(options.skip(), options.pageSize());
+        return accountRepository.searchAccounts(query, pageRequest);
     }
 
 }
