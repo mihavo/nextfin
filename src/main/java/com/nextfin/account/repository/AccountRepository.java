@@ -48,7 +48,7 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
                     LOWER(a.holder.lastName) LIKE LOWER(CONCAT('%', :query, '%')) OR
                     LOWER(a.holder.user.email) LIKE LOWER(CONCAT('%', :query, '%')) OR
                     LOWER(a.holder.user.username) LIKE LOWER(CONCAT('%', :query, '%')) OR
-                    CAST(a.id AS string) LIKE CONCAT('%', :query, '%')
+                    a.iban LIKE CONCAT('%', :query, '%')
                 ) AND a.status = com.nextfin.account.enums.AccountStatus.ACTIVE
             """)
     Page<AccountSearchResultDto> searchAccounts(@Param("query") String query, Pageable pageable);
