@@ -146,6 +146,13 @@ public class RedisService implements CacheService {
     }
 
     @Override
+    public Set<String> getFromSortedSet(String setKey, long page) {
+        if (!RedisConfig.isCachingEnabled()) return Set.of();
+        Set<String> allEntries = stringRedisTemplate.opsForZSet().reverseRange(setKey, 0, -1);
+        return allEntries != null ? allEntries : Set.of();
+    }
+
+    @Override
     public void addToSortedSet(String setKey, String member, double score) {
         if (!RedisConfig.isCachingEnabled()) throw new CacheDisabledException();
         stringRedisTemplate.opsForZSet().addIfAbsent(setKey, member, score);

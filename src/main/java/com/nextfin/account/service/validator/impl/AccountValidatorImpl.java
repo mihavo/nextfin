@@ -84,6 +84,6 @@ public class AccountValidatorImpl implements AccountValidator {
 
     private Set<String> getCurrentAccounts() {
         String key = CacheUtils.buildAccountsSetKey(userService.getCurrentUser().getId());
-        return cache.getFromSortedSet(key, 1, ACCOUNTS_CACHE_SIZE);
+        return cache.getFromSortedSet(key, 1);
     }
 }

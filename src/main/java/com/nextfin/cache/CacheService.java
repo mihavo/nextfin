@@ -135,6 +135,16 @@ public interface CacheService {
      */
     Set<String> getFromSortedSet(String setKey, long page, long pageSize);
 
+
+    /**
+     * Gets all the members of a specified sorted set based on the set key
+     *
+     * @param setKey
+     * @param page
+     * @return the members of the set
+     */
+    Set<String> getFromSortedSet(String setKey, long page);
+
     /**
      * Adds an element to a sorted set with a score
      *
