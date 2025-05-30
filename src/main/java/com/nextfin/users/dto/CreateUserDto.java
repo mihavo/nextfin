@@ -10,11 +10,10 @@ import lombok.Setter;
 @Builder
 @Getter
 @Setter
-
 public class CreateUserDto {
 
 	@NotEmpty(message = "Username is required")
-	@Size(min = 3, max = 28, message = "Username must be between 3 and 28 characters")
+	@Size(min = 7, max = 28, message = "Username must be between 3 and 28 characters")
 	private String username;
 
 	@NotEmpty(message = "Password is required")
