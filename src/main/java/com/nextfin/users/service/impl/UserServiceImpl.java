@@ -21,6 +21,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -39,6 +41,7 @@ public class UserServiceImpl implements UserService {
 
 
 	@Override
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public User createUser(CreateUserDto dto) {
 		boolean userMatch = userRepository.existsBySocialSecurityNumber(dto.getSocialSecurityNumber());
 		if (userMatch) {

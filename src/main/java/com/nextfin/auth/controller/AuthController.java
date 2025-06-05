@@ -38,14 +38,13 @@ public class AuthController {
     }
 
     @PostMapping("register")
-    public ResponseEntity<RegisterResponseDto> register(@Valid @RequestBody CreateUserDto userDto) {
+    public ResponseEntity<RegisterResponseDto> register(@Valid @RequestBody CreateUserDto userDto, HttpServletRequest request,
+                                                        HttpServletResponse response) {
         User user = userService.createUser(userDto);
-        return new ResponseEntity<>(new RegisterResponseDto(messageSource.getMessage(
-                "auth.register-success",
-                null,
-                LocaleContextHolder.getLocale()
-        ),
-                user), HttpStatus.CREATED);
+        authService.createNewUserSession(userDto, request, response);
+        return new ResponseEntity<>(
+                new RegisterResponseDto(messageSource.getMessage("auth.register-success", null, LocaleContextHolder.getLocale()),
+                                        user), HttpStatus.CREATED);
     }
 
     @GetMapping("logout/success")
