@@ -39,7 +39,7 @@ public class AddressServiceImpl implements AddressService {
                                              .city(city)
                                              .zipCode(zipCode)
                                              .state(dto.state())
-                                             .type(dto.addressType() != null ? dto.addressType() : AddressType.BILLING)
+                                             .type(dto.type() != null ? dto.type() : AddressType.BILLING)
                                              .build());
     }
 

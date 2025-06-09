@@ -70,7 +70,7 @@ public class HolderController {
         return new ResponseEntity<>(new CreateHolderResponseDto(holder, message), HttpStatus.CREATED);
     }
 
-    /**
+/**
      * Fetches a holder by its ID. Requires the user role to be MANAGER, EMPLOYEE or ADMIN.
      * @return a {@link ResponseEntity} containing the Holder
      */

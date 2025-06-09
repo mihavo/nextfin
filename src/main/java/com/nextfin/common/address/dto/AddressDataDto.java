@@ -10,6 +10,6 @@ public record AddressDataDto(String street,
                              String city,
                              String state,
                              @Length(min = 5, max = 5) String zipCode,
-                             AddressType addressType
+                             AddressType type
 ) {
 }
