@@ -32,4 +32,21 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
 
     @Query("SELECT t FROM Transaction t WHERE t.targetAccount IN :accounts OR t.sourceAccount IN :accounts")
     Page<Transaction> findAllBySourceOrTargetAccounts(List<Account> accounts, Pageable pageable);
+
+    @Query("""
+                SELECT t FROM Transaction t
+                WHERE t.category = com.nextfin.transaction.entity.TransactionCategory.TRANSFERS
+                  AND t.createdAt BETWEEN :start AND :end
+                  AND t.targetAccount.holder.id = :holderId
+            """)
+    List<Transaction> findIncomeByTimePeriod(@Param("holderId") UUID holderId, @Param("start") Instant start,
+                                             @Param("end") Instant end);
+
+    @Query("""
+                SELECT t FROM Transaction t
+                  WHERE t.createdAt BETWEEN :start AND :end
+                  AND t.sourceAccount.holder.id = :holderId
+            """)
+    List<Transaction> findExpensesByTimePeriod(@Param("holderId") UUID holderId, @Param("start") Instant start,
+                                               @Param("end") Instant end);
 }
