@@ -29,6 +29,8 @@
 - [Documentation](#documentation)
 - [License](#license)
 
+> 📌 **See also:** [Nextfin UI](https://github.com/mihavo/nextfin-ui) — frontend app for the Nextfin platform.
+
 ## 📖 Overview
 
 **Nextfin** is a comprehensive RESTful backend platform designed to enhance digital banking
