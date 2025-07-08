@@ -40,5 +40,6 @@ public class Employee {
     private Address address;
 
     @Column(name = "employee_role", nullable = false)
-    private EmployeeRole role;
+    @Builder.Default
+    private EmployeeRole role = EmployeeRole.OTHER;
 }

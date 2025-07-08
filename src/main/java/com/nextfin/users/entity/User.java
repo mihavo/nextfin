@@ -21,7 +21,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "users")
-@Check(constraints = "auth_provider = 'local' AND hashed_password IS NOT NULL")
+@Check(constraints = "(auth_provider != 'local') OR (hashed_password IS NOT NULL)")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
