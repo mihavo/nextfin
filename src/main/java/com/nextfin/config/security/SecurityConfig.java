@@ -8,6 +8,7 @@ import com.nextfin.users.service.impl.NextfinUserDetailsService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,8 +29,8 @@ import org.springframework.security.web.authentication.logout.HeaderWriterLogout
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.web.header.writers.ClearSiteDataHeaderWriter;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.session.MapSessionRepository;
 import org.springframework.session.SessionRepository;
 import org.springframework.session.config.annotation.web.http.EnableSpringHttpSession;
@@ -46,6 +47,9 @@ public class SecurityConfig {
     private final NextfinUserDetailsService nextfinUserDetailsService;
     private final PasswordEncoder passwordEncoder;
     private final MessageSource messageSource;
+
+    @Value("${nextfin.oauth.redirect-uri:http://localhost:3000/login/success}")
+    private String oauth2RedirectUri;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -79,7 +83,7 @@ public class SecurityConfig {
         http.oauth2Login(oauth2 -> {
             String baseUrl = AppConstants.API_BASE_URL + "/oauth2";
             oauth2.authorizationEndpoint(auth -> auth.baseUri(baseUrl + "/authorization"));
-//            oauth2.defaultSuccessUrl(baseUrl + "/success", true).permitAll();
+            oauth2.defaultSuccessUrl(oauth2RedirectUri, true);
             oauth2.failureUrl(baseUrl + "/failure").permitAll();
             oauth2.userInfoEndpoint(userInfo -> userInfo.oidcUserService(oidcUserService));
         });
@@ -87,7 +91,8 @@ public class SecurityConfig {
 
         http.exceptionHandling(
                 customizer -> customizer.defaultAuthenticationEntryPointFor(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),
-                                                                            new AntPathRequestMatcher("/api/**")));
+                                                                            PathPatternRequestMatcher.withDefaults()
+                                                                                                     .matcher("/api/**")));
 
         return http.build();
     }
