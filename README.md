@@ -13,7 +13,7 @@
   ·
   <a href="https://github.com/mihavo/nextfin/issues/new?labels=feature?template=feature_request.md">Request feature</a>
 </p>
-<p align="center"> <img src="https://img.shields.io/badge/Spring%20Boot-3.3.2-green" alt="Spring Boot"> 
+<p align="center"> <img src="https://img.shields.io/badge/Spring%20Boot-3.5.0-green" alt="Spring Boot"> 
 <img src="https://img.shields.io/badge/OAuth-2.0-blue" alt="OAuth">
 <img src="https://img.shields.io/badge/Twilio-API-red" alt="Twilio">
 <img src="https://img.shields.io/badge/PostgreSQL-17-yellow" alt="PostgreSQL">
