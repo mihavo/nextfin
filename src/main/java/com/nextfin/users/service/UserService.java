@@ -5,6 +5,9 @@ import com.nextfin.users.dto.CreateUserDto;
 import com.nextfin.users.entity.User;
 import com.nextfin.users.service.impl.NextfinUserDetailsService;
 
+import java.util.Optional;
+import java.util.UUID;
+
 public interface UserService extends NextfinUserDetailsService {
 
 	/**
@@ -34,4 +37,6 @@ public interface UserService extends NextfinUserDetailsService {
 	 * Saves current authenticated user's accounts in cache for future reference
 	 */
 	void cacheAccounts();
+
+    Optional<UUID> gettUserIdByEmail(String email);
 }

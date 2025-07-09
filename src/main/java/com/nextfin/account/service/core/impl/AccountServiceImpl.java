@@ -11,11 +11,13 @@ import com.nextfin.account.service.validator.AccountValidator;
 import com.nextfin.employee.entity.Employee;
 import com.nextfin.employee.service.EmployeeService;
 import com.nextfin.exceptions.exception.NotFoundException;
+import com.nextfin.exceptions.exception.UserNotFoundException;
 import com.nextfin.holder.entity.Holder;
 import com.nextfin.organization.service.OrganizationService;
 import com.nextfin.transaction.entity.Transaction;
 import com.nextfin.users.entity.NextfinUserDetails;
 import com.nextfin.users.entity.User;
+import com.nextfin.users.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +29,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,6 +55,7 @@ public class AccountServiceImpl implements AccountService {
     private final IBANService ibanService;
 
     private final MessageSource messageSource;
+    private final UserService userService;
 
     @Override
     public void checkExistence(Long... accountIds) {
@@ -190,8 +194,16 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public List<Account> getCurrentUserAccounts() {
-        UUID id = ((NextfinUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
-        return accountRepository.getCurrentUserAccounts(id);
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (principal instanceof OidcUser oidcPrincipal) {
+            String email = oidcPrincipal.getEmail();
+            UUID id = userService.gettUserIdByEmail(email).orElseThrow(() -> new UserNotFoundException("User not found"));
+            return accountRepository.getCurrentUserAccounts(id);
+        } else if (principal instanceof NextfinUserDetails nextfinPrincipal) {
+            UUID id = nextfinPrincipal.getId();
+            return accountRepository.getCurrentUserAccounts(id);
+        }
+        throw new UserNotFoundException("User not found.");
     }
 
     @Override

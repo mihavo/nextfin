@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -84,7 +85,12 @@ public class UserServiceImpl implements UserService {
 														 account.getDateOpened().toEpochMilli() / 1000.0));
 	}
 
-	@Override
+    @Override
+    public Optional<UUID> gettUserIdByEmail(String email) {
+        return userRepository.getIdByEmail(email);
+    }
+
+    @Override
 	public UserDetails loadUserById(UUID id) throws UserNotFoundException {
 		return userRepository.findById(id)
 							 .orElseThrow(() -> new UserNotFoundException(messageSource.getMessage("user.not-found-by-id",
