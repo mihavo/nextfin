@@ -1,5 +1,7 @@
 package com.nextfin.stats.service;
 
+import com.nextfin.exceptions.exception.HolderNotFoundException;
+import com.nextfin.holder.entity.Holder;
 import com.nextfin.stats.dto.ExpensesStatsResponseDto;
 import com.nextfin.stats.dto.IncomeStatsResponseDto;
 import com.nextfin.stats.enums.StatsRange;
@@ -29,8 +31,10 @@ public class StatsService {
         Instant now = Instant.now();
         ZonedDateTime start = getStartTime(range, now, zone);
 
-        List<Transaction> incomeTxs = transactionRepository.findIncomeByTimePeriod(
-                userService.getCurrentUser().getHolder().getId(), start.toInstant(), now);
+        Holder holder = userService.getCurrentUser().getHolder();
+        if (holder == null) throw new HolderNotFoundException(userService.getCurrentUser().getId());
+
+        List<Transaction> incomeTxs = transactionRepository.findIncomeByTimePeriod(holder.getId(), start.toInstant(), now);
 
         BigDecimal total = calculateTotal(incomeTxs);
         BigDecimal avg = calculateAverage(incomeTxs, total);
@@ -43,8 +47,10 @@ public class StatsService {
         Instant now = Instant.now();
         ZonedDateTime start = getStartTime(range, now, zone);
 
-        List<Transaction> expenseTxs = transactionRepository.findExpensesByTimePeriod(
-                userService.getCurrentUser().getHolder().getId(), start.toInstant(), now);
+        Holder holder = userService.getCurrentUser().getHolder();
+        if (holder == null) throw new HolderNotFoundException(userService.getCurrentUser().getId());
+
+        List<Transaction> expenseTxs = transactionRepository.findExpensesByTimePeriod(holder.getId(), start.toInstant(), now);
 
         BigDecimal total = calculateTotal(expenseTxs);
         BigDecimal avg = calculateAverage(expenseTxs, total);

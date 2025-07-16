@@ -20,6 +20,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -69,11 +70,14 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public User getCurrentUser() throws UserNotFoundException {
-		User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Object currentUser = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		if (currentUser == null) {
 			throw new ForbiddenException();
 		}
-		return currentUser;
+        if (currentUser instanceof OidcUser oidcUser) {
+            return userRepository.findUserByEmail((oidcUser.getEmail())).orElseThrow(() -> new UserNotFoundException(
+                    messageSource.getMessage("unknown_user.not-found", null, LocaleContextHolder.getLocale())));
+        } else return (User) currentUser;
 	}
 
 	@Override

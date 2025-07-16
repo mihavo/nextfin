@@ -25,4 +25,4 @@ public class Oauth2Controller {
         System.out.println(userInfo);
         return new ResponseEntity<>(userInfo, HttpStatus.OK);
     }
-}
+} 

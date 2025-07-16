@@ -75,6 +75,12 @@ public class GlobalExceptionHandler {
         );
     }
 
+    @ExceptionHandler(HolderNotFoundException.class)
+    public ResponseEntity<APIErrorResponse> handleHolderNotFoundException(HolderNotFoundException e) {
+        return new ResponseEntity<>(APIErrorResponse.builder().status(HttpStatus.BAD_REQUEST).message(e.getMessage())
+                                                    .timestamp(ZonedDateTime.now()).build(), HttpStatus.BAD_REQUEST);
+    }
+
     protected String printStackTrace(Throwable exception) {
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);

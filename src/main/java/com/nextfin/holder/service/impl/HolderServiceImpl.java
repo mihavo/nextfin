@@ -7,6 +7,7 @@ import com.nextfin.common.address.entity.Address;
 import com.nextfin.common.address.service.def.AddressService;
 import com.nextfin.exceptions.exception.BadRequestException;
 import com.nextfin.exceptions.exception.NotFoundException;
+import com.nextfin.exceptions.exception.UserNotFoundException;
 import com.nextfin.holder.dto.CreateHolderDto;
 import com.nextfin.holder.dto.HolderMapper;
 import com.nextfin.holder.entity.Holder;
@@ -18,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -74,8 +76,12 @@ public class HolderServiceImpl implements HolderService {
 
     @Override
     public Holder getHolderByCurrentUser() {
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return holderRepository.getByUser(user)
+        Object user = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (user instanceof OidcUser oidcUser) {
+            user = userRepository.findUserByEmail((oidcUser.getEmail())).orElseThrow(() -> new UserNotFoundException(
+                    messageSource.getMessage("unknown_user.not-found", null, LocaleContextHolder.getLocale())));
+        }
+        return holderRepository.getByUser((User) user)
                                .orElseThrow(() -> new NotFoundException("Holder not found for current user"));
     }
 
