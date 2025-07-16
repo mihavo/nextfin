@@ -95,6 +95,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public boolean isOnboardingComplete(String email) {
+        return userRepository.findUserByEmail(email).isPresent();
+    }
+
+    @Override
 	public UserDetails loadUserById(UUID id) throws UserNotFoundException {
 		return userRepository.findById(id)
 							 .orElseThrow(() -> new UserNotFoundException(messageSource.getMessage("user.not-found-by-id",

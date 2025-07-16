@@ -2,13 +2,13 @@ package com.nextfin.config.security;
 
 import com.nextfin.AppConstants;
 import com.nextfin.account.service.security.session.MultiSessionRepository;
+import com.nextfin.auth.oauth2.handler.Oauth2SuccessHandler;
 import com.nextfin.auth.oauth2.service.OidcService;
 import com.nextfin.auth.providers.UserAuthProvider;
 import com.nextfin.users.service.impl.NextfinUserDetailsService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -47,9 +47,7 @@ public class SecurityConfig {
     private final NextfinUserDetailsService nextfinUserDetailsService;
     private final PasswordEncoder passwordEncoder;
     private final MessageSource messageSource;
-
-    @Value("${nextfin.oauth.redirect-uri:http://localhost:3000/login/success}")
-    private String oauth2RedirectUri;
+    private final Oauth2SuccessHandler oauth2SuccessHandler;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -83,8 +81,8 @@ public class SecurityConfig {
         http.oauth2Login(oauth2 -> {
             String baseUrl = AppConstants.API_BASE_URL + "/oauth2";
             oauth2.authorizationEndpoint(auth -> auth.baseUri(baseUrl + "/authorization"));
-            oauth2.defaultSuccessUrl(oauth2RedirectUri, true);
             oauth2.failureUrl(baseUrl + "/failure").permitAll();
+            oauth2.successHandler(oauth2SuccessHandler);
             oauth2.userInfoEndpoint(userInfo -> userInfo.oidcUserService(oidcUserService));
         });
         http.oauth2Client(Customizer.withDefaults());

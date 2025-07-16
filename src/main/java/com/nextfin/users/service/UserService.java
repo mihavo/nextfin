@@ -39,4 +39,6 @@ public interface UserService extends NextfinUserDetailsService {
 	void cacheAccounts();
 
     Optional<UUID> gettUserIdByEmail(String email);
+
+    boolean isOnboardingComplete(String email);
 }
