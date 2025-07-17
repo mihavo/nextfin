@@ -6,6 +6,7 @@ import com.nextfin.auth.dto.SuccessfulOnboardingStepDto;
 import com.nextfin.auth.enums.OnboardingStep;
 import com.nextfin.holder.dto.CreateHolderDto;
 import com.nextfin.holder.entity.Holder;
+import com.nextfin.onboarding.entity.TosAcceptance;
 import com.nextfin.onboarding.service.OnboardingService;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -41,6 +42,17 @@ public class OnboardingController {
                 OnboardingStep.HOLDER_CREATION.next()).build();
         SuccessfulOnboardingStepDto<Holder> response = SuccessfulOnboardingStepDto.<Holder>builder().onboardingStatus(status)
                                                                                   .stepData(holder).build();
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/accept-terms")
+    public ResponseEntity<SuccessfulOnboardingStepDto<TosAcceptance>> acceptTerms() {
+        TosAcceptance acceptance = onboardingService.acceptTerms();
+        OnboardingStatusDto status = OnboardingStatusDto.builder().onboardingComplete(false).stage(
+                OnboardingStep.TOS_ACCEPTED.next()).build();
+        SuccessfulOnboardingStepDto<TosAcceptance> response = SuccessfulOnboardingStepDto.<TosAcceptance>builder()
+                                                                                         .onboardingStatus(status).stepData(
+                        acceptance).build();
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 }

@@ -7,4 +7,5 @@ public class AppConstants {
     public static final String VISA_REGEX_NO_DASH = "^4[0-9]{12}(?:[0-9]{3})?$";
     public static final String VISA_REGEX = "^4[0-9]{3}-?[0-9]{4}-?[0-9]{4}-?[0-9]{4}$";
     public static final String USER_PWD_REGEX = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=]).*$";
+    public static final String LATEST_TOS_VERSION = "1.0.0";
 }

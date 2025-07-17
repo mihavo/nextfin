@@ -5,6 +5,7 @@ import com.nextfin.AppConstants;
 import com.nextfin.auth.enums.OnboardingStep;
 import com.nextfin.generic.Auditable;
 import com.nextfin.holder.entity.Holder;
+import com.nextfin.onboarding.entity.TosAcceptance;
 import com.nextfin.users.enums.Role;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -12,6 +13,7 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.Check;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -91,7 +93,11 @@ public class User extends Auditable implements NextfinUserDetails {
 
     @Column(name = "onboarding_step", nullable = false)
     @Builder.Default
+    @ColumnDefault("0")
     private OnboardingStep onboardingStep = OnboardingStep.HOLDER_CREATION;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<TosAcceptance> tosAcceptances;
 
     @Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
