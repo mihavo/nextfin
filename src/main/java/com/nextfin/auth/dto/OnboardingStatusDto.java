@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class OnboardingStatusResponseDto {
+public class OnboardingStatusDto {
     boolean onboardingComplete;
     OnboardingStep stage;
 }
