@@ -26,7 +26,7 @@ public class Oauth2SuccessHandler implements AuthenticationSuccessHandler {
                                         Authentication authentication) throws IOException {
         OidcUser principal = (OidcUser) authentication.getPrincipal();
         boolean onboardingComplete = userService.isOnboardingComplete(principal.getEmail());
-        String redirectUri = defaultBaseUrl + (onboardingComplete ? "/onboarding" : "/dashboard");
+        String redirectUri = defaultBaseUrl + (onboardingComplete ? "/onboarding" : "/");
         response.sendRedirect(redirectUri);
 
     }

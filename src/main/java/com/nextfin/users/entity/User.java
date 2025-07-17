@@ -2,6 +2,7 @@ package com.nextfin.users.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.nextfin.AppConstants;
+import com.nextfin.auth.enums.OnboardingStep;
 import com.nextfin.generic.Auditable;
 import com.nextfin.holder.entity.Holder;
 import com.nextfin.users.enums.Role;
@@ -88,7 +89,11 @@ public class User extends Auditable implements NextfinUserDetails {
 	@OneToOne(mappedBy = "user")
 	private Holder holder;
 
-	@Override
+    @Column(name = "onboarding_step", nullable = false)
+    @Builder.Default
+    private OnboardingStep onboardingStep = OnboardingStep.HOLDER_CREATION;
+
+    @Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		return List.of(new SimpleGrantedAuthority(role.name()));
 	}

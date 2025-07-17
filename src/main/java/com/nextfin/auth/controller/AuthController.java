@@ -60,4 +60,5 @@ public class AuthController {
     public ResponseEntity<User> getMe() {
         return new ResponseEntity<>(userService.getCurrentUser(), HttpStatus.OK);
     }
+
 }
