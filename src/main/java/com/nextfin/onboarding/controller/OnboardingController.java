@@ -6,6 +6,7 @@ import com.nextfin.auth.dto.SuccessfulOnboardingStepDto;
 import com.nextfin.auth.enums.OnboardingStep;
 import com.nextfin.holder.dto.CreateHolderDto;
 import com.nextfin.holder.entity.Holder;
+import com.nextfin.onboarding.entity.Tos;
 import com.nextfin.onboarding.entity.TosAcceptance;
 import com.nextfin.onboarding.service.OnboardingService;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
@@ -54,5 +55,11 @@ public class OnboardingController {
                                                                                          .onboardingStatus(status).stepData(
                         acceptance).build();
         return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    @GetMapping("/terms")
+    public ResponseEntity<Tos> getTermsOfService() {
+        Tos tos = onboardingService.getTermsOfService();
+        return new ResponseEntity<>(tos, HttpStatus.OK);
     }
 }

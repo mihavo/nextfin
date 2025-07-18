@@ -4,8 +4,10 @@ import com.nextfin.onboarding.entity.Tos;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
 public interface TosRepository extends JpaRepository<Tos, UUID> {
+    Optional<Tos> findByVersion(String version);
 }

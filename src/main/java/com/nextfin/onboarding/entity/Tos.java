@@ -2,6 +2,7 @@ package com.nextfin.onboarding.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -23,9 +24,10 @@ public class Tos {
     private String version;
 
     @Lob
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
+    @CreationTimestamp
     @Column(name = "published_at", nullable = false)
     private LocalDateTime publishedAt;
 

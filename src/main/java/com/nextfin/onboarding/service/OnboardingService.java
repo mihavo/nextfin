@@ -5,8 +5,10 @@ import com.nextfin.auth.enums.OnboardingStep;
 import com.nextfin.holder.dto.CreateHolderDto;
 import com.nextfin.holder.entity.Holder;
 import com.nextfin.holder.service.HolderService;
+import com.nextfin.onboarding.entity.Tos;
 import com.nextfin.onboarding.entity.TosAcceptance;
 import com.nextfin.onboarding.repository.TosAcceptanceRepository;
+import com.nextfin.onboarding.repository.TosRepository;
 import com.nextfin.users.entity.User;
 import com.nextfin.users.service.UserService;
 import jakarta.validation.Valid;
@@ -23,6 +25,7 @@ public class OnboardingService {
     private final HolderService holderService;
 
     private final TosAcceptanceRepository tosAcceptanceRepository;
+    private final TosRepository tosRepository;
 
     public OnboardingStep getCurrentUserOnboardingStep() {
         User user = userService.getCurrentUser();
@@ -49,5 +52,10 @@ public class OnboardingService {
         TosAcceptance acceptance = TosAcceptance.builder().acceptanceDate(LocalDateTime.now()).tosVersion(
                 AppConstants.LATEST_TOS_VERSION).build();
         return tosAcceptanceRepository.save(acceptance);
+    }
+
+    public Tos getTermsOfService() {
+        return tosRepository.findByVersion(AppConstants.LATEST_TOS_VERSION).orElseThrow(
+                () -> new IllegalStateException("Terms of Service not found for version: " + AppConstants.LATEST_TOS_VERSION));
     }
 }
