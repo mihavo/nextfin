@@ -1,6 +1,7 @@
 package com.nextfin.onboarding.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Pattern;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -21,9 +22,9 @@ public class Tos {
     private UUID id;
 
     @Column(nullable = false, unique = true)
+    @Pattern(regexp = "^\\d+\\.\\d+$", message = "Version must be in the format x.x")
     private String version;
 
-    @Lob
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
