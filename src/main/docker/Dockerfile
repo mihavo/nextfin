@@ -1,13 +1,19 @@
-FROM maven:latest as maven-builder
+FROM gradle:8.5-jdk21 AS gradle-builder
 
+# Copy source and build files
 COPY src /app/src
-COPY pom.xml /app
+COPY build.gradle* settings.gradle* /app/
+COPY gradlew* /app/
+COPY gradle /app/gradle
+WORKDIR /app
 
-RUN mvn -f /app/pom.xml clean package -DskipTests
+# Ensure proper permissions and run build
+RUN chmod +x ./gradlew
+RUN ./gradlew --no-daemon build -x test
 
 FROM openjdk:21
 
-COPY --from=maven-builder /app/target/*.jar /app-artifact/nextfin.jar
+COPY --from=gradle-builder /app/build/libs/*.jar /app-artifact/nextfin.jar
 WORKDIR /app-artifact
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "nextfin.jar"]

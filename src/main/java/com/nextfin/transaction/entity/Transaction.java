@@ -55,6 +55,7 @@ public class Transaction {
     private String targetName;
 
     @Column(name = "category", nullable = false)
+    @Builder.Default
     private TransactionCategory category = TransactionCategory.TRANSFERS;
     
     @Enumerated
