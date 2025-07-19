@@ -8,5 +8,5 @@ import lombok.Data;
 @Builder
 public class OnboardingStatusDto {
     boolean onboardingComplete;
-    OnboardingStep stage;
+    OnboardingStep step;
 }

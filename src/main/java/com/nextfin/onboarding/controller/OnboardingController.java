@@ -32,14 +32,14 @@ public class OnboardingController {
     public ResponseEntity<OnboardingStatusDto> getStatus() {
         OnboardingStep currentStep = onboardingService.getCurrentUserOnboardingStep();
         boolean isOnboardingComplete = currentStep.equals(OnboardingStep.COMPLETED);
-        return new ResponseEntity<>(OnboardingStatusDto.builder().onboardingComplete(isOnboardingComplete).stage(currentStep)
+        return new ResponseEntity<>(OnboardingStatusDto.builder().onboardingComplete(isOnboardingComplete).step(currentStep)
                                                        .build(), HttpStatus.OK);
     }
 
     @PostMapping("/create-holder")
     public ResponseEntity<SuccessfulOnboardingStepDto<Holder>> createHolder(@Valid @RequestBody CreateHolderDto request) {
         Holder holder = onboardingService.createHolder(request);
-        OnboardingStatusDto status = OnboardingStatusDto.builder().onboardingComplete(false).stage(
+        OnboardingStatusDto status = OnboardingStatusDto.builder().onboardingComplete(false).step(
                 OnboardingStep.HOLDER_CREATION.next()).build();
         SuccessfulOnboardingStepDto<Holder> response = SuccessfulOnboardingStepDto.<Holder>builder().onboardingStatus(status)
                                                                                   .stepData(holder).build();
@@ -49,7 +49,7 @@ public class OnboardingController {
     @PostMapping("/accept-terms")
     public ResponseEntity<SuccessfulOnboardingStepDto<TosAcceptance>> acceptTerms() {
         TosAcceptance acceptance = onboardingService.acceptTerms();
-        OnboardingStatusDto status = OnboardingStatusDto.builder().onboardingComplete(false).stage(
+        OnboardingStatusDto status = OnboardingStatusDto.builder().onboardingComplete(false).step(
                 OnboardingStep.TOS_ACCEPTED.next()).build();
         SuccessfulOnboardingStepDto<TosAcceptance> response = SuccessfulOnboardingStepDto.<TosAcceptance>builder()
                                                                                          .onboardingStatus(status).stepData(
