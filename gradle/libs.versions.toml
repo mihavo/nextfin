@@ -35,6 +35,10 @@ org-testcontainers-junit-jupiter = "1.21.0"
 org-testcontainers-postgresql = "1.21.0"
 redis-clients-jedis = "5.2.0"
 
+
+[plugins]
+versions = { id = "org.springframework.boot", version = "3.5.0" }
+
 [libraries]
 com-fasterxml-jackson-datatype-jackson-datatype-jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310", version.ref = "com-fasterxml-jackson-datatype-jackson-datatype-jsr310" }
 com-h2database-h2 = { module = "com.h2database:h2", version.ref = "com-h2database-h2" }
