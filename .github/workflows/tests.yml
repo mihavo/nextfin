@@ -17,5 +17,5 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
-      - name: Run tests with Maven
-        run: mvn test  -Dspring.profiles.active=test
+      - name: Run tests with Gradle
+        run: ./gradlew test -Dspring.profiles.active=test
