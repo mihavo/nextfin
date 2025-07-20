@@ -11,7 +11,8 @@ org-hibernate-validator-hibernate-validator = "8.0.0.Final"
 org-iban4j-iban4j = "3.2.11-RELEASE"
 org-javamoney-moneta = "1.4.4"
 org-jobrunr-jobrunr-spring-boot-v3-starter = "8.0.0-beta.1"
-org-mapstruct-mapstruct = "1.6.0.Beta1"
+org-mapstruct-mapstruct = "1.6.3"
+org-mapstruct-mapstruct-processor = "1.6.3"
 org-postgresql-postgresql = "42.7.5"
 org-projectlombok-lombok = "1.18.38"
 org-springdoc-springdoc-openapi-starter-webmvc-ui = "2.5.0"
@@ -50,6 +51,7 @@ org-iban4j-iban4j = { module = "org.iban4j:iban4j", version.ref = "org-iban4j-ib
 org-javamoney-moneta = { module = "org.javamoney:moneta", version.ref = "org-javamoney-moneta" }
 org-jobrunr-jobrunr-spring-boot-v3-starter = { module = "org.jobrunr:jobrunr-spring-boot-3-starter", version.ref = "org-jobrunr-jobrunr-spring-boot-v3-starter" }
 org-mapstruct-mapstruct = { module = "org.mapstruct:mapstruct", version.ref = "org-mapstruct-mapstruct" }
+org-mapstruct-mapstruct-processor = { module = "org.mapstruct:mapstruct-processor", version.ref = "org-mapstruct-mapstruct-processor" }
 org-postgresql-postgresql = { module = "org.postgresql:postgresql", version.ref = "org-postgresql-postgresql" }
 org-projectlombok-lombok = { module = "org.projectlombok:lombok", version.ref = "org-projectlombok-lombok" }
 org-springdoc-springdoc-openapi-starter-webmvc-ui = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version.ref = "org-springdoc-springdoc-openapi-starter-webmvc-ui" }

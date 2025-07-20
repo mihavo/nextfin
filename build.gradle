@@ -17,6 +17,10 @@ repositories {
     }
 }
 
+configurations {
+    all*.exclude module: 'spring-boot-starter-logging'
+}
+
 dependencies {
     api libs.org.springframework.boot.spring.boot.starter
     api libs.org.springframework.boot.spring.boot.starter.data.jpa
@@ -27,7 +31,8 @@ dependencies {
     api libs.org.projectlombok.lombok
     annotationProcessor libs.org.projectlombok.lombok
     api libs.org.mapstruct.mapstruct
-    annotationProcessor libs.org.mapstruct.mapstruct
+    annotationProcessor libs.org.mapstruct.mapstruct.processor
+    annotationProcessor libs.org.projectlombok.lombok
     api libs.org.javamoney.moneta
     api libs.org.springdoc.springdoc.openapi.starter.webmvc.ui
     api libs.org.springframework.boot.spring.boot.starter.actuator
@@ -53,6 +58,7 @@ dependencies {
     testImplementation libs.org.testcontainers.junit.jupiter
     testImplementation libs.org.testcontainers.postgresql
     testAnnotationProcessor libs.org.projectlombok.lombok
+    testAnnotationProcessor libs.org.mapstruct.mapstruct.processor
 }
 
 group = 'com.mihavo'
