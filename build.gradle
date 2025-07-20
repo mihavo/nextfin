@@ -55,7 +55,7 @@ dependencies {
     testAnnotationProcessor libs.org.projectlombok.lombok
 }
 
-group = 'com.michaelvol'
+group = 'com.mihavo'
 version = '0.0.6'
 description = 'nextfin'
 java.sourceCompatibility = JavaVersion.VERSION_21
