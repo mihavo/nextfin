@@ -37,9 +37,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      - name: Build Spring Boot application
-        run: ./gradlew bootJar -x test
-
       - name: Bump Version
         id: bump
         uses: Plugily-Projects/version-bump-action@v6
@@ -53,6 +50,9 @@ jobs:
       
       - name: Store New Version in GITHUB_ENV
         run: echo "VERSION=${{steps.bump.outputs.version}}" >> $GITHUB_ENV
+
+      - name: Build Spring Boot application
+        run: ./gradlew bootJar -x test
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
