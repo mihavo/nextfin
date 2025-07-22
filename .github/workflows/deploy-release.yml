@@ -61,6 +61,6 @@ jobs:
           name: Release ${{ env.VERSION }}
           draft: false
           prerelease: false
-          files: target/*.jar
+          files: build/libs/*.jar
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
