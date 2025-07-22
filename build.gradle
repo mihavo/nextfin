@@ -62,7 +62,7 @@ dependencies {
 }
 
 group = 'com.mihavo'
-version = '0.0.7'
+version = '0.0.8'
 description = 'nextfin'
 java.sourceCompatibility = JavaVersion.VERSION_21
 
