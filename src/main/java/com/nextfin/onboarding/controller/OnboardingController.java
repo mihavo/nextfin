@@ -9,16 +9,12 @@ import com.nextfin.holder.entity.Holder;
 import com.nextfin.onboarding.entity.Tos;
 import com.nextfin.onboarding.entity.TosAcceptance;
 import com.nextfin.onboarding.service.OnboardingService;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(AppConstants.API_BASE_URL + "/onboarding")
@@ -50,7 +46,7 @@ public class OnboardingController {
     public ResponseEntity<SuccessfulOnboardingStepDto<TosAcceptance>> acceptTerms() {
         TosAcceptance acceptance = onboardingService.acceptTerms();
         OnboardingStatusDto status = OnboardingStatusDto.builder().onboardingComplete(false).step(
-                OnboardingStep.TOS_ACCEPTED.next()).build();
+                OnboardingStep.TOS_ACCEPTANCE.next()).build();
         SuccessfulOnboardingStepDto<TosAcceptance> response = SuccessfulOnboardingStepDto.<TosAcceptance>builder()
                                                                                          .onboardingStatus(status).stepData(
                         acceptance).build();

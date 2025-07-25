@@ -10,8 +10,8 @@ import com.nextfin.onboarding.entity.TosAcceptance;
 import com.nextfin.onboarding.repository.TosAcceptanceRepository;
 import com.nextfin.onboarding.repository.TosRepository;
 import com.nextfin.users.entity.User;
+import com.nextfin.users.repository.UserRepository;
 import com.nextfin.users.service.UserService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -26,13 +26,14 @@ public class OnboardingService {
 
     private final TosAcceptanceRepository tosAcceptanceRepository;
     private final TosRepository tosRepository;
+    private final UserRepository userRepository;
 
     public OnboardingStep getCurrentUserOnboardingStep() {
         User user = userService.getCurrentUser();
         return user.getOnboardingStep();
     }
 
-    public Holder createHolder(@Valid CreateHolderDto request) {
+    public Holder createHolder(CreateHolderDto request) {
         User user = userService.getCurrentUser();
         OnboardingStep currentStep = user.getOnboardingStep();
         if (!currentStep.equals(OnboardingStep.HOLDER_CREATION)) {
@@ -40,18 +41,22 @@ public class OnboardingService {
         }
         Holder holder = holderService.createHolder(request, user);
         user.setOnboardingStep(currentStep.next());
+        userRepository.save(user);
         return holder;
     }
 
     public TosAcceptance acceptTerms() {
         User user = userService.getCurrentUser();
         OnboardingStep currentStep = user.getOnboardingStep();
-        if (!currentStep.equals(OnboardingStep.TOS_ACCEPTED)) {
+        if (!currentStep.equals(OnboardingStep.TOS_ACCEPTANCE)) {
             throw new IllegalStateException("Cannot accept terms at this step: " + currentStep);
         }
         TosAcceptance acceptance = TosAcceptance.builder().acceptanceDate(LocalDateTime.now()).tosVersion(
                 AppConstants.LATEST_TOS_VERSION).build();
-        return tosAcceptanceRepository.save(acceptance);
+        TosAcceptance tosAcceptance = tosAcceptanceRepository.save(acceptance);
+        user.setOnboardingStep(currentStep.next());
+        userRepository.save(user);
+        return tosAcceptance;
     }
 
     public Tos getTermsOfService() {
