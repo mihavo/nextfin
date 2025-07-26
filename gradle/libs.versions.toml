@@ -10,27 +10,29 @@ net-datafaker-datafaker = "2.3.0"
 org-hibernate-validator-hibernate-validator = "8.0.0.Final"
 org-iban4j-iban4j = "3.2.11-RELEASE"
 org-javamoney-moneta = "1.4.4"
+org-jboss-logging-jboss-logging = "3.6.1.Final"
+org-jetbrains-kotlin-kotlin-reflect = "1.9.10"
 org-jobrunr-jobrunr-spring-boot-v3-starter = "8.0.0-beta.1"
 org-mapstruct-mapstruct = "1.6.3"
 org-mapstruct-mapstruct-processor = "1.6.3"
 org-postgresql-postgresql = "42.7.5"
 org-projectlombok-lombok = "1.18.38"
 org-springdoc-springdoc-openapi-starter-webmvc-ui = "2.5.0"
-org-springframework-boot-spring-boot-devtools = "3.5.0"
-org-springframework-boot-spring-boot-starter = "3.5.0"
-org-springframework-boot-spring-boot-starter-actuator = "3.5.0"
-org-springframework-boot-spring-boot-starter-data-jpa = "3.5.0"
-org-springframework-boot-spring-boot-starter-log4j2 = "3.5.0"
-org-springframework-boot-spring-boot-starter-oauth2-client = "3.5.0"
-org-springframework-boot-spring-boot-starter-security = "3.5.0"
-org-springframework-boot-spring-boot-starter-test = "3.5.0"
-org-springframework-boot-spring-boot-starter-web = "3.5.0"
-org-springframework-boot-spring-boot-testcontainers = "3.5.0"
+org-springframework-boot-spring-boot-devtools = "4.0.0-M1"
+org-springframework-boot-spring-boot-starter = "4.0.0-M1"
+org-springframework-boot-spring-boot-starter-actuator = "4.0.0-M1"
+org-springframework-boot-spring-boot-starter-data-jpa = "4.0.0-M1"
+org-springframework-boot-spring-boot-starter-log4j2 = "4.0.0-M1"
+org-springframework-boot-spring-boot-starter-oauth2-client = "4.0.0-M1"
+org-springframework-boot-spring-boot-starter-security = "4.0.0-M1"
+org-springframework-boot-spring-boot-starter-test = "4.0.0-M1"
+org-springframework-boot-spring-boot-starter-web = "4.0.0-M1"
+org-springframework-boot-spring-boot-testcontainers = "4.0.0-M1"
 org-springframework-data-spring-data-redis = "3.4.3"
 org-springframework-kafka-spring-kafka = "3.3.4"
 org-springframework-security-spring-security-test = "6.5.0"
-org-springframework-session-spring-session-data-redis = "3.5.0"
-org-springframework-session-spring-session-jdbc = "3.5.0"
+org-springframework-session-spring-session-data-redis = "4.0.0-M1"
+org-springframework-session-spring-session-jdbc = "4.0.0-M1"
 org-springframework-spring-webflux = "6.2.7"
 org-testcontainers-junit-jupiter = "1.21.0"
 org-testcontainers-postgresql = "1.21.0"
@@ -38,7 +40,7 @@ redis-clients-jedis = "5.2.0"
 
 
 [plugins]
-versions = { id = "org.springframework.boot", version = "3.5.0" }
+versions = { id = "org.springframework.boot", version = "4.0.0-M1" }
 
 [libraries]
 com-fasterxml-jackson-datatype-jackson-datatype-jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310", version.ref = "com-fasterxml-jackson-datatype-jackson-datatype-jsr310" }
@@ -49,6 +51,8 @@ net-datafaker-datafaker = { module = "net.datafaker:datafaker", version.ref = "n
 org-hibernate-validator-hibernate-validator = { module = "org.hibernate.validator:hibernate-validator", version.ref = "org-hibernate-validator-hibernate-validator" }
 org-iban4j-iban4j = { module = "org.iban4j:iban4j", version.ref = "org-iban4j-iban4j" }
 org-javamoney-moneta = { module = "org.javamoney:moneta", version.ref = "org-javamoney-moneta" }
+org-jboss-logging-jboss-logging = { module = "org.jboss.logging:jboss-logging", version.ref = "org-jboss-logging-jboss-logging" }
+org-jetbrains-kotlin-kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "org-jetbrains-kotlin-kotlin-reflect" }
 org-jobrunr-jobrunr-spring-boot-v3-starter = { module = "org.jobrunr:jobrunr-spring-boot-3-starter", version.ref = "org-jobrunr-jobrunr-spring-boot-v3-starter" }
 org-mapstruct-mapstruct = { module = "org.mapstruct:mapstruct", version.ref = "org-mapstruct-mapstruct" }
 org-mapstruct-mapstruct-processor = { module = "org.mapstruct:mapstruct-processor", version.ref = "org-mapstruct-mapstruct-processor" }

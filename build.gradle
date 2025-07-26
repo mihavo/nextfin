@@ -34,7 +34,13 @@ dependencies {
     annotationProcessor libs.org.mapstruct.mapstruct.processor
     annotationProcessor libs.org.projectlombok.lombok
     api libs.org.javamoney.moneta
-    api libs.org.springdoc.springdoc.openapi.starter.webmvc.ui
+    api libs.org.jetbrains.kotlin.kotlin.reflect
+    api libs.org.jboss.logging.jboss.logging
+    api(libs.org.springdoc.springdoc.openapi.starter.webmvc.ui) {
+        exclude group: 'org.springdoc', module: 'springdoc-openapi-kotlin'
+        exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib'
+        exclude group: 'org.jetbrains.kotlin', module: 'kotlin-reflect'
+    }
     api libs.org.springframework.boot.spring.boot.starter.actuator
     api libs.org.springframework.boot.spring.boot.starter.log4j2
     api libs.org.springframework.session.spring.session.jdbc

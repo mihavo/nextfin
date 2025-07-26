@@ -12,7 +12,6 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
-import org.hibernate.annotations.Check;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.security.core.GrantedAuthority;
@@ -23,8 +22,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "users")
-@Check(constraints = "(auth_provider != 'local') OR (hashed_password IS NOT NULL)")
+@Table(name = "users", check = {@CheckConstraint(constraint = "(auth_provider != 'local') OR (hashed_password IS NOT NULL)")})
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder

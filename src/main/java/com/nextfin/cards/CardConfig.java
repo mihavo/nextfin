@@ -12,6 +12,6 @@ public class CardConfig {
 
     @Bean
     public Faker FakerConfig() {
-        return new Faker(new Locale(LocaleContextHolder.getLocale().toLanguageTag()));
+        return new Faker(Locale.forLanguageTag(LocaleContextHolder.getLocale().toLanguageTag()));
     }
 }
