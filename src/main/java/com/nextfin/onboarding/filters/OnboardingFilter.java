@@ -1,5 +1,6 @@
 package com.nextfin.onboarding.filters;
 
+import com.nextfin.AppConstants;
 import com.nextfin.auth.enums.OnboardingStep;
 import com.nextfin.onboarding.service.OnboardingService;
 import jakarta.servlet.FilterChain;
@@ -36,7 +37,9 @@ public class OnboardingFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return authentication == null || !authentication.isAuthenticated() || authentication.getPrincipal().equals(
-                "anonymousUser");
+        boolean isUnauthenticated = authentication == null || !authentication.isAuthenticated() || authentication.getPrincipal()
+                                                                                                                 .equals("anonymousUser");
+        boolean isOnboardingPath = request.getRequestURI().startsWith(AppConstants.API_BASE_URL + "/onboarding");
+        return isUnauthenticated || isOnboardingPath;
     }
 }
