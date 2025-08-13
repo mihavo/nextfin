@@ -2,6 +2,7 @@ package com.nextfin.onboarding.service;
 
 import com.nextfin.AppConstants;
 import com.nextfin.auth.enums.OnboardingStep;
+import com.nextfin.comms.verification.EmailVerificationService;
 import com.nextfin.holder.dto.CreateHolderDto;
 import com.nextfin.holder.entity.Holder;
 import com.nextfin.holder.service.HolderService;
@@ -12,6 +13,7 @@ import com.nextfin.onboarding.repository.TosRepository;
 import com.nextfin.users.entity.User;
 import com.nextfin.users.repository.UserRepository;
 import com.nextfin.users.service.UserService;
+import com.twilio.rest.verify.v2.service.Verification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +25,7 @@ public class OnboardingService {
 
     private final UserService userService;
     private final HolderService holderService;
+    private final EmailVerificationService emailVerificationService;
 
     private final TosAcceptanceRepository tosAcceptanceRepository;
     private final TosRepository tosRepository;
@@ -51,7 +54,7 @@ public class OnboardingService {
         if (!currentStep.equals(OnboardingStep.TOS_ACCEPTANCE)) {
             throw new IllegalStateException("Cannot accept terms at this step: " + currentStep);
         }
-        TosAcceptance acceptance = TosAcceptance.builder().acceptanceDate(LocalDateTime.now()).tosVersion(
+        TosAcceptance acceptance = TosAcceptance.builder().user(user).acceptanceDate(LocalDateTime.now()).tosVersion(
                 AppConstants.LATEST_TOS_VERSION).build();
         TosAcceptance tosAcceptance = tosAcceptanceRepository.save(acceptance);
         user.setOnboardingStep(currentStep.next());
@@ -62,5 +65,23 @@ public class OnboardingService {
     public Tos getTermsOfService() {
         return tosRepository.findByVersion(AppConstants.LATEST_TOS_VERSION).orElseThrow(
                 () -> new IllegalStateException("Terms of Service not found for version: " + AppConstants.LATEST_TOS_VERSION));
+    }
+
+    public Verification verifyEmail() {
+        User user = userService.getCurrentUser();
+        OnboardingStep currentStep = user.getOnboardingStep();
+        if (!currentStep.equals(OnboardingStep.EMAIL_VERIFICATION)) {
+            throw new IllegalStateException("Cannot verify email at this step: " + currentStep);
+        }
+        return emailVerificationService.sendEmailVerificationCode(user.getEmail());
+    }
+
+    public void validateEmailOtp(String code) {
+        User user = userService.getCurrentUser();
+        OnboardingStep currentStep = user.getOnboardingStep();
+        if (!currentStep.equals(OnboardingStep.EMAIL_VERIFICATION)) {
+            throw new IllegalStateException("Cannot verify email at this step: " + currentStep);
+        }
+        emailVerificationService.validateEmailVerificationCode(user.getEmail(), code);
     }
 }

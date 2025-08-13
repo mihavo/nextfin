@@ -9,9 +9,12 @@ import com.nextfin.holder.entity.Holder;
 import com.nextfin.onboarding.entity.Tos;
 import com.nextfin.onboarding.entity.TosAcceptance;
 import com.nextfin.onboarding.service.OnboardingService;
+import com.twilio.rest.verify.v2.service.Verification;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 public class OnboardingController {
 
     private final OnboardingService onboardingService;
+    private final MessageSource messageSource;
 
     @GetMapping("/status")
     public ResponseEntity<OnboardingStatusDto> getStatus() {
@@ -52,6 +56,25 @@ public class OnboardingController {
                         acceptance).build();
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
+
+    @PostMapping("/verify-email")
+    public ResponseEntity<Verification> verifyEmail() {
+        Verification verification = onboardingService.verifyEmail();
+        return new ResponseEntity<>(verification, HttpStatus.OK);
+    }
+
+    @PostMapping("/validate-email-otp")
+    public ResponseEntity<SuccessfulOnboardingStepDto<String>> validateEmailOtp(@RequestBody String code) {
+        onboardingService.validateEmailOtp(code);
+        OnboardingStatusDto status = OnboardingStatusDto.builder().onboardingComplete(true).step(
+                OnboardingStep.HOLDER_CREATION.next()).build();
+        String emailVerifiedMessage = messageSource.getMessage("onboarding.email.verified", null,
+                                                               LocaleContextHolder.getLocale());
+        SuccessfulOnboardingStepDto<String> response = SuccessfulOnboardingStepDto.<String>builder().onboardingStatus(status)
+                                                                                  .stepData(emailVerifiedMessage).build();
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
 
     @GetMapping("/terms")
     public ResponseEntity<Tos> getTermsOfService() {

@@ -97,6 +97,7 @@ public class User extends Auditable implements NextfinUserDetails {
     private OnboardingStep onboardingStep = OnboardingStep.HOLDER_CREATION;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<TosAcceptance> tosAcceptances;
 
     @Override
