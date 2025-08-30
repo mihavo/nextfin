@@ -31,7 +31,7 @@ public class EmailVerificationService {
     @PostConstruct
     private void initializeTwilio() {
         Twilio.init(accountSid, authToken);
-        log.info("2FA Initialized");
+        log.info("Email Verification Service Initialized");
     }
 
     public Verification sendEmailVerificationCode(@Email String email) {

@@ -39,7 +39,9 @@ public class OnboardingFilter extends OncePerRequestFilter {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         boolean isUnauthenticated = authentication == null || !authentication.isAuthenticated() || authentication.getPrincipal()
                                                                                                                  .equals("anonymousUser");
-        boolean isOnboardingPath = request.getRequestURI().startsWith(AppConstants.API_BASE_URL + "/onboarding");
-        return isUnauthenticated || isOnboardingPath;
+        String requestURI = request.getRequestURI();
+        boolean isOnboardingPath = requestURI.startsWith(AppConstants.API_BASE_URL + "/onboarding");
+        boolean isUserFetchPath = requestURI.equals(AppConstants.API_BASE_URL + "/auth/me");
+        return isUnauthenticated || isOnboardingPath || isUserFetchPath;
     }
 }
