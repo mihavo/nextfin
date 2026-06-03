@@ -1,10 +1,8 @@
 <p align="center">
   <a href="https://github.com/mihavo/nextfin">
-    <img src="resources/vectors/logo.png" alt="Nextfin logo" width="200" height="140">
+    <img src="resources/vectors/logo.svg" alt="Nextfin logo" width="400" height="190">
   </a>
 </p>
-
-<h3 align="center">Nextfin</h3>
 
 <p align="center">
   A secure and scalable backend platform for e-banking operations
@@ -23,11 +21,12 @@
 
 ## Table of Contents
 
-- [Overview](#overview)
-- [Features](#features)
-- [Quick Start](#quick-start)
-- [Documentation](#documentation)
-- [License](#license)
+- [Table of Contents](#table-of-contents)
+- [📖 Overview](#-overview)
+- [🌟 Features](#-features)
+- [🚀 Quick Start](#-quick-start)
+- [📚 Documentation](#-documentation)
+- [📜 License](#-license)
 
 > 📌 **See also:** [Nextfin UI](https://github.com/mihavo/nextfin-ui) — frontend app for the Nextfin platform.
 
